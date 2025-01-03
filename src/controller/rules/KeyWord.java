@@ -26,8 +26,8 @@ public class KeyWord extends RuleMandatories {
     private final int LAST_LIMIT = 200;
 
 
-    protected KeyWord(RuleType type, Repository repository) {
-        super(type, repository);
+    public KeyWord(Repository repository) {
+        super(RuleType.MANDATORY, repository);
         textFiles = repository.getTextfiles();
     }
 
