@@ -15,7 +15,7 @@ import java.util.Map;
 public final class Json {
 
     private static Map<String, List<String>> list;
-    private static final String jsonFilePath = "resources/keywords.json";
+    private static final String jsonFilePath = "src/main/resources/keywords.json";
 
 
     private Json() {
@@ -28,7 +28,7 @@ public final class Json {
     public static void setup() throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
 
-        Map<String, List<String>> list = objectMapper.readValue(new File(jsonFilePath), new TypeReference<Map<String, List<String>>>() {});
+        list = objectMapper.readValue(new File(jsonFilePath), new TypeReference<Map<String, List<String>>>() {});
 
     }
 

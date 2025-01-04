@@ -1,5 +1,6 @@
 package controller;
 
+import model.RepoList;
 import model.Repository;
 
 import java.util.ArrayList;
@@ -7,7 +8,7 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Applies the rules from the {@link controller.rules} package to the {@link model.Repository} from {@link model.RepoList}.
+ * Applies the rules from the {@link controller.rules} package to the {@link Repository} from {@link RepoList}.
  */
 public class Checker {
 
