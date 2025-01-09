@@ -19,21 +19,18 @@ public class RepoListManager {
      */
     private final int THRESHOLD = 10;
 
+    private final int REFILL_AMOUNT = 10;
+
     /**
      * Amount of unprocessed, ready repositories.
      */
     private int unprocessedRepos = 0;
 
 
-    public void saveResult(Repository repo) {
-        // save the result
-    }
 
-    public Repository getNextRepo() throws TimeoutException {
-        unprocessedRepos--;
-        if (unprocessedRepos < THRESHOLD) {
-            getNewRepos();
-        }
+    public synchronized Repository getNextRepo() throws TimeoutException {
+        checkRepoAmount();
+
 
         // if no new repositories are available, wait for 10 seconds.
         // If still no new repositories are available, throw a TimeoutException
@@ -49,6 +46,8 @@ public class RepoListManager {
             }
             throw new TimeoutException("No new repositories available.");
         }
+        unprocessedRepos--;
+
         return repoList.getNext();
     }
 

@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
- * Implements the requests, the rules in {@link java.java.controller.rules} can ask.
+ * Implements the requests, the rules in {@link controller.rules} can ask.
  */
 public class Repository {
 

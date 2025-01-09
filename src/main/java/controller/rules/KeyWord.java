@@ -7,6 +7,7 @@ import util.Json;
 import model.TextFile;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -16,7 +17,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class KeyWord extends RuleMandatories {
 
     private final String[] KEYWORDS = Json.getAllKeywords();
-    private final ArrayList<TextFile> textFiles;
+    private final List<TextFile> textFiles;
 
     // The limits determine, how many keywords need to be found for a point.
     private final int FIRST_LIMIT = 1;

@@ -31,7 +31,7 @@ public class RepoList {
         return instance;
     }
 
-    public Repository getNext() {
+    public synchronized Repository getNext() {
         if (repos.isEmpty()) {
             return null;
         }

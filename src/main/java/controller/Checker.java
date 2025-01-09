@@ -15,7 +15,7 @@ public class Checker {
     private RuleCollection rules;
     private final RepoListManager listManager = new RepoListManager();
 
-    private Checker() {
+    public Checker() {
         rules = new RuleCollection();
     }
 
