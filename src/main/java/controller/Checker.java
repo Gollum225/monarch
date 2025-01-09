@@ -24,9 +24,8 @@ public class Checker {
      * Apply the list of rules to the given amount of repositories.
      *
      * @param amount of repositories to be checked
-     * @throws TimeoutException, if no new repositories are available after 10 seconds
      */
-    public void checkRepos(int amount) throws TimeoutException {
+    public void checkRepos(int amount) {
         AtomicInteger unprocessedRepos = new AtomicInteger(amount);
         ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
         CompletionService<Void> completionService = new ExecutorCompletionService<>(executor);

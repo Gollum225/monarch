@@ -60,6 +60,8 @@ public class RepoListManager {
      * @param repo
      */
     public void finishRepo(Repository repo) {
+        repo.finish();
+        System.out.println("\u001B[32m" + "repo: " + repo.getRepositoryName() + " of " + repo.getOwner() + " got: " + repo.getOverallPoints() + " points" + "\u001B[0m");
      //TODO
     }
 }

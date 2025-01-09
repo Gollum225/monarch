@@ -1,5 +1,6 @@
 package model;
 
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 
 /**
@@ -13,7 +14,9 @@ public class RepoList {
      * List of {@link Repository}.
      * Set up as a Queue.
      */
-    private LinkedHashSet<Repository> repos = new LinkedHashSet<>();
+    private LinkedHashSet<Repository> unprocessedRepos = new LinkedHashSet<>();
+    private LinkedHashSet<Repository> startedRepos = new LinkedHashSet<>();
+
 
     private RepoList() {
     }
@@ -32,14 +35,16 @@ public class RepoList {
     }
 
     public synchronized Repository getNext() {
-        if (repos.isEmpty()) {
+        if (unprocessedRepos.isEmpty()) {
             return null;
         }
-        return repos.iterator().next();
+        Repository currentRepo = unprocessedRepos.removeFirst();
+        startedRepos.add(currentRepo);
+        return currentRepo;
     }
 
     public int size() {
-        return repos.size();
+        return unprocessedRepos.size();
     }
 
     /**
@@ -50,8 +55,18 @@ public class RepoList {
     public boolean addRepo(Repository[] repos) {
         boolean everythingNew = true;
         for (Repository repo : repos) {
-            everythingNew = this.repos.add(repo);
+            everythingNew = this.unprocessedRepos.add(repo);
         }
         return everythingNew;
+    }
+
+    /**
+     * Adds a single {@link Repository} to the list.
+     * @param repo to be added
+     * @return true, if the repo is new and could be added
+     */
+    public boolean addRepo(Repository repo) {
+        System.out.println("Added repo: " + repo.getRepositoryName() + " by " + repo.getOwner());
+        return unprocessedRepos.add(repo);
     }
 }
