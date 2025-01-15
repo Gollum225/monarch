@@ -15,29 +15,43 @@ import java.util.Map;
  */
 public class Repository implements RepoFunctions {
 
-    public String getRepositoryName() {
-        return repositoryName;
-    }
 
     // uniquely identifies a repository
     private final String repositoryName;
-
-    public String getOwner() {
-        return owner;
-    }
-
     private final String owner;
+
+    /**
+     * All request will be called on the cache.
+     */
     private final RepoCache cache;
 
+    private boolean isCloned = false;
+
+    /**
+     * Constructor for the Repository.
+     * @param repositoryName name of the repository to uniquely identify it with the {@link #owner}
+     * @param owner owner of the repository
+     */
     public Repository(String repositoryName, String owner) {
         this.repositoryName = repositoryName;
         this.owner = owner;
         this.cache = new RepoCache(repositoryName, owner);
     }
 
+    /**
+     * Maps the rule to the points it has given.
+     */
     private HashMap<Class<? extends RuleMandatories>, Integer> results = new HashMap<>();
 
     private int overallPoints = 0;
+
+    public String getRepositoryName() {
+        return repositoryName;
+    }
+
+    public String getOwner() {
+        return owner;
+    }
 
     public List<TextFile> getTextfiles() {
         String repoIdentifier ="repository: " + repositoryName + " of owner: " + owner;
