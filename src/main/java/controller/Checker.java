@@ -28,6 +28,18 @@ public class Checker {
     public void checkRepos(int amount) {
         AtomicInteger unprocessedRepos = new AtomicInteger(amount);
         ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+        CompletionService<Void> completionService = getVoidCompletionService(amount, executor);
+
+        try {
+            for (int i = 0; i < amount; i++) {
+                completionService.take().get();
+            }
+        } catch (ExecutionException | InterruptedException e) {
+            throw new RuntimeException("Error while processing repos", e);
+            //TODO: handle exception
+        } finally {
+            executor.shutdown();
+        }
         CompletionService<Void> completionService = new ExecutorCompletionService<>(executor);
 
         for (int i = 0; i < amount; i++) {
@@ -44,19 +56,7 @@ public class Checker {
                 return null;
             });
         }
-
-        try {
-            for (int i = 0; i < amount; i++) {
-                completionService.take().get();
-            }
-        } catch (ExecutionException | InterruptedException e) {
-            throw new RuntimeException("Error while processing repos", e);
-            //TODO: handle exception
-        } finally {
-            executor.shutdown();
-        }
-
-
+        return completionService;
     }
 
 }
