@@ -88,8 +88,8 @@ public class Repository implements RepoFunctions {
     }
 
     @Override
-    public String getFile(String path) {
-        return cache.getFile(path);
+    public String getFile(String path, String url) {
+        return cache.getFile(path, url);
     }
 
     public int saveResult(Class<? extends RuleMandatories> rule, int points) {
