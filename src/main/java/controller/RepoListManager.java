@@ -51,8 +51,22 @@ public class RepoListManager {
         return repoList.getNext();
     }
 
-    private void getNewRepos() {
-        //TODO: get new repositories
+    private void getNewRepos(int amount) {
+
+        List<Repository> repos;
+        try {
+             repos = GithubCommunication.getRepository(amount);
+        } catch (JsonProcessingException e) {
+            throw new InputMismatchException("Error while getting new repositories.");
+        }
+
+        for (Repository repo : repos) {
+            if (repoList.addRepo(repo)) {
+                unprocessedRepos++;
+            }
+        }
+
+        checkRepoAmount();
     }
 
     /**
