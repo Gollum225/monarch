@@ -1,7 +1,10 @@
 package util;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import model.Repository;
 
 import java.io.File;
 import java.io.IOException;
@@ -58,6 +61,33 @@ public final class Json {
 
         return allKeywords.toArray(new String[0]);
     }
+
+    public static List<Repository> parseRepositories(String jsonResponse) throws JsonProcessingException {
+        // Jackson ObjectMapper
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        // Die JSON-Response als JsonNode parsen
+        JsonNode rootNode = objectMapper.readTree(jsonResponse);
+
+        // Den Pfad zur "edges"-Liste finden
+        JsonNode edges = rootNode.at("/data/search/edges");
+
+        // Liste für die Ergebnisse
+        List<Repository> repositories = new ArrayList<>();
+
+        // Über die Knoten in der "edges"-Liste iterieren
+        for (JsonNode edge : edges) {
+            JsonNode node = edge.get("node");
+            String name = node.get("name").asText(); // Repository-Name
+            String owner = node.get("owner").get("login").asText(); // Owner-Login
+
+            // Repository-Objekt erstellen und zur Liste hinzufügen
+            repositories.add(new Repository(name, owner));
+        }
+
+        return repositories;
+    }
+
 
 
 
