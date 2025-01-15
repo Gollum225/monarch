@@ -42,9 +42,10 @@ public class Repository implements RepoFunctions {
     public List<TextFile> getTextfiles() {
         String repoIdentifier ="repository: " + repositoryName + " of owner: " + owner;
         Map<String, String> textFileUrl = new HashMap<>();
-        List <TextFile> textFiles = new ArrayList<>();
-        JsonNode structure = getStructure();
-        JsonNode tree = structure.get("tree");
+        List <JsonNode> foundTextFiles = new ArrayList<>();
+
+        List <TextFile> parsedTextFiles = new ArrayList<>();
+        JsonNode tree = getStructure();
         if (tree == null || !tree.isArray()) {
             System.out.println("No files found in " + repoIdentifier);
             return new ArrayList<TextFile>();
@@ -60,9 +61,10 @@ public class Repository implements RepoFunctions {
                         path.endsWith(".markdown") ||
                         path.endsWith(".rst") ||
                         path.endsWith(".adoc") ||
-                        path.endsWith(".pdf") ||
+                        //path.endsWith(".pdf") ||
                         path.endsWith(".docx")) {
                     textFileUrl.put(entry.get("url").asText(), path);
+                    foundTextFiles.add(entry);
                     textFileCount++;
 
 
@@ -70,16 +72,18 @@ public class Repository implements RepoFunctions {
             }
         }
         System.out.println("Found " + textFileCount + " textfiles in " + repoIdentifier);
-        for (Map.Entry<String, String> url: textFileUrl.entrySet()) {
-            String content = getFile(url.getKey());
+        for (JsonNode file: foundTextFiles) {
+            String url = file.get("url").asText();
+            String path = file.get("path").asText();
+            String content = getFile(path, url);
             if (content != null) {
-                TextFile textFile = new TextFile(url.getKey(), url.getValue(), content);
+                TextFile textFile = new TextFile(url, path, content);
                 //System.out.println("Found text file: " + textFile.getPath());
-                textFiles.add(textFile);
+                parsedTextFiles.add(textFile);
                 //System.out.println("Remaining textfiles of " + repoIdentifier + ": " + textFileCount--);
             }
         }
-        return textFiles;
+        return parsedTextFiles;
     }
 
     @Override
