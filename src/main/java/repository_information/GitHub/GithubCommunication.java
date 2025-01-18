@@ -183,16 +183,12 @@ public final class GithubCommunication implements GitMandatories {
         return new String(decodedBytes);
     }
 
-    public static boolean cloneRepo(String owner, String repo) {
+    public static boolean cloneRepo(String owner, String repo, Path path) {
 
         String repoUrl = "https://github.com/" + owner + "/" + repo + ".git";
 
-        String targetDirectory = "C:\\Users\\colin\\Documents\\Programmierprojekt\\monarch\\src\\main\\resources\\cloned_repos\\" + owner + "\\" + repo;
-
-        Path path = new File(targetDirectory).toPath();
-
         if (path.toFile().exists()) {
-            System.out.println("Repository already cloned to: " + targetDirectory);
+            System.out.println("Repository already cloned to: " + path);
             return true;
         }
 
@@ -200,14 +196,14 @@ public final class GithubCommunication implements GitMandatories {
             Git.cloneRepository()
                     .setURI(repoUrl)
                     .setCredentialsProvider(new UsernamePasswordCredentialsProvider("Gollum225", ACCESS_TOKEN))
-                    .setDirectory(new File(targetDirectory))
+                    .setDirectory(path.toFile())
                     .call();
 
         } catch (GitAPIException | InvalidPathException e) {
             System.err.println("couldn't clone: " + e.getMessage());
             return false;
         }
-        System.out.println("Repository cloned to: " + targetDirectory);
+        System.out.println("Repository cloned to: " + path);
         return true;
     }
 

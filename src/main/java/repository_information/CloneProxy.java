@@ -18,7 +18,6 @@ import static util.Globals.CLONED_REPOS_PATH;
 
 public class CloneProxy extends AbstractProxy{
 
-    private final String repoPath = CLONED_REPOS_PATH + "/" + owner + "/" + repositoryName;
 
 
     public CloneProxy(String repositoryName, String owner, RepoCache cache) {
@@ -39,19 +38,19 @@ public class CloneProxy extends AbstractProxy{
 
     @Override
     public String getFile(String path, String url) {
-        path = repoPath + "/" + path;
+        Path filePath = repoPath.resolve(path);
         try {
-            return Files.readString(Path.of(path));
+            return Files.readString(filePath);
 
         } catch (IOException e) {
-            System.err.println("Local file not found: " + path);
+            System.err.println("Local file not found: " + filePath);
             return "";
         }
     }
 
-    private List<JsonNode> getStructure(String path) {
+    private List<JsonNode> getStructure(Path repoPath) {
+        String path = repoPath.toString();
         File folder = new File(path);
-        //String path2 = path.replaceAll("\\\\", "/");
         List<JsonNode> files = new ArrayList<>();
 
         ObjectMapper mapper = new ObjectMapper();
@@ -70,7 +69,7 @@ public class CloneProxy extends AbstractProxy{
                 int length = path.length();
                 node.put("path", file.getAbsolutePath().substring(length + 1));
                 node.put("type", "tree");
-                List<JsonNode> newFiles = new ArrayList<>(getStructure(file.getAbsolutePath()));
+                List<JsonNode> newFiles = new ArrayList<>(getStructure(Path.of(file.getAbsolutePath())));
                 if (!newFiles.isEmpty()) {
                     files.addAll(newFiles);
                 }
