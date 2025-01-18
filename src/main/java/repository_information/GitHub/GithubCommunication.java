@@ -1,4 +1,4 @@
-package repository_information;
+package repository_information.GitHub;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -13,18 +13,20 @@ import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
+import org.eclipse.jgit.dircache.InvalidPathException;
+import repository_information.GitMandatories;
 import util.Json;
 
 
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.*;
-import java.nio.file.InvalidPathException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.nio.file.Path;
 import java.util.Base64;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -35,6 +37,8 @@ public final class GithubCommunication implements GitMandatories {
 
 
     private static final String ACCESS_TOKEN = System.getenv("GitHub_API");
+
+    private static final GithubRateLimitCheck rateLimitCheck = GithubRateLimitCheck.getInstance();
 
     private GithubCommunication() {
         throw new UnsupportedOperationException("Utility-class shouldn't be instantiated.");
@@ -132,8 +136,15 @@ public final class GithubCommunication implements GitMandatories {
         // Statuscode überprüfen
         int responseCode = connection.getResponseCode();
         if (responseCode != 200) {
-            throw new RuntimeException("Fehler: HTTP-Code " + responseCode);
+            System.err.println("Error while getting GitHub response. Code: " + responseCode);
+            return "";
         }
+
+        // Set the Rate Limit tracker.
+        rateLimitCheck.setRateLimit(RateResource.valueOf(connection.getHeaderField("x-ratelimit-resource").toUpperCase()),
+                Integer.parseInt(connection.getHeaderField("x-ratelimit-limit")),
+                Integer.parseInt(connection.getHeaderField("x-ratelimit-remaining")),
+                new Date(Integer.parseInt(connection.getHeaderField("x-ratelimit-reset")) * 1000L));
 
         // Antwort lesen
         BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
