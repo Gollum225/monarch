@@ -23,11 +23,13 @@ public abstract class AbstractProxy implements RepoFunctions{
         return GithubCommunication.cloneRepo(owner, repositoryName);
     }
 
-    void changeToClone() {
+    boolean changeToClone() {
         System.out.println("\u001B[34m" + "Changing to clone: " + repositoryName + " of owner: " + owner + "\u001B[0m");
         if (cloneRepo()) {
             cache.setProxy(new CloneProxy(repositoryName, owner, cache));
+            return true;
         }
+        return false;
     }
 
     public abstract void finish();
