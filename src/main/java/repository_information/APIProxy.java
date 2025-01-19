@@ -21,9 +21,11 @@ public class APIProxy extends AbstractProxy{
         }
 
         JsonNode structure = GithubCommunication.getStructure(owner, repositoryName);
-        if (structure == null || (structure != null && structure.size() > 1500)) {
-            changeToClone();
+        if (structure == null) {
+            changeToClone("couldn't get structure");
             return cache.getStructure();
+        } else if (structure != null && structure.size() > 1500) {
+            changeToClone("large structure: " + structure.size() + " elements");
         }
         return structure;
     }
@@ -36,7 +38,7 @@ public class APIProxy extends AbstractProxy{
         String fileContent = GithubCommunication.getFile(url);
 
         if (fileContent == null) {
-            changeToClone();
+            changeToClone("couldn't get file");
             return cache.getFile(path, url);
         }
         return GithubCommunication.getFile(url);
@@ -79,7 +81,7 @@ public class APIProxy extends AbstractProxy{
         }
 
         //try to clone
-        if (changeToClone()) {
+        if (changeToClone("rate limit near")) {
             return true;
         } else {
             // couldn't clone, try for the hard rate limit or wait for the rate limit to reset.

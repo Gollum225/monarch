@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 public interface RepoFunctions {
 
-    public JsonNode getStructure();
-    public String getFile(String path, String url);
+    JsonNode getStructure();
+    String getFile(String path, String url);
+    boolean changeToClone(String reason);
 }

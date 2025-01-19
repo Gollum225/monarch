@@ -45,9 +45,17 @@ public class RepoCache implements RepoFunctions {
 
         //TODO: überlegen, wann cachen sinnvoll ist
         String file = proxy.getFile(path, url);
+        if (file == null || file.isEmpty()) {
+            return null;
+        }
         files.put(url, file);
 
         return file;
+    }
+
+    @Override
+    public boolean changeToClone(String reason) {
+        return proxy.changeToClone(reason);
     }
 
     /**

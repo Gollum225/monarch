@@ -33,6 +33,15 @@ public abstract class AbstractProxy implements RepoFunctions{
 
     boolean changeToClone() {
         System.out.println("\u001B[34m" + "Changing to clone: " + repositoryName + " of owner: " + owner + "\u001B[0m");
+
+        return change();
+    }
+
+    public boolean changeToClone(String reason) {
+        System.out.println("\u001B[34m" + "Changing to clone: " + repositoryName + " of owner: " + owner + " because of " + reason + "\u001B[0m");
+        return change();
+    }
+    private boolean change() {
         if (cloneRepo()) {
             cache.setProxy(new CloneProxy(repositoryName, owner, cache));
             return true;

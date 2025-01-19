@@ -110,6 +110,11 @@ public class Repository implements RepoFunctions {
         return cache.getFile(path, url);
     }
 
+    @Override
+    public boolean changeToClone(String reason) {
+        return cache.changeToClone(reason);
+    }
+
     public int saveResult(Class<? extends RuleMandatories> rule, int points) {
         results.put(rule, points);
         return points;
