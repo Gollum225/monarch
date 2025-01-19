@@ -22,6 +22,9 @@ public class RepoCache implements RepoFunctions {
     }
 
     //Cached information:
+    /**
+     * The structure of the repository, as requested in {@link RepoCache#getStructure()}.
+     */
     private JsonNode structure;
     private Map<String, String> files = new HashMap<>();
 
@@ -47,6 +50,10 @@ public class RepoCache implements RepoFunctions {
         return file;
     }
 
+    /**
+     * Sets the proxy to the given one. Useful, when the repo was cloned.
+     * @param proxy new {@link AbstractProxy} to use.
+     */
     public void setProxy(AbstractProxy proxy) {
         this.proxy = proxy;
     }

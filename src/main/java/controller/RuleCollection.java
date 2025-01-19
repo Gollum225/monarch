@@ -7,7 +7,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 
 /**
- * Collection of rules from the {@link java.java.controller.rules} package.
+ * Collection of rules from the {@link controller.rules} package.
  */
 public class RuleCollection {
 
@@ -22,7 +22,7 @@ public class RuleCollection {
 
 
     /**
-     * Equips the {@link Repository} with the rules from the {@link java.java.controller.rules} package.
+     * Equips the {@link Repository} with the rules from the {@link controller.rules} package.
      *
      * @param repository the repository, which is given to the rules to work with.
      * @return a list of rules with the given repository.
