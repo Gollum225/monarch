@@ -52,7 +52,9 @@ public class KeyWord extends RuleMandatories {
                         if (stopProcessing.get()) {
                             return;
                         }
-                        if (textFile.getContent().contains(keyword)) {
+                        // Following condition is taken from StackOverflow: https://stackoverflow.com/a/90780
+                        // This is necessary, because the method "contains" is case-sensitive.
+                        if (Pattern.compile(Pattern.quote(keyword), Pattern.CASE_INSENSITIVE).matcher(textFile.getContent()).find()) {
                             count++;
                         }
                     }
