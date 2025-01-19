@@ -33,6 +33,12 @@ public class APIProxy extends AbstractProxy{
         if (checkForClone()) {
             return cache.getFile(path, url);
         }
+        String fileContent = GithubCommunication.getFile(url);
+
+        if (fileContent == null) {
+            changeToClone();
+            return cache.getFile(path, url);
+        }
         return GithubCommunication.getFile(url);
     }
 
