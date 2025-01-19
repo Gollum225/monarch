@@ -62,26 +62,24 @@ public final class Json {
         return allKeywords.toArray(new String[0]);
     }
 
-    public static List<Repository> parseRepositories(String jsonResponse) throws JsonProcessingException {
-        // Jackson ObjectMapper
-        ObjectMapper objectMapper = new ObjectMapper();
 
-        // Die JSON-Response als JsonNode parsen
-        JsonNode rootNode = objectMapper.readTree(jsonResponse);
+    /**
+     * Parses the JSON response from the GitHub API and returns a list of repositories.
+     *
+     * @param rootNode the root node of the JSON response
+     * @return a list of repositories
+     */
+    public static List<Repository> parseRepositories(JsonNode rootNode) throws JsonProcessingException {
 
-        // Den Pfad zur "edges"-Liste finden
         JsonNode edges = rootNode.at("/data/search/edges");
 
-        // Liste für die Ergebnisse
         List<Repository> repositories = new ArrayList<>();
 
-        // Über die Knoten in der "edges"-Liste iterieren
         for (JsonNode edge : edges) {
             JsonNode node = edge.get("node");
             String name = node.get("name").asText(); // Repository-Name
             String owner = node.get("owner").get("login").asText(); // Owner-Login
 
-            // Repository-Objekt erstellen und zur Liste hinzufügen
             repositories.add(new Repository(name, owner));
         }
 

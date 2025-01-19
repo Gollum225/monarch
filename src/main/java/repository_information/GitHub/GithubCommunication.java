@@ -37,6 +37,7 @@ public final class GithubCommunication implements GitMandatories {
 
 
     private static final String ACCESS_TOKEN = System.getenv("GitHub_API");
+    private static String cursor = "";
 
     private static final GithubRateLimitCheck rateLimitCheck = GithubRateLimitCheck.getInstance();
 
@@ -57,7 +58,7 @@ public final class GithubCommunication implements GitMandatories {
 
         // GraphQL-Query
         //String query = "{ \"query\": \"{ search(query: \\\"stars:>100" + randomChar + "\\\", type: REPOSITORY, first: " + amount +") { edges { node { ... on Repository { name owner { login } } } } } }\" }";
-        String query = "{ \"query\": \"{ search(query: \\\"stars:<100\\\", type: REPOSITORY, first: "+amount+") { edges { node { ... on Repository { name owner { login } } } } } }\" }";
+        String query = "{ \"query\": \"{ search(query: \\\"stars:>100\\\", type: REPOSITORY, first: "+amount+", after: \\\"" + cursor + "\\\") { edges { node { ... on Repository { name owner { login } } } } pageInfo { hasNextPage endCursor } } }\" }";
 
         // HTTP-Client erstellen
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {            // HTTP-POST-Anfrage
@@ -84,8 +85,21 @@ public final class GithubCommunication implements GitMandatories {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        System.out.println(Json.parseRepositories(responseBody));
-        return Json.parseRepositories(responseBody);
+        //System.out.println(Json.parseRepositories(responseBody));
+
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        JsonNode rootNode = objectMapper.readTree(responseBody);
+
+        if (rootNode.get("data").
+                get("search").
+                get("pageInfo").
+                get("hasNextPage").asBoolean()) {
+            cursor = rootNode.get("data").get("search").get("pageInfo").get("endCursor").asText();
+
+        }
+
+        return Json.parseRepositories(rootNode);
 
     }
 
