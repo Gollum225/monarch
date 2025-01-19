@@ -150,8 +150,8 @@ public final class GithubCommunication implements GitMandatories {
         // Statuscode überprüfen
         int responseCode = connection.getResponseCode();
         if (responseCode != 200) {
-            System.err.println("Error while getting GitHub response. Code: " + responseCode);
-            return "";
+            System.err.println("Error while getting GitHub response. Code: " + responseCode + " (" + apiUrl + ")");
+            return null;
         }
 
         // Set the Rate Limit tracker.
@@ -178,6 +178,9 @@ public final class GithubCommunication implements GitMandatories {
             response = sendGetRequest(urlString);
         } catch (IOException e) {
             System.out.println("Couldnt get file: " + urlString);
+            return null;
+        }
+        if (response == null) {
             return null;
         }
 

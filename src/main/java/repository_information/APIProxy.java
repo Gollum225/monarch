@@ -21,8 +21,9 @@ public class APIProxy extends AbstractProxy{
         }
 
         JsonNode structure = GithubCommunication.getStructure(owner, repositoryName);
-        if (structure != null && structure.size() > 1500) {
+        if (structure == null || (structure != null && structure.size() > 1500)) {
             changeToClone();
+            return cache.getStructure();
         }
         return structure;
     }

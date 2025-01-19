@@ -33,7 +33,7 @@ public class CloneProxy extends AbstractProxy{
         node.set("tree", tree);
         System.out.println("node: " + node);
 
-        return node;
+        return node.get("tree");
     }
 
     @Override
