@@ -78,4 +78,14 @@ public class RepoListManager {
         System.out.println("\u001B[32m" + "repo: " + repo.getRepositoryName() + " of " + repo.getOwner() + " got: " + repo.getOverallPoints() + " points" + "\u001B[0m");
      //TODO
     }
+
+    /**
+     * Checks if the amount of unprocessed repositories is below the threshold.
+     * Triggers the refill if necessary
+     */
+    private void checkRepoAmount() {
+        if (repoList.size() < THRESHOLD) {
+            getNewRepos(REFILL_AMOUNT);
+        }
+    }
 }
