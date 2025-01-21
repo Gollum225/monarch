@@ -26,6 +26,10 @@ public class RepoCache implements RepoFunctions {
      * The structure of the repository, as requested in {@link RepoCache#getStructure()}.
      */
     private JsonNode structure;
+
+    /**
+     * The path of the file based on the repository root mapped to the content.
+     */
     private Map<String, String> files = new HashMap<>();
 
     @Override
@@ -38,17 +42,17 @@ public class RepoCache implements RepoFunctions {
     }
 
     @Override
-    public String getFile(String path, String url) {
-        if (files.containsKey(url)) {
-            return files.get(url);
+    public String getFile(String path) {
+        if (files.containsKey(path)) {
+            return files.get(path);
         }
 
         //TODO: überlegen, wann cachen sinnvoll ist
-        String file = proxy.getFile(path, url);
+        String file = proxy.getFile(path);
         if (file == null || file.isEmpty()) {
             return null;
         }
-        files.put(url, file);
+        files.put(path, file);
 
         return file;
     }

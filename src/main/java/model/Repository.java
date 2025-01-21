@@ -55,14 +55,13 @@ public class Repository implements RepoFunctions {
 
     public List<TextFile> getTextfiles() {
         String repoIdentifier ="repository: " + repositoryName + " of owner: " + owner;
-        Map<String, String> textFileUrl = new HashMap<>();
         List <JsonNode> foundTextFiles = new ArrayList<>();
 
         List <TextFile> parsedTextFiles = new ArrayList<>();
         JsonNode tree = getStructure();
         if (tree == null || !tree.isArray()) {
             System.out.println("No files found in " + repoIdentifier);
-            return new ArrayList<TextFile>();
+            return new ArrayList<>();
         }
         System.out.println("Found " + tree.size() + " files in " + repoIdentifier);
         int textFileCount = 0;
@@ -77,7 +76,6 @@ public class Repository implements RepoFunctions {
                         path.endsWith(".adoc") ||
                         //path.endsWith(".pdf") ||
                         path.endsWith(".docx")) {
-                    textFileUrl.put(entry.get("url").asText(), path);
                     foundTextFiles.add(entry);
                     textFileCount++;
 
@@ -87,11 +85,10 @@ public class Repository implements RepoFunctions {
         }
         System.out.println("Found " + textFileCount + " textfiles in " + repoIdentifier);
         for (JsonNode file: foundTextFiles) {
-            String url = file.get("url").asText();
             String path = file.get("path").asText();
-            String content = getFile(path, url);
+            String content = getFile(path);
             if (content != null) {
-                TextFile textFile = new TextFile(url, path, content);
+                TextFile textFile = new TextFile(path, content);
                 //System.out.println("Found text file: " + textFile.getPath());
                 parsedTextFiles.add(textFile);
                 //System.out.println("Remaining textfiles of " + repoIdentifier + ": " + textFileCount--);
@@ -106,8 +103,8 @@ public class Repository implements RepoFunctions {
     }
 
     @Override
-    public String getFile(String path, String url) {
-        return cache.getFile(path, url);
+    public String getFile(String path) {
+        return cache.getFile(path);
     }
 
     @Override

@@ -31,17 +31,17 @@ public class APIProxy extends AbstractProxy{
     }
 
     @Override
-    public String getFile(String path, String url) {
+    public String getFile(String path) {
         if (checkForClone()) {
-            return cache.getFile(path, url);
+            return cache.getFile(path);
         }
-        String fileContent = GithubCommunication.getFile(url);
+        String fileContent = GithubCommunication.getFile(path, owner, repositoryName);
 
         if (fileContent == null) {
             changeToClone("couldn't get file");
-            return cache.getFile(path, url);
+            return cache.getFile(path);
         }
-        return GithubCommunication.getFile(url);
+        return fileContent;
     }
 
     @Override

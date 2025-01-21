@@ -37,7 +37,7 @@ public class CloneProxy extends AbstractProxy{
     }
 
     @Override
-    public String getFile(String path, String url) {
+    public String getFile(String path) {
         Path filePath = repoPath.resolve(path);
         try {
             return Files.readString(filePath);

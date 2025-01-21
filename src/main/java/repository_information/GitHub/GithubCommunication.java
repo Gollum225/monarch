@@ -172,7 +172,8 @@ public final class GithubCommunication implements GitMandatories {
         return response.toString();
     }
 
-    public static String getFile(String urlString) {
+    public static String getFile(String path, String owner, String reponame) {
+        String urlString = "https://api.github.com/repos/" + owner + "/" + reponame + "/contents/" + path;
         String response;
         try {
             response = sendGetRequest(urlString);

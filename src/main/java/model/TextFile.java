@@ -4,8 +4,8 @@ public class TextFile extends File {
 
     private String content;
 
-    public TextFile(String url, String path, String content) {
-        super(url, path);
+    public TextFile(String path, String content) {
+        super(path);
         this.content = content;
     }
 
