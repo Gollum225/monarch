@@ -31,7 +31,6 @@ public class CloneProxy extends AbstractProxy{
         ArrayNode tree = mapper.createArrayNode();
         tree.addAll(getStructure(repoPath));
         node.set("tree", tree);
-        System.out.println("node: " + node);
 
         return node.get("tree");
     }
@@ -55,13 +54,11 @@ public class CloneProxy extends AbstractProxy{
 
         ObjectMapper mapper = new ObjectMapper();
 
-        System.out.println("files in folder: " + folder.listFiles());
         if (folder.listFiles() == null) {
             System.err.println("Repository isn't cloned yet. Exptected at:" + path);
             return new ArrayList<>();
         }
 
-        System.out.println("file number: " + folder.listFiles().length);
         for (File file : folder.listFiles()) {
 
             if (file.isDirectory()) {
