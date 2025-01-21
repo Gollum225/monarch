@@ -1,12 +1,11 @@
 package controller.rules;
 
-import controller.RuleMandatories;
+import controller.Rule;
 import controller.RuleType;
 import model.Repository;
 import util.Json;
 import model.TextFile;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -15,7 +14,7 @@ import java.util.regex.Pattern;
 /**
  * This mandatory rule scans the textfiles for a given list of keywords.
  */
-public class KeyWord extends RuleMandatories {
+public class KeyWord extends Rule {
 
     private final String[] KEYWORDS = Json.getAllKeywords();
     private final List<TextFile> textFiles;

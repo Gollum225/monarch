@@ -46,8 +46,8 @@ public class Checker {
             completionService.submit(() -> {
                 Repository currentRepo = listManager.getNextRepo();
 
-                ArrayList<RuleMandatories> equippedRules = rules.equipRules(currentRepo);
-                for (RuleMandatories rule : equippedRules) {
+                ArrayList<Rule> equippedRules = rules.equipRules(currentRepo);
+                for (Rule rule : equippedRules) {
                     currentRepo.saveResult(rule.getClass(), rule.execute());
                 }
 

@@ -14,7 +14,7 @@ public class RuleCollection {
     /**
      * The rules to be applied to the {@link Repository}.
      */
-    private final ArrayList<Class <? extends RuleMandatories>> rules = new ArrayList<>();
+    private final ArrayList<Class <? extends Rule>> rules = new ArrayList<>();
 
     public RuleCollection() {
         rules.add(KeyWord.class);
@@ -27,10 +27,10 @@ public class RuleCollection {
      * @param repository the repository, which is given to the rules to work with.
      * @return a list of rules with the given repository.
      */
-    public ArrayList<RuleMandatories> equipRules(Repository repository) {
-        ArrayList<RuleMandatories> ruleList = new ArrayList<>();
+    public ArrayList<Rule> equipRules(Repository repository) {
+        ArrayList<Rule> ruleList = new ArrayList<>();
 
-        for (Class<? extends RuleMandatories> rule : rules) {
+        for (Class<? extends Rule> rule : rules) {
             try {
                 ruleList.add(rule.getDeclaredConstructor(Repository.class).newInstance(repository));
             } catch (NoSuchMethodException e) {

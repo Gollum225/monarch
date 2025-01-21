@@ -2,12 +2,12 @@ package controller;
 
 import model.Repository;
 
-public abstract class RuleMandatories {
+public abstract class Rule {
 
     final RuleType type;
     final Repository repository;
 
-    protected RuleMandatories(RuleType type, Repository repository) {
+    protected Rule(RuleType type, Repository repository) {
         this.type = type;
         this.repository = repository;
     }

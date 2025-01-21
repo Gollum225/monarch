@@ -2,7 +2,7 @@ package model;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import controller.RepoCache;
-import controller.RuleMandatories;
+import controller.Rule;
 import repository_information.RepoFunctions;
 
 import java.util.ArrayList;
@@ -41,7 +41,7 @@ public class Repository implements RepoFunctions {
     /**
      * Maps the rule to the points it has given.
      */
-    private HashMap<Class<? extends RuleMandatories>, Integer> results = new HashMap<>();
+    private HashMap<Class<? extends Rule>, Integer> results = new HashMap<>();
 
     private int overallPoints = 0;
 
@@ -112,7 +112,7 @@ public class Repository implements RepoFunctions {
         return cache.changeToClone(reason);
     }
 
-    public int saveResult(Class<? extends RuleMandatories> rule, int points) {
+    public int saveResult(Class<? extends Rule> rule, int points) {
         results.put(rule, points);
         return points;
     }
