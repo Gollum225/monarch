@@ -40,6 +40,10 @@ public class Checker {
         } finally {
             executor.shutdown();
         }
+
+    }
+
+    private CompletionService<Void> getVoidCompletionService(int amount, ExecutorService executor) {
         CompletionService<Void> completionService = new ExecutorCompletionService<>(executor);
 
         for (int i = 0; i < amount; i++) {
