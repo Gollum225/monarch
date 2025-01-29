@@ -137,7 +137,7 @@ public class Repository implements RepoFunctions {
     }
 
     public boolean checkFileExistence(String path) {
-        JsonNode structure = cache.getStructure();
+        JsonNode structure = getStructure();
         for (JsonNode file: structure) {
             if (file.get("path").asText().equals(path)) {
                 return true;
