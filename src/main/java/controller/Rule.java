@@ -4,8 +4,8 @@ import model.Repository;
 
 public abstract class Rule {
 
-    final RuleType type;
-    final Repository repository;
+    protected final RuleType type;
+    protected final Repository repository;
 
     protected Rule(RuleType type, Repository repository) {
         this.type = type;
