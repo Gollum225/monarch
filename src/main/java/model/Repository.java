@@ -8,7 +8,6 @@ import repository_information.RepoFunctions;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Implements the requests, the rules in {@link controller.rules} can ask.
@@ -131,5 +130,19 @@ public class Repository implements RepoFunctions {
 
     public int getOverallPoints() {
         return overallPoints;
+    }
+
+    public HashMap<Class<? extends Rule>, Integer> getResults() {
+        return results;
+    }
+
+    public boolean checkFileExistence(String path) {
+        JsonNode structure = cache.getStructure();
+        for (JsonNode file: structure) {
+            if (file.get("path").asText().equals(path)) {
+                return true;
+            }
+        }
+        return false;
     }
 }
