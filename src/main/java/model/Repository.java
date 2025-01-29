@@ -1,7 +1,7 @@
 package model;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import controller.RepoCache;
+import repository_information.RepoCache;
 import controller.Rule;
 import repository_information.RepoFunctions;
 

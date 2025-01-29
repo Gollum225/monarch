@@ -1,6 +1,5 @@
 package repository_information;
 
-import controller.RepoCache;
 import repository_information.GitHub.GithubCommunication;
 import repository_information.GitHub.GithubRateLimitCheck;
 

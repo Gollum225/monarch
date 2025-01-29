@@ -1,7 +1,6 @@
 package repository_information;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import controller.RepoCache;
 import repository_information.GitHub.GithubCommunication;
 import repository_information.GitHub.RateResource;
 

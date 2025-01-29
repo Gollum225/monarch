@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import controller.RepoCache;
 import org.eclipse.jgit.util.FileUtils;
 
 import java.io.File;
@@ -13,8 +12,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-
-import static util.Globals.CLONED_REPOS_PATH;
 
 public class CloneProxy extends AbstractProxy{
 
