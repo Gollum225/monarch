@@ -1,5 +1,6 @@
 package controller;
 
+import controller.rules.RuleReturn;
 import model.Repository;
 
 public abstract class Rule {
@@ -16,9 +17,9 @@ public abstract class Rule {
     /**
      * Executes the rule.
      *
-     * @return amount of points the rule has given.
+     * @return an object representing the outcome of the rule. May be points or a failure message.
      */
-    public abstract int execute();
+    public abstract RuleReturn execute();
 
 
 }

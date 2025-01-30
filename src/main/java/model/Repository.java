@@ -40,7 +40,7 @@ public class Repository implements RepoFunctions {
     /**
      * Maps the rule to the points it has given.
      */
-    private HashMap<Class<? extends Rule>, Integer> results = new HashMap<>();
+    private HashMap<Class<? extends Rule>, RuleReturn> results = new HashMap<>();
 
     private int overallPoints = 0;
 
@@ -111,9 +111,8 @@ public class Repository implements RepoFunctions {
         return cache.changeToClone(reason);
     }
 
-    public int saveResult(Class<? extends Rule> rule, int points) {
+    public void saveResult(Class<? extends Rule> rule, RuleReturn points) {
         results.put(rule, points);
-        return points;
     }
 
     public String customQuery(String GraphQLQuery) {
@@ -122,8 +121,10 @@ public class Repository implements RepoFunctions {
 
     public int finish() {
 
-        for (Integer value : results.values()) {
-            overallPoints += value;
+        for (RuleReturn rule : results.values()) {
+            if (rule.isApplicable()) {
+                overallPoints += rule.getPoints();
+            }
         }
         return overallPoints;
     }
@@ -132,7 +133,7 @@ public class Repository implements RepoFunctions {
         return overallPoints;
     }
 
-    public HashMap<Class<? extends Rule>, Integer> getResults() {
+    public HashMap<Class<? extends Rule>, RuleReturn> getResults() {
         return results;
     }
 

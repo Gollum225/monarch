@@ -30,13 +30,12 @@ public class LLMReadme extends Rule {
     }
 
     @Override
-    public int execute() {
+    public RuleReturn execute() {
 
         String readme = getReadme();
 
         if (readme == null) {
-            System.out.println("No readme found in repository: " + repository.getRepositoryName() + " of owner: " + repository.getOwner());
-            return 0;
+            return new RuleReturn("No readme found");
         }
 
         String llmAnswer = null;
@@ -44,24 +43,22 @@ public class LLMReadme extends Rule {
         try {
             llmAnswer = sendGetRequest(readme);
         } catch (IOException e) {
-            System.out.println("GAB ERROR"); //TODO
-            e.printStackTrace();
+            return new RuleReturn("Error while getting LLM response");
         }
 
         if (llmAnswer == null) {
-            //TODO
-            return 0;
+            return new RuleReturn("No answer from LLM");
         }
 
 
         for (int i = 0; i <= MAX_POINTS; i++) {
             if (llmAnswer.contains(String.valueOf(i))) {
                 System.out.println("LLM gave: " + i + " points to " + repository.getRepositoryName() + " of owner: " + repository.getOwner());
-                return i;
+                return new RuleReturn(i);
             }
         }
 
-        return 0;
+        return new RuleReturn( "LLM gave an unexpected answer: " + llmAnswer);
     }
 
     /**

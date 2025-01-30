@@ -33,10 +33,10 @@ public class KeyWord extends Rule {
     }
 
     @Override
-    public int execute() {
+    public RuleReturn execute() {
 
         if (KEYWORDS == null || KEYWORDS.length == 0) {
-            return 0;
+            return new RuleReturn("No keywords found in the JSON file.");
         }
 
         AtomicInteger keywordCount = new AtomicInteger();
@@ -63,17 +63,17 @@ public class KeyWord extends Rule {
                     }
                 });
         if (keywordCount.get() >= LAST_LIMIT) {
-            return 5;
+            return new RuleReturn(5);
         } else if (keywordCount.get() >= FOURTH_LIMIT) {
-            return 4;
+            return new RuleReturn(4);
         } else if (keywordCount.get() >= THIRD_LIMIT) {
-            return 3;
+            return new RuleReturn(3);
         } else if (keywordCount.get() >= SECOND_LIMIT) {
-            return 2;
+            return new RuleReturn(2);
         } else if (keywordCount.get() >= FIRST_LIMIT) {
-            return 1;
+            return new RuleReturn(1);
         } else {
-            return 0;
+            return new RuleReturn(0);
         }
     }
 }
