@@ -1,6 +1,8 @@
 package controller;
 
+import controller.rules.DocFolder;
 import controller.rules.KeyWord;
+import controller.rules.LLMReadme;
 import model.Repository;
 
 import java.lang.reflect.InvocationTargetException;
@@ -18,9 +20,12 @@ public class RuleCollection {
 
     public RuleCollection() {
         rules.add(KeyWord.class);
+        rules.add(LLMReadme.class);
+        rules.add(DocFolder.class);
     }
 
 
+    //TODO: ist das eine factory?
     /**
      * Equips the {@link Repository} with the rules from the {@link controller.rules} package.
      *
