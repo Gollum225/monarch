@@ -1,11 +1,13 @@
 package model;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import controller.rules.RuleReturn;
 import repository_information.RepoCache;
 import controller.Rule;
 import repository_information.RepoFunctions;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -24,7 +26,10 @@ public class Repository implements RepoFunctions {
      */
     private final RepoCache cache;
 
-    private boolean isCloned = false;
+    /**
+     * Date of creation of the repository.
+     */
+    private Date created;
 
     /**
      * Constructor for the Repository.
@@ -35,6 +40,7 @@ public class Repository implements RepoFunctions {
         this.repositoryName = repositoryName;
         this.owner = owner;
         this.cache = new RepoCache(repositoryName, owner);
+        this.created = new Date();
     }
 
     /**
@@ -145,5 +151,9 @@ public class Repository implements RepoFunctions {
             }
         }
         return false;
+    }
+
+    public Date getCreationDate() {
+        return created;
     }
 }
