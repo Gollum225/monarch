@@ -108,6 +108,7 @@ public class RepoListManager {
      */
     private void checkRepoAmount() {
         if (repoList.size() < THRESHOLD) {
+            //getTestRepos();
             getNewRepos(REFILL_AMOUNT);
         }
     }
