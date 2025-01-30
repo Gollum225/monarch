@@ -1,0 +1,101 @@
+package controller.rules;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import controller.Rule;
+import controller.RuleType;
+import model.Repository;
+
+/**
+ * Checks if the repository contains a folder with documentation.
+ */
+public class DocFolder extends Rule {
+    private final int MAX_POINTS = 5;
+
+    public DocFolder(Repository repository) {
+        super(RuleType.MANDATORY, repository);
+    }
+
+    @Override
+    public RuleReturn execute() {
+
+        String[] docPaths = {"doc", "docs", "documentation", "documentations", };
+        JsonNode structure = repository.getStructure();
+        int counter = 0;
+        String lastFoundPath = "";
+        for (JsonNode node : structure) {
+            if (!node.get("type").asText().equals("tree")) {
+                continue;
+            }
+            String path = node.get("path").asText();
+            for (String docPath : docPaths) {
+                // Takes the String of each last path and checks, if it contains one of the docPaths.
+                if (contains(getLastFolder(path), docPath)) {
+                    counter++;
+                    lastFoundPath = path;
+
+                }
+            }
+        }
+
+        if (counter == 0) {
+            return new RuleReturn(0);
+        } else if (counter == 1) {
+            System.out.println("Found 1 documentation folder in repository: " + repository.getRepositoryName() + " of owner: " + repository.getOwner() + " at: " + lastFoundPath);
+            return new RuleReturn(3);
+        } else if (counter <= 5){
+            System.out.println("Found " + counter + " documentation folders in repository: " + repository.getRepositoryName() + " of owner: " + repository.getOwner() + " e.g.: " + lastFoundPath);
+            return new RuleReturn(4);
+        } else {
+            System.out.println("Found " + counter + " documentation folders in repository: " + repository.getRepositoryName() + " of owner: " + repository.getOwner() + " e.g.: " + lastFoundPath);
+            return new RuleReturn(MAX_POINTS);
+        }
+    }
+
+    /**
+     * Takes a path and returns the last folder (or file) in it.
+     * Basically everything after the last '/'.
+     *
+     * @param input path
+     * @return last folder (or file) in the path
+     */
+    private String getLastFolder(String input) {
+        int index = input.lastIndexOf('/');
+        if (index != -1 && index + 1 < input.length()) {
+            return input.substring(index + 1);
+        }
+        // Path was top level directory
+        return input;
+    }
+
+    /**
+     * Checks if the text contains the term. The search is case-insensitive.
+     * Only returns true, if the term is not surrounded by other letters.
+     *
+     * @param text to search in
+     * @param term to search for
+     * @return true, if the term is found in the text
+     */
+    private boolean contains(String text, String term) {
+        if (term.isEmpty()) {
+            return false;
+        }
+
+        text = text.toLowerCase();
+        term = term.toLowerCase();
+
+        int index = text.indexOf(term);
+        while (index != -1) {
+            boolean before = (index == 0) || !Character.isLetter(text.charAt(index - 1));
+            boolean after = (index + term.length() == text.length()) || !Character.isLetter(text.charAt(index + term.length()));
+
+            if (before && after) {
+                return true;
+            }
+
+            index = text.indexOf(term, index + 1);
+        }
+
+        return false;
+    }
+
+}
