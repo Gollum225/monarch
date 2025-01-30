@@ -13,10 +13,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class Checker {
 
     private RuleCollection rules;
-    private final RepoListManager listManager = new RepoListManager();
+    private final RepoListManager listManager;
 
     public Checker() {
         rules = new RuleCollection();
+        listManager = new RepoListManager(rules);
     }
 
 
@@ -55,7 +56,7 @@ public class Checker {
                     currentRepo.saveResult(rule.getClass(), rule.execute());
                 }
 
-                listManager.finishRepo(currentRepo);
+                listManager.finishRepo(currentRepo, rules);
 
                 return null;
             });

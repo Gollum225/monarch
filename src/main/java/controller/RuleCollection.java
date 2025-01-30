@@ -46,4 +46,8 @@ public class RuleCollection {
         }
         return ruleList;
     }
+
+    public ArrayList<Class<? extends Rule>> getRules() {
+        return rules;
+    }
 }
