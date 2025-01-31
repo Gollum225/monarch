@@ -2,6 +2,7 @@ package controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.MappingIterator;
+import com.fasterxml.jackson.databind.SequenceWriter;
 import model.RepoList;
 import model.Repository;
 import repository_information.GitHub.GithubCommunication;
@@ -9,6 +10,7 @@ import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.*;
@@ -205,9 +207,7 @@ public class RepoListManager {
         row.put("RepoName", repo.getRepositoryName());
         row.put("repoOwner", repo.getOwner());
         for (Class<? extends Rule> rule : ruleCollection.getRules()) {
-            if (rule.getSimpleName().equals("DocFolder")) {
-                continue;
-            }
+
             row.put(rule.getSimpleName(), String.valueOf(repo.getResults().get(rule).getResultString()));
         }
         row.put("TotalScore", String.valueOf(repo.getOverallPoints()));
@@ -216,7 +216,10 @@ public class RepoListManager {
 
 
         // write csv file
-            csvMapper.writer(schema.withHeader()).writeValue(csvFile, rows);
+        FileWriter fileWriter = new FileWriter(csvFile, true);
+        SequenceWriter seqWriter = csvMapper.writer(schema.withoutHeader()).writeValues(fileWriter);
+            seqWriter.writeAll(rows);
+
 
 
     }
