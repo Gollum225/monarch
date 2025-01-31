@@ -128,11 +128,12 @@ public class RepoListManager {
 
         if (path.toFile().exists()) {
             if (handleExistingCsv(path)) {
+                System.out.println("Result file with matching schema found. Continue with this file.");
                 return;
             } else if (file.renameTo(new File(RESOURCE_PATH.resolve("resultCopied.csv").toString()))) {
-                System.out.println("\u001B[33m" + "Old result file was found and renamed. Delete before next run!" + "\u001B[0m");
+                System.out.println("\u001B[33m" + "Old result file was renamed. Delete before next run!" + "\u001B[0m");
             } else {
-                System.err.println("Old result file was found and deleted.");
+                System.err.println("Old result file was deleted.");
                 file.delete();
             }
         }
@@ -144,7 +145,7 @@ public class RepoListManager {
         } catch (IOException e) {
             throw new RuntimeException("Couldn't create CSV file.");
         }
-        System.out.println("\\u001B[32m" + "CSV file created: " + path + "\u001B[0m");
+        System.out.println("\\u001B[32m" + "New CSV file created: " + path + "\u001B[0m");
 
     }
 
@@ -155,28 +156,22 @@ public class RepoListManager {
      */
     private boolean handleExistingCsv(Path path) {
         CsvMapper csvMapper = new CsvMapper();
-
-        CsvSchema existingSchema = CsvSchema.emptySchema().withHeader();
+        CsvSchema existingSchema = csvMapper.typedSchemaFor(Map.class).withHeader();
 
         try {
             MappingIterator<Map<String, String>> it = csvMapper
                     .readerFor(Map.class)
-                    .with(schema)
+                    .with(existingSchema)
                     .readValues(new File(path.toString()));
 
-            if (it.hasNext()) {
-                Map<String, String> firstRow = it.next();
+            existingSchema = (CsvSchema) it.getParserSchema();
 
-                CsvSchema.Builder schemaBuilder = CsvSchema.builder();
-                firstRow.keySet().forEach(schemaBuilder::addColumn);
-                schema = schemaBuilder.setUseHeader(true).build();
-            }
         } catch (IOException e) {
-            e.printStackTrace();
+            return false;
         }
 
-        if (!existingSchema.equals(schema)) {
-            System.err.println("Schema doesn't match the existing schema in the file. Overwriting the file.");
+        if (!existingSchema.toString().equals(schema.toString())) {
+            System.err.println("Schema doesn't match the existing schema in the file.");
             return false;
         }
         return true;
