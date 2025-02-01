@@ -195,7 +195,7 @@ public class RepoListManager {
                 .build();
     }
 
-    private void writeResult(Repository repo, RuleCollection ruleCollection) throws IOException {
+    private synchronized void writeResult(Repository repo, RuleCollection ruleCollection) throws IOException {
 
         File csvFile = new File(String.valueOf(RESOURCE_PATH.resolve("result.csv")));
 
