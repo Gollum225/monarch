@@ -1,8 +1,15 @@
 package repository_information;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import exceptions.CloneProhibitedException;
 import repository_information.GitHub.GithubCommunication;
 import repository_information.GitHub.RateResource;
+
+import java.util.List;
+import java.util.Map;
+
+import static util.Globals.CLONE_THRESHOLD;
+import static util.Globals.MAX_FILE_AMOUNT;
 
 public class APIProxy extends AbstractProxy{
 
@@ -12,7 +19,7 @@ public class APIProxy extends AbstractProxy{
     }
 
     @Override
-    public JsonNode getStructure() {
+    public JsonNode getStructure() throws CloneProhibitedException {
         if (checkForClone()) {
             // If checkForClone returns true, the rate limit is reached and the repository has been cloned.
             // The new proxy is a CloneProxy, so we can just call getStructure on it.
@@ -23,29 +30,31 @@ public class APIProxy extends AbstractProxy{
         if (structure == null) {
             changeToClone("couldn't get structure");
             return cache.getStructure();
-        } else if (structure != null && structure.size() > 1500) {
+        } else if (structure != null && structure.size() > CLONE_THRESHOLD) {
             changeToClone("large structure: " + structure.size() + " elements");
         }
         return structure;
     }
 
     @Override
-    public String getFile(String path) {
+    public Map<String, String> getFiles(List<String> paths) throws CloneProhibitedException {
         if (checkForClone()) {
-            return cache.getFile(path);
+            return cache.getFiles(paths);
         }
-        String fileContent = GithubCommunication.getFile(path, owner, repositoryName);
-
-        if (fileContent == null) {
-            changeToClone("couldn't get file");
-            return cache.getFile(path);
+        if (paths.size() > MAX_FILE_AMOUNT) {
+            changeToClone("too many files requested: " + paths.size());
         }
-        return fileContent;
+        return super.getFiles(paths);
     }
 
     @Override
     public void finish() {
         //Nothing to do here
+    }
+
+    @Override
+    String getSingleFile(String path) {
+        return GithubCommunication.getFile(path, owner, repositoryName);
     }
 
     private boolean checkRateLimit() {
@@ -74,7 +83,7 @@ public class APIProxy extends AbstractProxy{
      *
      * @return if the repository has been cloned.
      */
-    private boolean checkForClone() {
+    private boolean checkForClone() throws CloneProhibitedException {
         if (checkRateLimit(RateResource.GRAPHQL, false)) {
             return false;
         }

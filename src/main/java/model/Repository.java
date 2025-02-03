@@ -2,6 +2,7 @@ package model;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import controller.rules.RuleReturn;
+import exceptions.CloneProhibitedException;
 import repository_information.RepoCache;
 import controller.Rule;
 import repository_information.RepoFunctions;
@@ -10,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Implements the requests, the rules in {@link controller.rules} can ask.
@@ -58,7 +60,7 @@ public class Repository implements RepoFunctions {
         return owner;
     }
 
-    public List<TextFile> getTextfiles() {
+    public List<TextFile> getTextfiles() throws CloneProhibitedException {
         String repoIdentifier ="repository: " + repositoryName + " of owner: " + owner;
         List <JsonNode> foundTextFiles = new ArrayList<>();
 
@@ -89,32 +91,36 @@ public class Repository implements RepoFunctions {
             }
         }
         System.out.println("Found " + textFileCount + " textfiles in " + repoIdentifier);
+        List<String> paths = new ArrayList<>(textFileCount);
         for (JsonNode file: foundTextFiles) {
-            String path = file.get("path").asText();
-            String content = getFile(path);
-            if (content != null) {
-                TextFile textFile = new TextFile(path, content);
-                //System.out.println("Found text file: " + textFile.getPath());
-                parsedTextFiles.add(textFile);
-                //System.out.println("Remaining textfiles of " + repoIdentifier + ": " + textFileCount--);
-            }
+            paths.add(file.get("path").asText());
         }
+        Map<String, String> files = getFiles(paths);
+        for (Map.Entry<String, String> entry : files.entrySet()) {
+            parsedTextFiles.add(new TextFile(entry.getKey(), entry.getValue()));
+        }
+
         return parsedTextFiles;
     }
 
     @Override
-    public JsonNode getStructure() {
+    public JsonNode getStructure() throws CloneProhibitedException {
         return cache.getStructure();
     }
 
     @Override
-    public String getFile(String path) {
-        return cache.getFile(path);
+    public Map<String, String> getFiles(List<String> paths) throws CloneProhibitedException {
+        return cache.getFiles(paths);
     }
 
     @Override
-    public boolean changeToClone(String reason) {
+    public boolean changeToClone(String reason) throws CloneProhibitedException {
         return cache.changeToClone(reason);
+    }
+
+    @Override
+    public JsonNode generalInfo() {
+        return cache.generalInfo();
     }
 
     public void saveResult(Class<? extends Rule> rule, RuleReturn points) {
@@ -143,7 +149,7 @@ public class Repository implements RepoFunctions {
         return results;
     }
 
-    public boolean checkFileExistence(String path) {
+    public boolean checkFileExistence(String path) throws CloneProhibitedException {
         JsonNode structure = getStructure();
         for (JsonNode file: structure) {
             if (file.get("path").asText().equals(path)) {

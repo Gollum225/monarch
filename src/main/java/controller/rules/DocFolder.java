@@ -3,6 +3,7 @@ package controller.rules;
 import com.fasterxml.jackson.databind.JsonNode;
 import controller.Rule;
 import controller.RuleType;
+import exceptions.CloneProhibitedException;
 import model.Repository;
 
 /**
@@ -19,7 +20,12 @@ public class DocFolder extends Rule {
     public RuleReturn execute() {
 
         String[] docPaths = {"doc", "docs", "documentation", "documentations", };
-        JsonNode structure = repository.getStructure();
+        JsonNode structure = null;
+        try {
+            structure = repository.getStructure();
+        } catch (CloneProhibitedException e) {
+            return new RuleReturn(e.getMessage(), repository.getRepositoryName() + "of owner " + repository.getOwner(), this.getClass().getSimpleName());
+        }
         int counter = 0;
         String lastFoundPath = "";
         for (JsonNode node : structure) {

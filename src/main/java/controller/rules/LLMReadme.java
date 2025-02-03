@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import controller.Rule;
 import controller.RuleType;
+import exceptions.CloneProhibitedException;
 import model.Repository;
 
 import java.io.BufferedReader;
@@ -12,7 +13,9 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.regex.Pattern;
 
 public class LLMReadme extends Rule {
@@ -32,10 +35,15 @@ public class LLMReadme extends Rule {
     @Override
     public RuleReturn execute() {
 
-        String readme = getReadme();
+        String readme = null;
+        try {
+            readme = getReadme();
+        } catch (CloneProhibitedException e) {
+            return new RuleReturn(e.getMessage(), repository.getRepositoryName() + "of owner " + repository.getOwner(), this.getClass().getSimpleName());
+        }
 
         if (readme == null) {
-            return new RuleReturn("No readme found");
+            return new RuleReturn("No readme found", repository.getRepositoryName() + "of owner " + repository.getOwner(), this.getClass().getSimpleName());
         }
 
         String llmAnswer = null;
@@ -43,11 +51,11 @@ public class LLMReadme extends Rule {
         try {
             llmAnswer = sendGetRequest(readme);
         } catch (IOException e) {
-            return new RuleReturn("Error while getting LLM response");
+            return new RuleReturn("Error while getting LLM response", repository.getRepositoryName() + "of owner " + repository.getOwner(), this.getClass().getSimpleName());
         }
 
         if (llmAnswer == null) {
-            return new RuleReturn("No answer from LLM");
+            return new RuleReturn("No answer from LLM", repository.getRepositoryName() + "of owner " + repository.getOwner(), this.getClass().getSimpleName());
         }
 
 
@@ -58,7 +66,7 @@ public class LLMReadme extends Rule {
             }
         }
 
-        return new RuleReturn( "LLM gave an unexpected answer: " + llmAnswer);
+        return new RuleReturn( "LLM gave an unexpected answer: " + llmAnswer, repository.getRepositoryName() + "of owner " + repository.getOwner(), this.getClass().getSimpleName());
     }
 
     /**
@@ -67,12 +75,12 @@ public class LLMReadme extends Rule {
      *
      * @return readme file content or null, if no readme file is found.
      */
-    private String getReadme() {
+    private String getReadme() throws CloneProhibitedException {
         String[] readmeNames = {"README.md", "readme.md", "Readme.md", "README", "readme", "Readme"};
 
         for (String name : readmeNames) {
             if (repository.checkFileExistence(name)) {
-                return repository.getFile(name);
+                return repository.getFiles(new ArrayList<>(List.of(name))).get(name);
             }
         }
 
@@ -81,7 +89,7 @@ public class LLMReadme extends Rule {
             if (Pattern.compile(Pattern.quote("docs/readme"), Pattern.CASE_INSENSITIVE).matcher(path).find()||
                     Pattern.compile(Pattern.quote("documentation/readme"), Pattern.CASE_INSENSITIVE).matcher(path).find()||
                     Pattern.compile(Pattern.quote("readme"), Pattern.CASE_INSENSITIVE).matcher(path).find()) {
-                return repository.getFile(file.get("path").asText());
+                return repository.getFiles(new ArrayList<>(List.of(path))).get(path);
             }
         }
         return null;

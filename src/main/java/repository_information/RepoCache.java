@@ -1,9 +1,12 @@
 package repository_information;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import exceptions.CloneProhibitedException;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
 
 public class RepoCache implements RepoFunctions {
 
@@ -11,6 +14,7 @@ public class RepoCache implements RepoFunctions {
     private final String repositoryName;
     private final String owner;
     private AbstractProxy proxy;
+    private JsonNode generalInfo;
 
     public RepoCache(String repositoryName, String owner) {
         this.repositoryName = repositoryName;
@@ -30,7 +34,7 @@ public class RepoCache implements RepoFunctions {
     private Map<String, String> files = new HashMap<>();
 
     @Override
-    public JsonNode getStructure() {
+    public JsonNode getStructure() throws CloneProhibitedException {
         if (structure == null) {
             structure = proxy.getStructure();
         }
@@ -39,24 +43,35 @@ public class RepoCache implements RepoFunctions {
     }
 
     @Override
-    public String getFile(String path) {
-        if (files.containsKey(path)) {
-            return files.get(path);
-        }
+    public Map<String, String> getFiles(List<String> paths) throws CloneProhibitedException {
+        ArrayList<String> notCached = new ArrayList<>();
+        Map<String, String> results = new HashMap<>();
 
-        //TODO: überlegen, wann cachen sinnvoll ist
-        String file = proxy.getFile(path);
-        if (file == null || file.isEmpty()) {
-            return null;
+        for (String path : paths) {
+            if (files.containsKey(path)) {
+                results.put(path, files.get(path));
+            } else {
+                notCached.add(path);
+            }
         }
-        files.put(path, file);
+        Map<String, String> requestResults = proxy.getFiles(notCached);
+        files.putAll(requestResults);
+        results.putAll(requestResults);
 
-        return file;
+        return results;
     }
 
     @Override
-    public boolean changeToClone(String reason) {
+    public boolean changeToClone(String reason) throws CloneProhibitedException {
         return proxy.changeToClone(reason);
+    }
+
+    @Override
+    public JsonNode generalInfo() {
+        if (generalInfo == null) {
+            generalInfo = proxy.generalInfo();
+        }
+        return generalInfo;
     }
 
     /**

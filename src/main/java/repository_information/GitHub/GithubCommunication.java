@@ -225,6 +225,22 @@ public final class GithubCommunication implements GitMandatories {
         return true;
     }
 
+    public static JsonNode generalInfo(String owner, String repo) {
+        String apiUrl = GITHUB_REST_URL + "/repos/" + owner + "/" + repo;
+        String response = null;
+        try {
+            response = sendGetRequest(apiUrl);
+        } catch (IOException e) {
+            e.printStackTrace(); //TODO
+        }
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        try {
+            return objectMapper.readTree(response);
+        } catch (JsonProcessingException e) {
+            return null;
+        }
+    }
 }
 
 

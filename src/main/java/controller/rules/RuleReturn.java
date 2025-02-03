@@ -11,10 +11,11 @@ public class RuleReturn{
 
     }
 
-    public RuleReturn(String failureMessage){
+    public RuleReturn(String failureMessage, String repoIdentifier, String ruleName){
         points = 0;
         this.isApplicable = false;
         this.failureMessage = failureMessage;
+        System.out.println("Rule " + ruleName + " not applicable for " + repoIdentifier + ". Reason: " + failureMessage);
     }
 
     public int getPoints(){

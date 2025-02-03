@@ -2,6 +2,7 @@ package controller.rules;
 
 import controller.Rule;
 import controller.RuleType;
+import exceptions.CloneProhibitedException;
 import model.Repository;
 import util.Json;
 import model.TextFile;
@@ -17,7 +18,7 @@ import java.util.regex.Pattern;
 public class KeyWord extends Rule {
 
     private final String[] KEYWORDS = Json.getAllKeywords();
-    private final List<TextFile> textFiles;
+    private List<TextFile> textFiles;
 
     // The limits determine, how many keywords need to be found for a point.
     private final int FIRST_LIMIT = 1;
@@ -29,14 +30,20 @@ public class KeyWord extends Rule {
 
     public KeyWord(Repository repository) {
         super(RuleType.MANDATORY, repository);
-        textFiles = repository.getTextfiles();
     }
 
     @Override
     public RuleReturn execute() {
 
+        try {
+            textFiles = repository.getTextfiles();
+        } catch (CloneProhibitedException e) {
+            return new RuleReturn(e.getMessage(), repository.getRepositoryName() + "of owner " + repository.getOwner(), this.getClass().getSimpleName());
+        }
+
+
         if (KEYWORDS == null || KEYWORDS.length == 0) {
-            return new RuleReturn("No keywords found in the JSON file.");
+            return new RuleReturn("No keywords found in the JSON file.", repository.getRepositoryName() + "of owner " + repository.getOwner(), this.getClass().getSimpleName());
         }
 
         AtomicInteger keywordCount = new AtomicInteger();
