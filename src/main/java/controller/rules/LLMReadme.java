@@ -112,7 +112,7 @@ public class LLMReadme extends Rule {
         String formattetReadme = objectMapper.writeValueAsString(readme);
 
         String roleContent
-                = " \"You are a machine to assist in evaluating a readme file of a GitHub repository according to the likelihood of the repository containing architectural information. Formulate your response as one point in the range of 0 to " + MAX_POINTS + " points. Answer only with the one number.\"";
+                = " \"You are a machine to evaluate README files of Git Repositories. The user is looking for Repositories with architecture documentation. Give 0 to " + MAX_POINTS + " Points according to the likelihood of the existence of documentation for the repository. Answer only with the one number.\"";
 
 
 
