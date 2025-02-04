@@ -31,7 +31,13 @@ public class APIProxy extends AbstractProxy{
             changeToClone("couldn't get structure");
             return cache.getStructure();
         } else if (structure != null && structure.size() > CLONE_THRESHOLD) {
-            changeToClone("large structure: " + structure.size() + " elements");
+            // If the structure is too large: try to clone, but don't throw an exception, because it is not the
+            // callers fault.
+            try {
+                changeToClone("large structure: " + structure.size() + " elements");
+            } catch (CloneProhibitedException e) {
+                return structure;
+            }
         }
         return structure;
     }
