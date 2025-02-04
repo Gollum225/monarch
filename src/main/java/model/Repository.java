@@ -12,6 +12,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 /**
  * Implements the requests, the rules in {@link controller.rules} can ask.
@@ -32,6 +33,8 @@ public class Repository implements RepoFunctions {
      * Date of creation of the repository.
      */
     private Date created;
+
+    private String readme;
 
     /**
      * Constructor for the Repository.
@@ -161,5 +164,38 @@ public class Repository implements RepoFunctions {
 
     public Date getCreationDate() {
         return created;
+    }
+
+    /**
+     * Returns the content of the readme file. If no readme file is found in the top level directory,
+     * a readme file from a possible documentation folder is returned.
+     *
+     * @return readme file content or null, if no readme file is found.
+     */
+    public String getReadme() throws CloneProhibitedException {
+        if (readme != null) {
+            return readme;
+        }
+
+        String[] readmeNames = {"README.md", "readme.md", "Readme.md", "README", "readme", "Readme"};
+
+        for (String name : readmeNames) {
+            if (checkFileExistence(name)) {
+                readme = getFiles(new ArrayList<>(List.of(name))).get(name);
+                return readme;
+            }
+        }
+
+        for (JsonNode file : getStructure()) {
+            String path = file.get("path").asText();
+            if (Pattern.compile(Pattern.quote("docs/readme"), Pattern.CASE_INSENSITIVE).matcher(path).find()||
+                    Pattern.compile(Pattern.quote("documentation/readme"), Pattern.CASE_INSENSITIVE).matcher(path).find()||
+                    Pattern.compile(Pattern.quote("readme"), Pattern.CASE_INSENSITIVE).matcher(path).find()) {
+                readme = getFiles(new ArrayList<>(List.of(path))).get(path);
+                return readme;
+            }
+        }
+        return null;
+
     }
 }
