@@ -24,6 +24,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Base64;
 import java.util.Date;
@@ -173,7 +175,7 @@ public final class GithubCommunication implements GitMandatories {
     }
 
     public static String getFile(String path, String owner, String reponame) {
-        String urlString = "https://api.github.com/repos/" + owner + "/" + reponame + "/contents/" + path;
+        String urlString = GITHUB_REST_URL + "/repos/" + owner + "/" + reponame + "/contents/" + encode(path);
         String response;
         try {
             response = sendGetRequest(urlString);
@@ -199,6 +201,10 @@ public final class GithubCommunication implements GitMandatories {
     private static String decodeBase64(String encodedContent) {
         byte[] decodedBytes = Base64.getMimeDecoder().decode(encodedContent);
         return new String(decodedBytes);
+    }
+
+    public static String encode(String content) {
+        return URLEncoder.encode(content, StandardCharsets.UTF_8).replace("+", "%20");
     }
 
     public static boolean cloneRepo(String owner, String repo, Path path) {
