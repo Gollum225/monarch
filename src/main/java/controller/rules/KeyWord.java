@@ -59,6 +59,9 @@ public class KeyWord extends Rule {
                         if (stopProcessing.get()) {
                             return;
                         }
+                        if (keyword == null || keyword.isEmpty() || textFile.getContent() == null || textFile.getContent().isEmpty()) {
+                            continue;
+                        }
                         // Following condition is taken from StackOverflow: https://stackoverflow.com/a/90780
                         // This is necessary, because the method "contains" is case-sensitive.
                         if (Pattern.compile(Pattern.quote(keyword), Pattern.CASE_INSENSITIVE).matcher(textFile.getContent()).find()) {
