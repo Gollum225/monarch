@@ -38,12 +38,12 @@ public class KeyWord extends Rule {
         try {
             textFiles = repository.getTextfiles();
         } catch (CloneProhibitedException e) {
-            return new RuleReturn(e.getMessage(), repository.getRepositoryName() + "of owner " + repository.getOwner(), this.getClass().getSimpleName());
+            return new RuleReturn(e.getMessage(), repository.getIdentifier(), this.getClass().getSimpleName());
         }
 
 
         if (KEYWORDS == null || KEYWORDS.length == 0) {
-            return new RuleReturn("No keywords found in the JSON file.", repository.getRepositoryName() + "of owner " + repository.getOwner(), this.getClass().getSimpleName());
+            return new RuleReturn("No keywords found in the JSON file.", repository.getIdentifier(), this.getClass().getSimpleName());
         }
 
         AtomicInteger keywordCount = new AtomicInteger();

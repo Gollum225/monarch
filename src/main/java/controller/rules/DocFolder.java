@@ -24,7 +24,7 @@ public class DocFolder extends Rule {
         try {
             structure = repository.getStructure();
         } catch (CloneProhibitedException e) {
-            return new RuleReturn(e.getMessage(), repository.getRepositoryName() + "of owner " + repository.getOwner(), this.getClass().getSimpleName());
+            return new RuleReturn(e.getMessage(), repository.getIdentifier(), this.getClass().getSimpleName());
         }
         int counter = 0;
         String lastFoundPath = "";
@@ -46,13 +46,13 @@ public class DocFolder extends Rule {
         if (counter == 0) {
             return new RuleReturn(0);
         } else if (counter == 1) {
-            System.out.println("Found 1 documentation folder in repository: " + repository.getRepositoryName() + " of owner: " + repository.getOwner() + " at: " + lastFoundPath);
+            System.out.println("Found 1 documentation folder in " + repository.getIdentifier() + " at: " + lastFoundPath);
             return new RuleReturn(3);
         } else if (counter <= 5){
-            System.out.println("Found " + counter + " documentation folders in repository: " + repository.getRepositoryName() + " of owner: " + repository.getOwner() + " e.g.: " + lastFoundPath);
+            System.out.println("Found " + counter + " documentation folders in " + repository.getIdentifier() + " e.g.: " + lastFoundPath);
             return new RuleReturn(4);
         } else {
-            System.out.println("Found " + counter + " documentation folders in repository: " + repository.getRepositoryName() + " of owner: " + repository.getOwner() + " e.g.: " + lastFoundPath);
+            System.out.println("Found " + counter + " documentation folders in " + repository.getIdentifier() + " e.g.: " + lastFoundPath);
             return new RuleReturn(MAX_POINTS);
         }
     }

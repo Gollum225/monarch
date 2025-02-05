@@ -23,6 +23,7 @@ public class Repository implements RepoFunctions {
     // uniquely identifies a repository
     private final String repositoryName;
     private final String owner;
+    private final String repoIdentifier;
 
     /**
      * All request will be called on the cache.
@@ -46,6 +47,7 @@ public class Repository implements RepoFunctions {
         this.owner = owner;
         this.cache = new RepoCache(repositoryName, owner);
         this.created = new Date();
+        this.repoIdentifier = "repository: " + repositoryName + " of owner: " + owner;
     }
 
     /**
@@ -197,5 +199,9 @@ public class Repository implements RepoFunctions {
         }
         return null;
 
+    }
+
+    public String getIdentifier() {
+        return repoIdentifier;
     }
 }

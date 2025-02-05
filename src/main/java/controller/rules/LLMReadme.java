@@ -37,11 +37,11 @@ public class LLMReadme extends Rule {
         try {
             readme = repository.getReadme();
         } catch (CloneProhibitedException e) {
-            return new RuleReturn(e.getMessage(), repository.getRepositoryName() + "of owner " + repository.getOwner(), this.getClass().getSimpleName());
+            return new RuleReturn(e.getMessage(), repository.getIdentifier(), this.getClass().getSimpleName());
         }
 
         if (readme == null) {
-            return new RuleReturn("No readme found", repository.getRepositoryName() + "of owner " + repository.getOwner(), this.getClass().getSimpleName());
+            return new RuleReturn("No readme found", repository.getIdentifier(), this.getClass().getSimpleName());
         }
 
         String llmAnswer = null;
@@ -49,22 +49,22 @@ public class LLMReadme extends Rule {
         try {
             llmAnswer = sendGetRequest(readme);
         } catch (IOException e) {
-            return new RuleReturn("Error while getting LLM response", repository.getRepositoryName() + "of owner " + repository.getOwner(), this.getClass().getSimpleName());
+            return new RuleReturn("Error while getting LLM response", repository.getIdentifier(), this.getClass().getSimpleName());
         }
 
         if (llmAnswer == null) {
-            return new RuleReturn("No answer from LLM", repository.getRepositoryName() + "of owner " + repository.getOwner(), this.getClass().getSimpleName());
+            return new RuleReturn("No answer from LLM", repository.getIdentifier(), this.getClass().getSimpleName());
         }
 
 
         for (int i = 0; i <= MAX_POINTS; i++) {
             if (llmAnswer.contains(String.valueOf(i))) {
-                System.out.println("LLM gave: " + i + " points to " + repository.getRepositoryName() + " of owner: " + repository.getOwner());
+                System.out.println("LLM gave: " + i + " points to " + repository.getIdentifier());
                 return new RuleReturn(i);
             }
         }
 
-        return new RuleReturn( "LLM gave an unexpected answer: " + llmAnswer, repository.getRepositoryName() + "of owner " + repository.getOwner(), this.getClass().getSimpleName());
+        return new RuleReturn( "LLM gave an unexpected answer: " + llmAnswer, repository.getIdentifier(), this.getClass().getSimpleName());
     }
 
     private String sendGetRequest(String readme) throws IOException {
