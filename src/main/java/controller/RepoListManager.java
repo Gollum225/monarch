@@ -26,8 +26,14 @@ public class RepoListManager {
         csvHandler.createCsv();
     }
 
+    /**
+     * Handles the writing of the results to a CSV file.
+     */
     private final CSVHandler csvHandler;
 
+    /**
+     * List of repositories this class handles.
+     */
     private final RepoList repoList = RepoList.getInstace();
 
     /**
@@ -35,6 +41,9 @@ public class RepoListManager {
      */
     private final int THRESHOLD = 2;
 
+    /**
+     * Amount of repositories to get, when the threshold is reached.
+     */
     private final int REFILL_AMOUNT = 3;
 
     /**
@@ -43,7 +52,11 @@ public class RepoListManager {
     private int unprocessedRepos = 0;
 
 
-
+    /**
+     * Gets the next repository to check.
+     * @return next repository
+     * @throws TimeoutException if no new repositories are available after 10 seconds
+     */
     public synchronized Repository getNextRepo() throws TimeoutException {
         checkRepoAmount();
 

@@ -12,9 +12,19 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class Checker {
 
+    /**
+     * The rules that will be applied to the repositories.
+     */
     private RuleCollection rules;
+
+    /**
+     * Manages repositories.
+     */
     private final RepoListManager listManager;
 
+    /**
+     * Creates a new Checker with the default rules.
+     */
     public Checker() {
         rules = new RuleCollection();
         listManager = new RepoListManager(rules);
@@ -44,6 +54,13 @@ public class Checker {
 
     }
 
+    /**
+     * Creates a new CompletionService for the given amount of repositories.
+     *
+     * @param amount of repositories to be checked
+     * @param executor to execute the tasks
+     * @return the CompletionService
+     */
     private CompletionService<Void> getVoidCompletionService(int amount, ExecutorService executor) {
         CompletionService<Void> completionService = new ExecutorCompletionService<>(executor);
 

@@ -20,7 +20,7 @@ import java.util.regex.Pattern;
 public class Repository implements RepoFunctions {
 
 
-    // uniquely identifies a repository
+    // uniquely identifies a repository:
     private final String repositoryName;
     private final String owner;
     private final String repoIdentifier;
@@ -35,6 +35,9 @@ public class Repository implements RepoFunctions {
      */
     private Date created;
 
+    /**
+     * Content of the readme file. null if no readme file is found, or if the readme file is not yet requested.
+     */
     private String readme;
 
     /**
@@ -55,16 +58,35 @@ public class Repository implements RepoFunctions {
      */
     private HashMap<Class<? extends Rule>, RuleReturn> results = new HashMap<>();
 
+    /**
+     * The overall points of the repository. Starting with 0.
+     */
     private int overallPoints = 0;
 
+    /**
+     * Getter for the name of the repository.
+     *
+     * @return repository name.
+     */
     public String getRepositoryName() {
         return repositoryName;
     }
 
+    /**
+     * Getter for the owner of the repository.
+     *
+     * @return repository owner
+     */
     public String getOwner() {
         return owner;
     }
 
+    /**
+     * Returns all textfiles of a {@link Repository}. The textfiles are identified by their file extension.
+     * Searched extensions are: txt, md, markdown, rst, adoc, pdf, docx.
+     * @return list of {@link TextFile}
+     * @throws CloneProhibitedException if this call lead to cloning of the repository, where cloning is prohibited.
+     */
     public List<TextFile> getTextfiles() throws CloneProhibitedException {
         String repoIdentifier ="repository: " + repositoryName + " of owner: " + owner;
         List <JsonNode> foundTextFiles = new ArrayList<>();
@@ -128,6 +150,12 @@ public class Repository implements RepoFunctions {
         return cache.generalInfo();
     }
 
+    /**
+     * Saves the result of an executed rule in the repository.
+     *
+     * @param rule that was executed
+     * @param points the rule gave
+     */
     public void saveResult(Class<? extends Rule> rule, RuleReturn points) {
         results.put(rule, points);
     }
@@ -136,6 +164,10 @@ public class Repository implements RepoFunctions {
         return ""; //TODO: implement
     }
 
+    /**
+     * Should be called after all rules are executed. Calculates the overall points of the repository.
+     * @return
+     */
     public int finish() {
 
         for (RuleReturn rule : results.values()) {
@@ -146,14 +178,31 @@ public class Repository implements RepoFunctions {
         return overallPoints;
     }
 
+    /**
+     * Getter for the overal points.
+     *
+     * @return sum of all points given by the rules.
+     */
     public int getOverallPoints() {
         return overallPoints;
     }
 
+    /**
+     * Getter for results.
+     *
+     * @return map of rules and their results.
+     */
     public HashMap<Class<? extends Rule>, RuleReturn> getResults() {
         return results;
     }
 
+    /**
+     * Checks if a file exists in the repository.
+     *
+     * @param path the path of the file to check.
+     * @return true, if the file exists.
+     * @throws CloneProhibitedException if this methode lead to a clone of the repository, but the repository is prohibited to clone.
+     */
     public boolean checkFileExistence(String path) throws CloneProhibitedException {
         JsonNode structure = getStructure();
         for (JsonNode file: structure) {
@@ -164,6 +213,11 @@ public class Repository implements RepoFunctions {
         return false;
     }
 
+    /**
+     * Returns the date where the repository was discovered. This is not the date, where it was begun to be analyzed.
+     *
+     * @return date of discovery.
+     */
     public Date getCreationDate() {
         return created;
     }
@@ -201,6 +255,13 @@ public class Repository implements RepoFunctions {
 
     }
 
+    /**
+     * Returns the identifier of the repository. The identifier is the name of the repository and the owner.
+     * Identifier is used mainly for logging, because it is a nicely formatted string.
+     * Use {@link #getRepositoryName()} and {@link #getOwner()} for other code-purposes.
+     *
+     * @return identifier of the repository.
+     */
     public String getIdentifier() {
         return repoIdentifier;
     }

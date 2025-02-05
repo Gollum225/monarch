@@ -18,6 +18,9 @@ public class RuleCollection {
      */
     private final ArrayList<Class <? extends Rule>> rules = new ArrayList<>();
 
+    /**
+     * Creates a new RuleColection. Adds the rules in the constructor to the list to be executed.
+     */
     public RuleCollection() {
         rules.add(KeyWord.class);
         rules.add(LLMReadme.class);
@@ -52,6 +55,11 @@ public class RuleCollection {
         return ruleList;
     }
 
+    /**
+     * Getter for the rules.
+     *
+     * @return the list of rules
+     */
     public ArrayList<Class<? extends Rule>> getRules() {
         return rules;
     }

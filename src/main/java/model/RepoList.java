@@ -1,6 +1,5 @@
 package model;
 
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 
 /**
@@ -8,6 +7,9 @@ import java.util.LinkedHashSet;
  */
 public class RepoList {
 
+    /**
+     * The instance of the {@link RepoList} for the Singleton pattern.
+     */
     private static RepoList instance;
 
     /**
@@ -17,7 +19,9 @@ public class RepoList {
     private LinkedHashSet<Repository> unprocessedRepos = new LinkedHashSet<>();
     private LinkedHashSet<Repository> startedRepos = new LinkedHashSet<>();
 
-
+    /**
+     * Private constructor for the Singleton pattern.
+     */
     private RepoList() {
     }
 
@@ -34,6 +38,11 @@ public class RepoList {
         return instance;
     }
 
+    /**
+     * Gets the next {@link Repository} from the list.
+     *
+     * @return next unprocessed {@link Repository}
+     */
     public synchronized Repository getNext() {
         if (unprocessedRepos.isEmpty()) {
             return null;
@@ -43,6 +52,11 @@ public class RepoList {
         return currentRepo;
     }
 
+    /**
+     * Getter for the amount of unprocessed {@link Repository}.
+     *
+     * @return unprocessed {@link Repository}
+     */
     public int size() {
         return unprocessedRepos.size();
     }
