@@ -1,23 +1,18 @@
 package controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.MappingIterator;
-import com.fasterxml.jackson.databind.SequenceWriter;
 import model.RepoList;
 import model.Repository;
 import repository_information.GitHub.GithubCommunication;
-import com.fasterxml.jackson.dataformat.csv.CsvMapper;
-import com.fasterxml.jackson.dataformat.csv.CsvSchema;
+import util.CSVHandler;
 
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Path;
-import java.util.*;
+
+import java.util.InputMismatchException;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import static util.Globals.RESOURCE_PATH;
 
 /**
  * Manages the list of repositories and provides the next repository to check.
@@ -26,11 +21,12 @@ import static util.Globals.RESOURCE_PATH;
 public class RepoListManager {
 
     public RepoListManager(RuleCollection ruleCollection) {
-        createSchema(ruleCollection);
-        createCsv();
+        csvHandler = new CSVHandler("result.csv");
+        csvHandler.createResultSchema(ruleCollection);
+        csvHandler.createCsv();
     }
 
-    private CsvSchema schema;
+    private final CSVHandler csvHandler;
 
     private final RepoList repoList = RepoList.getInstace();
 
@@ -71,6 +67,11 @@ public class RepoListManager {
         return repoList.getNext();
     }
 
+    /**
+     * Gets new repositories from the GitHub API.
+     *
+     * @param amount amount of repositories to get
+     */
     private void getNewRepos(int amount) {
 
         List<Repository> repos;
@@ -91,14 +92,15 @@ public class RepoListManager {
 
     /**
      * Writes the result of the search to files.
-     * @param repo
+     *
+     * @param repo repository to be finished
      */
     public void finishRepo(Repository repo, RuleCollection ruleCollection) {
         repo.finish();
         System.out.println("\u001B[32m" + "repo: " + repo.getRepositoryName() + " of " + repo.getOwner() + " got: " + repo.getOverallPoints() + " points" + "\u001B[0m");
         //TODO
         try {
-            writeResult(repo, ruleCollection);//TODO
+            csvHandler.writeResult(repo, ruleCollection);
         } catch (IOException e) {
             throw new RuntimeException(e); //TODO
         }
@@ -123,105 +125,4 @@ public class RepoListManager {
         repoList.addRepo(new Repository("bigbluebutton", "bigbluebutton"));
         unprocessedRepos = 5;
     }
-
-    private void createCsv() {
-        Path path = RESOURCE_PATH.resolve("result.csv");
-        File file = new File(path.toString());
-
-        if (path.toFile().exists()) {
-            if (handleExistingCsv(path)) {
-                System.out.println("Result file with matching schema found. Continue with this file.");
-                return;
-            } else if (file.renameTo(new File(RESOURCE_PATH.resolve("resultCopied.csv").toString()))) {
-                System.out.println("\u001B[33m" + "Old result file was renamed. Delete before next run!" + "\u001B[0m");
-            } else {
-                System.err.println("Old result file was deleted.");
-                file.delete();
-            }
-        }
-        CsvMapper csvMapper = new CsvMapper();
-
-        try {
-            csvMapper.writer(schema)
-                    .writeValue(new File(path.toString()), new ArrayList<>());
-        } catch (IOException e) {
-            throw new RuntimeException("Couldn't create CSV file.");
-        }
-        System.out.println("\\u001B[32m" + "New CSV file created: " + path + "\u001B[0m");
-
-    }
-
-    /**
-     * Checks if the schema of the existing CSV file matches the schema of the current run.
-     * @param path to the existing CSV file
-     * @return true, if the schema matches
-     */
-    private boolean handleExistingCsv(Path path) {
-        CsvMapper csvMapper = new CsvMapper();
-        CsvSchema existingSchema = csvMapper.typedSchemaFor(Map.class).withHeader();
-
-        try {
-            MappingIterator<Map<String, String>> it = csvMapper
-                    .readerFor(Map.class)
-                    .with(existingSchema)
-                    .readValues(new File(path.toString()));
-
-            existingSchema = (CsvSchema) it.getParserSchema();
-
-        } catch (IOException e) {
-            return false;
-        }
-
-        if (!existingSchema.toString().equals(schema.toString())) {
-            System.err.println("Schema doesn't match the existing schema in the file.");
-            return false;
-        }
-        return true;
-    }
-
-    private void createSchema(RuleCollection ruleCollection) {
-        CsvSchema.Builder schemaBuilder = CsvSchema.builder()
-                .addColumn("RepoName")
-                .addColumn("repoOwner");
-
-        for (Class<? extends Rule> rule : ruleCollection.getRules()) {
-            schemaBuilder.addColumn(rule.getSimpleName());
-        }
-
-        schema = schemaBuilder
-                .addColumn("TotalScore")
-                .addColumn("reachablePoints")
-                .setUseHeader(true)
-                .build();
-    }
-
-    private synchronized void writeResult(Repository repo, RuleCollection ruleCollection) throws IOException {
-
-        File csvFile = new File(String.valueOf(RESOURCE_PATH.resolve("result.csv")));
-
-        CsvMapper csvMapper = new CsvMapper();
-        List<Map<String, String>> rows = new ArrayList<>();
-
-
-        Map<String, String> row = new HashMap<>();
-        row.put("RepoName", repo.getRepositoryName());
-        row.put("repoOwner", repo.getOwner());
-        for (Class<? extends Rule> rule : ruleCollection.getRules()) {
-
-            row.put(rule.getSimpleName(), String.valueOf(repo.getResults().get(rule).getResultString()));
-        }
-        row.put("TotalScore", String.valueOf(repo.getOverallPoints()));
-
-        rows.add(row);
-
-
-        // write csv file
-        FileWriter fileWriter = new FileWriter(csvFile, true);
-        SequenceWriter seqWriter = csvMapper.writer(schema.withoutHeader()).writeValues(fileWriter);
-            seqWriter.writeAll(rows);
-
-
-
-    }
-
 }
