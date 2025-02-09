@@ -70,7 +70,16 @@ public class Checker {
 
                 ArrayList<Rule> equippedRules = rules.equipRules(currentRepo);
                 for (Rule rule : equippedRules) {
-                    currentRepo.saveResult(rule.getClass(), rule.execute());
+                    if (rule.getType() == RuleType.MANDATORY) {
+                        currentRepo.saveResult(rule.getClass(), rule.execute());
+                    }
+                }
+                if (currentRepo.getOverallPoints() > 0) {
+                    for (Rule rule : equippedRules) {
+                        if (rule.getType() == RuleType.QUALITY) {
+                            currentRepo.saveResult(rule.getClass(), rule.execute());
+                        }
+                    }
                 }
 
                 listManager.finishRepo(currentRepo, rules);
