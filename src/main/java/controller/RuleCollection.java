@@ -27,6 +27,8 @@ public class RuleCollection {
         rules.add(LLMReadme.class);
         rules.add(DocFolder.class);
         rules.add(ReadReadmeLinks.class);
+
+        rules.add(controller.rules.QualityMetric.class);
     }
 
 
