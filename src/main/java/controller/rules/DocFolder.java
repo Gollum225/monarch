@@ -73,35 +73,4 @@ public class DocFolder extends Rule {
         return input;
     }
 
-//    /**
-//     * Checks if the text contains the term. The search is case-insensitive.
-//     * Only returns true, if the term is not surrounded by other letters.
-//     *
-//     * @param text to search in
-//     * @param term to search for
-//     * @return true, if the term is found in the text
-//     */
-//    private boolean contains(String text, String term) {
-//        if (term.isEmpty()) {
-//            return false;
-//        }
-//
-//        text = text.toLowerCase();
-//        term = term.toLowerCase();
-//
-//        int index = text.indexOf(term);
-//        while (index != -1) {
-//            boolean before = (index == 0) || !Character.isLetter(text.charAt(index - 1));
-//            boolean after = (index + term.length() == text.length()) || !Character.isLetter(text.charAt(index + term.length()));
-//
-//            if (before && after) {
-//                return true;
-//            }
-//
-//            index = text.indexOf(term, index + 1);
-//        }
-//
-//        return false;
-//    }
-
 }
