@@ -62,6 +62,29 @@ public final class Json {
         return allKeywords.toArray(new String[0]);
     }
 
+    /**
+     * Get specific keywords from the JSON file.
+     *
+     * @param key of the keywords to get
+     * @return list of words under the index
+     */
+    public static List<String> getSpecificKeywords(String key) {
+
+        checkJson();
+        return list.get(key);
+    }
+
+    private static void checkJson() {
+        if (list == null) {
+            try {
+                setup();
+            } catch (IOException e) {
+                System.out.println("Couldn't read the JSON file.");
+                throw new RuntimeException("Couldn't read the JSON file.");
+            }
+        }
+    }
+
 
     /**
      * Parses the JSON response from the GitHub API and returns a list of repositories.
