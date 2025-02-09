@@ -3,6 +3,7 @@ package controller;
 import controller.rules.DocFolder;
 import controller.rules.KeyWord;
 import controller.rules.LLMReadme;
+import controller.rules.ReadReadmeLinks;
 import model.Repository;
 
 import java.lang.reflect.InvocationTargetException;
@@ -25,6 +26,7 @@ public class RuleCollection {
         rules.add(KeyWord.class);
         rules.add(LLMReadme.class);
         rules.add(DocFolder.class);
+        rules.add(ReadReadmeLinks.class);
     }
 
 
