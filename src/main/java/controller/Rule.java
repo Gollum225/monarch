@@ -1,6 +1,6 @@
 package controller;
 
-import controller.rules.RuleReturn;
+import model.RuleReturn;
 import model.Repository;
 
 import java.util.List;

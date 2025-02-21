@@ -3,6 +3,7 @@ package controller.rules;
 import controller.Rule;
 import controller.RuleType;
 import model.Repository;
+import model.RuleReturn;
 
 /**
  * Checks the quality metric of the repository. e.g. GitHub stars.

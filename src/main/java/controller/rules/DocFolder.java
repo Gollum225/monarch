@@ -5,6 +5,7 @@ import controller.Rule;
 import controller.RuleType;
 import exceptions.CloneProhibitedException;
 import model.Repository;
+import model.RuleReturn;
 
 /**
  * Checks if the repository contains a folder with documentation.

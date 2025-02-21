@@ -4,6 +4,7 @@ import controller.Rule;
 import controller.RuleType;
 import exceptions.CloneProhibitedException;
 import model.Repository;
+import model.RuleReturn;
 import util.Json;
 
 import java.io.BufferedReader;

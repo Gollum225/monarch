@@ -1,7 +1,6 @@
-package controller.rules;
+package model;
 
 import controller.Rule;
-import model.Repository;
 
 /**
  * Return value (of the {@link Rule#execute()} methode) of a rule.
