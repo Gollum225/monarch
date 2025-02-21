@@ -1,7 +1,6 @@
 package model;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import controller.rules.RuleReturn;
 import exceptions.CloneProhibitedException;
 import repository_information.RepoCache;
 import controller.Rule;
