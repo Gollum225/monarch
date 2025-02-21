@@ -41,7 +41,7 @@ public final class GithubCommunication implements GitMandatories {
     private static final String ACCESS_TOKEN = System.getenv("GitHub_API");
     private static String cursor = "";
 
-    private static final GithubRateLimitCheck rateLimitCheck = GithubRateLimitCheck.getInstance();
+    private static final RateLimitMandatories rateLimitCheck = GithubRateLimitCheck.getInstance();
 
 
     /**
