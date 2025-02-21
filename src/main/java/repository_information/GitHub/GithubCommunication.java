@@ -43,9 +43,6 @@ public final class GithubCommunication implements GitMandatories {
 
     private static final GithubRateLimitCheck rateLimitCheck = GithubRateLimitCheck.getInstance();
 
-    private GithubCommunication() {
-        throw new UnsupportedOperationException("Utility-class shouldn't be instantiated.");
-    }
 
     /**
      * Get the repositories from the GitHub API.
@@ -106,7 +103,7 @@ public final class GithubCommunication implements GitMandatories {
     }
 
 
-    public static JsonNode getStructure(String owner, String repo) {
+    public JsonNode getStructure(String owner, String repo) {
         return getStructure(owner, repo, "HEAD");
     }
 
@@ -174,7 +171,7 @@ public final class GithubCommunication implements GitMandatories {
         return response.toString();
     }
 
-    public static String getFile(String path, String owner, String reponame) {
+    public String getFile(String path, String owner, String reponame) {
         String urlString = GITHUB_REST_URL + "/repos/" + owner + "/" + reponame + "/contents/" + encode(path);
         String response;
         try {

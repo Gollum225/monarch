@@ -13,9 +13,11 @@ import static util.Globals.MAX_FILE_AMOUNT;
 
 public class APIProxy extends AbstractProxy{
 
+    GitMandatories gitAPI;
 
     public APIProxy(String repositoryName, String owner, RepoCache cache) {
         super(repositoryName, owner, cache);
+        gitAPI = new GithubCommunication();
     }
 
     @Override
@@ -26,7 +28,7 @@ public class APIProxy extends AbstractProxy{
             return cache.getStructure();
         }
 
-        JsonNode structure = GithubCommunication.getStructure(owner, repositoryName);
+        JsonNode structure = gitAPI.getStructure(owner, repositoryName);
         if (structure == null) {
             changeToClone("couldn't get structure");
             return cache.getStructure();
@@ -60,7 +62,7 @@ public class APIProxy extends AbstractProxy{
 
     @Override
     String getSingleFile(String path) {
-        return GithubCommunication.getFile(path, owner, repositoryName);
+        return gitAPI.getFile(path, owner, repositoryName);
     }
 
     private boolean checkRateLimit() {
