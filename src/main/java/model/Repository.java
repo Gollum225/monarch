@@ -34,6 +34,8 @@ public class Repository implements RepoFunctions {
      */
     private Date created;
 
+    private long duration;
+
     /**
      * Content of the readme file. null if no readme file is found, or if the readme file is not yet requested.
      */
@@ -168,12 +170,8 @@ public class Repository implements RepoFunctions {
      * @return
      */
     public int finish() {
-
-        for (RuleReturn rule : results.values()) {
-            if (rule.isApplicable()) {
-                overallPoints += rule.getPoints();
-            }
-        }
+        duration = (new Date().getTime() - created.getTime());
+        calculateOverallPoints();
         return overallPoints;
     }
 
@@ -183,7 +181,17 @@ public class Repository implements RepoFunctions {
      * @return sum of all points given by the rules.
      */
     public int getOverallPoints() {
+        calculateOverallPoints();
         return overallPoints;
+    }
+
+    private void calculateOverallPoints() {
+        overallPoints = 0;
+        for (RuleReturn rule : results.values()) {
+            if (rule.isApplicable()) {
+                overallPoints += rule.getPoints();
+            }
+        }
     }
 
     /**
@@ -263,5 +271,9 @@ public class Repository implements RepoFunctions {
      */
     public String getIdentifier() {
         return repoIdentifier;
+    }
+
+    public long getDuration() {
+        return duration;
     }
 }

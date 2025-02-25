@@ -114,6 +114,7 @@ public final class CSVHandler {
         }
 
         schema = schemaBuilder
+                .addColumn("Duration")
                 .addColumn("TotalScore")
                 .addColumn("reachablePoints")
                 .setUseHeader(true)
@@ -142,6 +143,7 @@ public final class CSVHandler {
 
             row.put(rule.getSimpleName(), String.valueOf(repo.getResults().get(rule).getResultString()));
         }
+        row.put("Duration", String.valueOf(repo.getDuration()));
         row.put("TotalScore", String.valueOf(repo.getOverallPoints()));
 
         //TODO reachable points
