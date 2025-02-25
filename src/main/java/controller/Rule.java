@@ -40,6 +40,15 @@ public abstract class Rule {
     public abstract RuleReturn execute();
 
     /**
+     * Getter for the type of the rule.
+     *
+     * @return type of the rule
+     */
+    public RuleType getType() {
+        return type;
+    }
+
+    /**
      * Checks if the text contains the term. The search is case-insensitive.
      * Only returns true, if the term is not surrounded by other letters.
      *
@@ -58,7 +67,7 @@ public abstract class Rule {
      *
      * @param text to search in
      * @param term to search for
-     * @return amount of occurrences
+     * @return number of occurrences
      */
     protected int countKeywordsMultipleOccurrence(String text, String term) {
         return scanText(true, text, term);
@@ -69,7 +78,7 @@ public abstract class Rule {
      *
      * @param text to search in
      * @param terms to search for
-     * @return amount of occurrences
+     * @return number of occurrences
      */
     protected int countMultipleKeywordsMultipleOccurrence(String text, List<String> terms) {
         int count = 0;
@@ -85,7 +94,7 @@ public abstract class Rule {
      *
      * @param text to search in
      * @param terms to search for
-     * @return amount of occurrences
+     * @return number of occurrences
      */
     protected int countMultipleKeywordsSingleOccurrence(String text, List<String> terms) {
         int count = 0;
@@ -104,7 +113,7 @@ public abstract class Rule {
      * @param count if true, the method will count the occurrences
      * @param text to search in
      * @param term to search for
-     * @return amount of occurrences, if count is true max. 1
+     * @return number of occurrences, if count is true max. 1
      */
     private int scanText(boolean count, String text, String term) {
         if (term.isEmpty()) {

@@ -17,6 +17,20 @@ public interface RepoFunctions {
      * @throws CloneProhibitedException if the repository is too large to clone.
      */
     Map<String, String> getFiles(List<String> paths) throws CloneProhibitedException;
+
+    /**
+     * Tries to clone the repository.
+     *
+     * @param reason why the repository should be cloned
+     * @return true if the repository was cloned.
+     * @throws CloneProhibitedException if the repository can't be cloned.
+     */
     boolean changeToClone(String reason) throws CloneProhibitedException;
+
+    /**
+     * Gets general information about the repository.
+     *
+     * @return a JsonNode with the general information.
+     */
     JsonNode generalInfo();
 }

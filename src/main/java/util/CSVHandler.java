@@ -19,6 +19,9 @@ import java.util.Map;
 
 import static util.Globals.RESOURCE_PATH;
 
+/**
+ * Responsible for the writing to and from the result file.
+ */
 public final class CSVHandler {
 
     /**
