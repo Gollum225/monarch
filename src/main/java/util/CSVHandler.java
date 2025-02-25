@@ -36,7 +36,7 @@ public final class CSVHandler {
     }
 
     private CsvSchema schema;
-    private final Path path;
+    private Path path;
     private final String filePath;
 
     /**
@@ -52,13 +52,15 @@ public final class CSVHandler {
             if (handleExistingCsv(path)) {
                 System.out.println(filePath + " file with matching schema found. Continue with this file.");
                 return;
-            } else if (file.renameTo(new File(RESOURCE_PATH.resolve(filePath + "Copied.csv").toString()))) { //TODO wieso funktioniert das nicht?
-                System.out.println("\u001B[33m" + "Old " + filePath + " file was renamed. Delete before next run!" + "\u001B[0m");
             } else {
-                System.err.println("Old " + filePath + " file was deleted.");
-                file.delete();
-            }
-        }
+                // The File exists and has no matching scheme.
+                int counter = 2;
+                while (file.exists()) {
+                    file = new File(RESOURCE_PATH.resolve(filePath.replace(".csv", "") + counter + ".csv").toString());
+                    path = file.toPath();
+                    counter++;
+                }
+            }}
         CsvMapper csvMapper = new CsvMapper();
 
         try {
@@ -67,7 +69,7 @@ public final class CSVHandler {
         } catch (IOException e) {
             throw new RuntimeException("Couldn't create CSV file at: " + filePath);
         }
-        System.out.println("\\u001B[32m" + "New CSV file created: " + path + "\u001B[0m");
+        System.out.println("\u001B[33m" + "New CSV file created at:  " + path + "\u001B[0m");
 
     }
 
