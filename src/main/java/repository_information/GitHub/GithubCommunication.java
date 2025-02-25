@@ -15,6 +15,7 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.eclipse.jgit.dircache.InvalidPathException;
 import repository_information.GitMandatories;
+import repository_information.RateLimitMandatories;
 import util.Json;
 
 
@@ -137,38 +138,48 @@ public final class GithubCommunication implements GitMandatories {
     }
 
     private static String sendGetRequest(String apiUrl) throws IOException {
-        // Verbindung öffnen
-        URL url = new URL(apiUrl);
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        HttpURLConnection connection = null;
+        BufferedReader in = null;
 
-        // GET-Methode und Header setzen
-        connection.setRequestMethod("GET");
-        connection.setRequestProperty("Authorization", "Bearer " + ACCESS_TOKEN);
-        connection.setRequestProperty("Accept", "application/vnd.github+json");
+        try {
+            URL url = new URL(apiUrl);
+            connection = (HttpURLConnection) url.openConnection();
 
-        // Statuscode überprüfen
-        int responseCode = connection.getResponseCode();
-        if (responseCode != 200) {
-            System.err.println("Error while getting GitHub response. Code: " + responseCode + " (" + apiUrl + ")");
-            return null;
+            // GET-Methode und Header setzen
+            connection.setRequestMethod("GET");
+            connection.setRequestProperty("Authorization", "Bearer " + ACCESS_TOKEN);
+            connection.setRequestProperty("Accept", "application/vnd.github+json");
+
+            // Statuscode überprüfen
+            int responseCode = connection.getResponseCode();
+            if (responseCode != 200) {
+                System.err.println("Error while getting GitHub response. Code: " + responseCode + " (" + apiUrl + ")");
+                return null;
+            }
+
+            // Set the Rate Limit tracker.
+            rateLimitCheck.setRateLimit(RateResource.valueOf(connection.getHeaderField("x-ratelimit-resource").toUpperCase()),
+                    Integer.parseInt(connection.getHeaderField("x-ratelimit-limit")),
+                    Integer.parseInt(connection.getHeaderField("x-ratelimit-remaining")),
+                    new Date(Integer.parseInt(connection.getHeaderField("x-ratelimit-reset")) * 1000L));
+
+            in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            String inputLine;
+            StringBuilder response = new StringBuilder();
+            while ((inputLine = in.readLine()) != null) {
+                response.append(inputLine);
+            }
+            in.close();
+
+            return response.toString();
+        } finally {
+            if (in != null) {
+                in.close();
+            }
+            if (connection != null) {
+                connection.disconnect();
+            }
         }
-
-        // Set the Rate Limit tracker.
-        rateLimitCheck.setRateLimit(RateResource.valueOf(connection.getHeaderField("x-ratelimit-resource").toUpperCase()),
-                Integer.parseInt(connection.getHeaderField("x-ratelimit-limit")),
-                Integer.parseInt(connection.getHeaderField("x-ratelimit-remaining")),
-                new Date(Integer.parseInt(connection.getHeaderField("x-ratelimit-reset")) * 1000L));
-
-        // Antwort lesen
-        BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-        String inputLine;
-        StringBuilder response = new StringBuilder();
-        while ((inputLine = in.readLine()) != null) {
-            response.append(inputLine);
-        }
-        in.close();
-
-        return response.toString();
     }
 
     public String getFile(String path, String owner, String reponame) {
@@ -206,6 +217,7 @@ public final class GithubCommunication implements GitMandatories {
 
     public static boolean cloneRepo(String owner, String repo, Path path) {
 
+        System.out.println("Cloning: " + owner + "/" + repo);
         String repoUrl = "https://github.com/" + owner + "/" + repo + ".git";
 
         if (path.toFile().exists()) {
