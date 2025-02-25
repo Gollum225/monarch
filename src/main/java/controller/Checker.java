@@ -49,6 +49,7 @@ public class Checker {
      * @param amount of repositories to be checked
      */
     public void checkRepos(int amount) {
+        start();
         AtomicInteger unprocessedRepos = new AtomicInteger(amount);
         ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
         CompletionService<Void> completionService = getVoidCompletionService(amount, executor);
@@ -120,6 +121,15 @@ public class Checker {
             });
         }
         return completionService;
+    }
+
+    private void start() {
+        try {
+            Json.setup();
+        } catch (IOException e) {
+            // No need to handle this exception, as the program cannot continue without the keywords.
+            throw new RuntimeException("Cant proceed, Error with setting up Json " + e);
+        }
     }
 
     private void finish() {
