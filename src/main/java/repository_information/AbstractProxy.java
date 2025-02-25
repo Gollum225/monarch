@@ -39,22 +39,24 @@ public abstract class AbstractProxy implements RepoFunctions{
 
     private boolean cloneRepo() throws CloneProhibitedException {
         if (cloneProhibited) {
+            System.out.println("\u001B[31m" + "Couldn't clone " + repositoryName + "of: " + owner + "\u001B[0m");
             throw new CloneProhibitedException();
         } else if (getRepoSize() > MAX_CLONE_SIZE) {
             cloneProhibited = true;
+            System.out.println("\u001B[31m" + "Couldn't clone " + repositoryName + "of: " + owner + "\u001B[0m");
             throw new CloneProhibitedException();
         }
         return GithubCommunication.cloneRepo(owner, repositoryName, repoPath);
     }
 
     boolean changeToClone() throws CloneProhibitedException {
-        System.out.println("\u001B[34m" + "Changing to clone: " + repositoryName + " of owner: " + owner + "\u001B[0m");
+        System.out.println("\u001B[34m" + "Trying to clone: " + repositoryName + " of owner: " + owner + "\u001B[0m");
 
         return change();
     }
 
     public boolean changeToClone(String reason) throws CloneProhibitedException {
-        System.out.println("\u001B[34m" + "Changing to clone: " + repositoryName + " of owner: " + owner + " because of " + reason + "\u001B[0m");
+        System.out.println("\u001B[34m" + "Trying to clone: " + repositoryName + " of owner: " + owner + " because of " + reason + "\u001B[0m");
         return change();
     }
     private boolean change() throws CloneProhibitedException {
