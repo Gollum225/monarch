@@ -35,6 +35,18 @@ import java.util.stream.Collectors;
 
 public final class GithubCommunication implements GitMandatories {
 
+    private static GithubCommunication instance;
+
+    private GithubCommunication() {
+    }
+
+    public static GithubCommunication getInstance() {
+        if (instance == null) {
+            instance = new GithubCommunication();
+        }
+        return instance;
+    }
+
     private static final String GITHUB_GRAPHQL_URL = "https://api.github.com/graphql";
     private static final String GITHUB_REST_URL = "https://api.github.com";
 
@@ -48,10 +60,10 @@ public final class GithubCommunication implements GitMandatories {
     /**
      * Get the repositories from the GitHub API.
      *
-     * @param amount the amount of repositories to get
-     * @return a list of repositories as Json
+     * @param amount the number of repositories to get
+     * @return a list of repositories as JSON
      */
-    public static List<Repository> getRepository(int amount) throws JsonProcessingException {
+    public List<Repository> getRepository(int amount) throws JsonProcessingException {
         String responseBody = "";
 
         System.out.println("token" + ACCESS_TOKEN);
@@ -103,12 +115,12 @@ public final class GithubCommunication implements GitMandatories {
 
     }
 
-
+    @Override
     public JsonNode getStructure(String owner, String repo) {
         return getStructure(owner, repo, "HEAD");
     }
 
-    public static JsonNode getStructure(String owner, String repo, String treeSha) {
+    public JsonNode getStructure(String owner, String repo, String treeSha) {
 
         String response = null;
 
@@ -137,7 +149,7 @@ public final class GithubCommunication implements GitMandatories {
 
     }
 
-    private static String sendGetRequest(String apiUrl) throws IOException {
+    private String sendGetRequest(String apiUrl) throws IOException {
         HttpURLConnection connection = null;
         BufferedReader in = null;
 
@@ -182,6 +194,7 @@ public final class GithubCommunication implements GitMandatories {
         }
     }
 
+    @Override
     public String getFile(String path, String owner, String reponame) {
         String urlString = GITHUB_REST_URL + "/repos/" + owner + "/" + reponame + "/contents/" + encode(path);
         String response;
@@ -206,16 +219,17 @@ public final class GithubCommunication implements GitMandatories {
         return decodeBase64(jsonNode.get("content").asText());
     }
 
-    private static String decodeBase64(String encodedContent) {
+    private String decodeBase64(String encodedContent) {
         byte[] decodedBytes = Base64.getMimeDecoder().decode(encodedContent);
         return new String(decodedBytes);
     }
 
-    public static String encode(String content) {
+    private String encode(String content) {
         return URLEncoder.encode(content, StandardCharsets.UTF_8).replace("+", "%20");
     }
 
-    public static boolean cloneRepo(String owner, String repo, Path path) {
+    @Override
+    public boolean cloneRepo(String owner, String repo, Path path) {
 
         System.out.println("Cloning: " + owner + "/" + repo);
         String repoUrl = "https://github.com/" + owner + "/" + repo + ".git";
@@ -240,7 +254,8 @@ public final class GithubCommunication implements GitMandatories {
         return true;
     }
 
-    public static JsonNode generalInfo(String owner, String repo) {
+    @Override
+    public JsonNode generalInfo(String owner, String repo) {
         String apiUrl = GITHUB_REST_URL + "/repos/" + owner + "/" + repo;
         String response = null;
         try {

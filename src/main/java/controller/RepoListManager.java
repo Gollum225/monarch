@@ -42,12 +42,12 @@ public class RepoListManager {
     private final int THRESHOLD = 2;
 
     /**
-     * Amount of repositories to get, when the threshold is reached.
+     * Number of repositories to get when the threshold is reached.
      */
     private final int REFILL_AMOUNT = 3;
 
     /**
-     * Amount of unprocessed, ready repositories.
+     * Number of unprocessed, ready repositories.
      */
     private int unprocessedRepos = 0;
 
@@ -61,7 +61,7 @@ public class RepoListManager {
         checkRepoAmount();
 
 
-        // if no new repositories are available, wait for 10 seconds.
+        // If no new repositories are available, wait for 10 seconds.
         // If still no new repositories are available, throw a TimeoutException
         for (int i = 0; i < 10; i++) {
             if (repoList.size() == 0) {
@@ -83,13 +83,13 @@ public class RepoListManager {
     /**
      * Gets new repositories from the GitHub API.
      *
-     * @param amount amount of repositories to get
+     * @param amount number of repositories to get
      */
     private void getNewRepos(int amount) {
 
         List<Repository> repos;
         try {
-             repos = GithubCommunication.getRepository(amount);
+             repos = GithubCommunication.getInstance().getRepository(amount);
         } catch (JsonProcessingException e) {
             throw new InputMismatchException("Error while getting new repositories.");
         }

@@ -2,7 +2,6 @@ package repository_information;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import exceptions.CloneProhibitedException;
-import repository_information.GitHub.GithubCommunication;
 import repository_information.GitHub.RateResource;
 
 import java.util.List;
@@ -13,11 +12,9 @@ import static util.Globals.MAX_FILE_AMOUNT;
 
 public class APIProxy extends AbstractProxy{
 
-    GitMandatories gitAPI;
 
     public APIProxy(String repositoryName, String owner, RepoCache cache) {
         super(repositoryName, owner, cache);
-        gitAPI = new GithubCommunication();
     }
 
     @Override

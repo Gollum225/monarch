@@ -21,6 +21,7 @@ public abstract class AbstractProxy implements RepoFunctions{
     final String owner;
     final RepoCache cache;
     final RateLimitMandatories rateLimitMandatories = GithubRateLimitCheck.getInstance();
+    final GitMandatories gitAPI = GithubCommunication.getInstance();
 
     /**
      * If the repository is too large to clone. The limit is set in {@link util.Globals#MAX_CLONE_SIZE}.
@@ -46,7 +47,7 @@ public abstract class AbstractProxy implements RepoFunctions{
             System.out.println("\u001B[31m" + "Couldn't clone " + repositoryName + "of: " + owner + "\u001B[0m");
             throw new CloneProhibitedException();
         }
-        return GithubCommunication.cloneRepo(owner, repositoryName, repoPath);
+        return gitAPI.cloneRepo(owner, repositoryName, repoPath);
     }
 
     boolean changeToClone() throws CloneProhibitedException {
@@ -73,7 +74,7 @@ public abstract class AbstractProxy implements RepoFunctions{
 
     @Override
     public JsonNode generalInfo() {
-        return GithubCommunication.generalInfo(owner, repositoryName);
+        return gitAPI.generalInfo(owner, repositoryName);
     }
 
     public abstract void finish();
