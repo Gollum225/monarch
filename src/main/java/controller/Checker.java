@@ -74,11 +74,13 @@ public class Checker {
                         currentRepo.saveResult(rule.getClass(), rule.execute());
                     }
                 }
-                if (currentRepo.getOverallPoints() > 0) {
-                    for (Rule rule : equippedRules) {
+                for (Rule rule : equippedRules) {
+                    if (currentRepo.getOverallPoints() > 0) {
                         if (rule.getType() == RuleType.QUALITY) {
                             currentRepo.saveResult(rule.getClass(), rule.execute());
                         }
+                    } else if (rule.getType() == RuleType.QUALITY) {
+                        currentRepo.saveResult(rule.getClass(), new RuleReturn("Did not get mandatory points", currentRepo.getIdentifier(), rule.getClass().getSimpleName()));
                     }
                 }
 
