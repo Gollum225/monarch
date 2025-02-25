@@ -6,6 +6,7 @@ import model.Repository;
 import util.Json;
 import view.Status;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.*;
@@ -61,7 +62,19 @@ public class Checker {
             //TODO: handle exception
         } finally {
             executor.shutdown();
+            try {
+                if (!executor.awaitTermination(60, TimeUnit.SECONDS)) {
+                    System.err.println("Executor did not terminate in the specified time.");
+                    List<Runnable> droppedTasks = executor.shutdownNow();
+                    System.err.println("Executor was abruptly shut down. " + droppedTasks.size() + " tasks will not be executed.");
+                }
+            } catch (InterruptedException e) {
+                System.err.println("Interrupted while waiting for executor to terminate: " + e.getMessage());
+                executor.shutdownNow();
+            }
+
         }
+        finish();
 
     }
 
