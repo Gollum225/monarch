@@ -25,7 +25,7 @@ public class Repository implements RepoFunctions {
     private final String repoIdentifier;
 
     /**
-     * All request will be called on the cache.
+     * All requests will be called on the cache.
      */
     private final RepoCache cache;
 
@@ -149,6 +149,16 @@ public class Repository implements RepoFunctions {
     @Override
     public JsonNode generalInfo() {
         return cache.generalInfo();
+    }
+
+    /**
+     * Gets the quality metric of a repository. e.g., GitHub stars.
+     *
+     * @return number of points
+     */
+    public int getQualityMetrics() {
+        JsonNode generalInfo = generalInfo();
+        return generalInfo.get("stargazers_count").asInt();
     }
 
     /**
