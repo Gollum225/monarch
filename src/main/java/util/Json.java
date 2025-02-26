@@ -92,7 +92,7 @@ public final class Json {
      * @param rootNode the root node of the JSON response
      * @return a list of repositories
      */
-    public static List<Repository> parseRepositories(JsonNode rootNode) throws JsonProcessingException {
+    public static List<Repository> parseGraphQLRepositories(JsonNode rootNode) throws JsonProcessingException {
 
         JsonNode edges = rootNode.at("/data/search/edges");
 
@@ -106,6 +106,17 @@ public final class Json {
             repositories.add(new Repository(name, owner));
         }
 
+        return repositories;
+    }
+
+    public static List<Repository> parseRestRepositories(JsonNode rootNode) throws JsonProcessingException {
+        JsonNode items = rootNode.get("items");
+        List<Repository> repositories = new ArrayList<>();
+        for (JsonNode item : items) {
+            String name = item.get("name").asText();
+            String owner = item.get("owner").get("login").asText();
+            repositories.add(new Repository(name, owner));
+        }
         return repositories;
     }
 

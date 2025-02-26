@@ -39,12 +39,7 @@ public class RepoListManager {
     /**
      * Starts getting new repositories, when the amount of unprocessed repositories is below this threshold.
      */
-    private final int THRESHOLD = 2;
-
-    /**
-     * Number of repositories to get when the threshold is reached.
-     */
-    private final int REFILL_AMOUNT = 3;
+    private final int THRESHOLD = 5;
 
     /**
      * Number of unprocessed, ready repositories.
@@ -83,13 +78,12 @@ public class RepoListManager {
     /**
      * Gets new repositories from the GitHub API.
      *
-     * @param amount number of repositories to get
      */
-    private void getNewRepos(int amount) {
+    private void getNewRepos() {
 
         List<Repository> repos;
         try {
-             repos = GithubCommunication.getInstance().getRepository(amount);
+             repos = GithubCommunication.getInstance().getTenRepository();
         } catch (JsonProcessingException e) {
             throw new InputMismatchException("Error while getting new repositories.");
         }
@@ -126,7 +120,7 @@ public class RepoListManager {
     private void checkRepoAmount() {
         if (repoList.size() < THRESHOLD) {
             //getTestRepos();
-            getNewRepos(REFILL_AMOUNT);
+            getNewRepos();
         }
     }
 

@@ -4,12 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import model.Repository;
-import org.apache.hc.client5.http.classic.methods.HttpPost;
-import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
-import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
-import org.apache.hc.core5.http.ContentType;
-import org.apache.hc.core5.http.io.entity.StringEntity;
-import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
@@ -31,7 +25,7 @@ import java.nio.file.Path;
 import java.util.Base64;
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Random;
 
 public final class GithubCommunication implements GitMandatories {
 
@@ -52,7 +46,6 @@ public final class GithubCommunication implements GitMandatories {
 
 
     private static final String ACCESS_TOKEN = System.getenv("GitHub_API");
-    private static String cursor = "";
 
     private static final RateLimitMandatories rateLimitCheck = GithubRateLimitCheck.getInstance();
 
@@ -60,60 +53,41 @@ public final class GithubCommunication implements GitMandatories {
 
 
     /**
-     * Get the repositories from the GitHub API.
-     *
-     * @param amount the number of repositories to get
-     * @return a list of repositories as JSON
+     * Gets 10 random repositories from the GitHub API.
+     * @return List of repositories
+     * @throws JsonProcessingException if the response couldn't be parsed
      */
-    public List<Repository> getRepository(int amount) throws JsonProcessingException {
+    public List<Repository> getTenRepository() throws JsonProcessingException {
+        int starAmount = 100;
+
+        int randomPage = (int) (Math.random() * 100);
+        String randomSearchString = createRandomSearchString();
+
         String responseBody = "";
+        String apiUrl = GITHUB_REST_URL + "/search/repositories?q=" + randomSearchString + "+stars:>" + starAmount + "&per_page=10" + "&page=" + randomPage;
 
-        System.out.println("token" + ACCESS_TOKEN);
-
-        // GraphQL-Query
-        //String query = "{ \"query\": \"{ search(query: \\\"stars:>100" + randomChar + "\\\", type: REPOSITORY, first: " + amount +") { edges { node { ... on Repository { name owner { login } } } } } }\" }";
-        String query = "{ \"query\": \"{ search(query: \\\"stars:>100\\\", type: REPOSITORY, first: "+amount+", after: \\\"" + cursor + "\\\") { edges { node { ... on Repository { name owner { login } } } } pageInfo { hasNextPage endCursor } } }\" }";
-
-        // HTTP-Client erstellen
-        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {            // HTTP-POST-Anfrage
-            HttpPost httpPost = new HttpPost(GITHUB_GRAPHQL_URL);
-            httpPost.setHeader("Authorization", "Bearer " + ACCESS_TOKEN);
-            httpPost.setHeader("Accept", "application/json");
-
-            // Query als Body hinzufügen
-            StringEntity entity = new StringEntity(query, ContentType.APPLICATION_JSON);
-            httpPost.setEntity(entity);
-
-            // Anfrage senden
-            try (CloseableHttpResponse response = httpClient.execute(httpPost)) {
-                // Antwort auslesen
-                if (response.getCode() == 200) {
-                    responseBody = new BufferedReader(
-                            new InputStreamReader(response.getEntity().getContent()))
-                            .lines()
-                            .collect(Collectors.joining("\n"));
-                } else {
-                    System.out.println("Error while getting Repository: " + response.getCode());
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+        try {
+            responseBody = sendGetRequest(apiUrl);
+        } catch (IOException e) {
+            return null;
         }
-        //System.out.println(Json.parseRepositories(responseBody));
-
-                JsonNode rootNode = objectMapper.readTree(responseBody);
-
-        if (rootNode.get("data").
-                get("search").
-                get("pageInfo").
-                get("hasNextPage").asBoolean()) {
-            cursor = rootNode.get("data").get("search").get("pageInfo").get("endCursor").asText();
-
-        }
-
-        return Json.parseRepositories(rootNode);
+        JsonNode rootNode = objectMapper.readTree(responseBody);
+        return Json.parseRestRepositories(rootNode);
 
     }
+
+    private String createRandomSearchString() {
+        Random random = new Random();
+        String randomSearchString = String.valueOf((char) (Math.random() * 26 + 'a'));
+        if (random.nextBoolean()) {
+            randomSearchString += (char) (Math.random() * 26 + 'a');
+            if (random.nextBoolean()) {
+                randomSearchString += (char) (Math.random() * 26 + 'a');
+            }
+        }
+        return randomSearchString;
+    }
+
 
     @Override
     public JsonNode getStructure(String owner, String repo) {
@@ -129,8 +103,8 @@ public final class GithubCommunication implements GitMandatories {
         try {
             response = sendGetRequest(apiUrl);
 
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (IOException e) {
+            return null;
         }
 
         if (response == null) {
@@ -156,12 +130,12 @@ public final class GithubCommunication implements GitMandatories {
             URL url = new URL(apiUrl);
             connection = (HttpURLConnection) url.openConnection();
 
-            // GET-Methode und Header setzen
+            // set GET-Methode and header
             connection.setRequestMethod("GET");
             connection.setRequestProperty("Authorization", "Bearer " + ACCESS_TOKEN);
             connection.setRequestProperty("Accept", "application/vnd.github+json");
 
-            // Statuscode überprüfen
+            // check status code
             int responseCode = connection.getResponseCode();
             if (responseCode != 200) {
                 System.err.println("Error while getting GitHub response. Code: " + responseCode + " (" + apiUrl + ")");
@@ -269,5 +243,3 @@ public final class GithubCommunication implements GitMandatories {
         }
     }
 }
-
-

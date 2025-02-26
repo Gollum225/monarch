@@ -1,6 +1,8 @@
 package model;
 
+import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.Set;
 
 /**
  * Holds multiple {@link Repository}.
@@ -17,7 +19,7 @@ public class RepoList {
      * Set up as a Queue.
      */
     private LinkedHashSet<Repository> unprocessedRepos = new LinkedHashSet<>();
-    private LinkedHashSet<Repository> startedRepos = new LinkedHashSet<>();
+    private final Set<String> startedRepos = new HashSet<>();
 
     /**
      * Private constructor for the Singleton pattern.
@@ -48,7 +50,7 @@ public class RepoList {
             return null;
         }
         Repository currentRepo = unprocessedRepos.removeFirst();
-        startedRepos.add(currentRepo);
+        startedRepos.add(currentRepo.getIdentifier());
         return currentRepo;
     }
 
@@ -80,6 +82,9 @@ public class RepoList {
      * @return true, if the repo is new and could be added
      */
     public boolean addRepo(Repository repo) {
+        if (startedRepos.contains(repo.getIdentifier())) {
+            return false;
+        }
         System.out.println("Added repo: " + repo.getRepositoryName() + " by " + repo.getOwner());
         return unprocessedRepos.add(repo);
     }
