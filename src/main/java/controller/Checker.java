@@ -3,14 +3,19 @@ package controller;
 import model.RuleReturn;
 import model.RepoList;
 import model.Repository;
+import org.eclipse.jgit.util.FileUtils;
 import util.Json;
 import view.Status;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import static util.Globals.CLONED_REPOS_PATH;
 
 /**
  * Applies the rules from the {@link controller.rules} package to the {@link Repository} from {@link RepoList}.
@@ -134,6 +139,33 @@ public class Checker {
 
     private void finish() {
         status.finish();
+        deleteClonedRepos();
     }
 
+    /**
+     * Deletes the cloned repositories.
+     * {@link repository_information.CloneProxy#finish()} should delete the repositories right after finishing the repo evaluation,
+     * but in some cases the deletion fails due to the operating system.
+     */
+    private void deleteClonedRepos() {
+        boolean failure = false;
+        File folder = new File(String.valueOf(CLONED_REPOS_PATH));
+        for (File file : Objects.requireNonNull(folder.listFiles())) {
+            if (file.isDirectory()) {
+                try {
+                    FileUtils.delete(file, FileUtils.RECURSIVE);
+                } catch (IOException e) {
+                    failure = true;
+                }
+            } else {
+                if (!file.delete()) {
+                    failure = true;
+                }
+            }
+        }
+        if (failure) {
+            System.out.println("\u001B[33m" + "Couldnt delete all repos. Please delete path manually if necessary: " + CLONED_REPOS_PATH + "\u001B[0m");
+        }
+
+    }
 }

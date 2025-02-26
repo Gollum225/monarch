@@ -11,14 +11,10 @@ import java.util.List;
 public class RepoCache implements RepoFunctions {
 
 
-    private final String repositoryName;
-    private final String owner;
     private AbstractProxy proxy;
     private JsonNode generalInfo;
 
     public RepoCache(String repositoryName, String owner) {
-        this.repositoryName = repositoryName;
-        this.owner = owner;
         this.proxy = new APIProxy(repositoryName, owner, this);
     }
 
@@ -72,6 +68,13 @@ public class RepoCache implements RepoFunctions {
             generalInfo = proxy.generalInfo();
         }
         return generalInfo;
+    }
+
+    @Override
+    public void finish() {
+        structure = null;
+        files.clear();
+        proxy.finish();
     }
 
     /**

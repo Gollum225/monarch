@@ -12,6 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class CloneProxy extends AbstractProxy{
 
@@ -56,7 +57,7 @@ public class CloneProxy extends AbstractProxy{
             return new ArrayList<>();
         }
 
-        for (File file : folder.listFiles()) {
+        for (File file : Objects.requireNonNull(folder.listFiles())) {
 
             if (file.isDirectory()) {
                 ObjectNode node = mapper.createObjectNode();
@@ -81,14 +82,14 @@ public class CloneProxy extends AbstractProxy{
 
     @Override
     public void finish() {
-        //deleteFolder(new File(path));
+        deleteFolder(new File(String.valueOf(repoPath)));
     }
 
     private void deleteFolder(File folder) {
         try {
             FileUtils.delete(folder, FileUtils.RECURSIVE);
         } catch (IOException e) {
-            // Already deleted.
+            // Deletion is not possible in some cases due to the operating system. It will be removed later again.
         }
     }
 

@@ -27,7 +27,7 @@ public class Repository implements RepoFunctions {
     /**
      * All requests will be called on the cache.
      */
-    private final RepoCache cache;
+    private RepoCache cache;
 
     /**
      * Date of creation of the repository.
@@ -175,18 +175,16 @@ public class Repository implements RepoFunctions {
         return ""; //TODO: implement
     }
 
-    /**
-     * Should be called after all rules are executed. Calculates the overall points of the repository.
-     * @return
-     */
-    public int finish() {
+    @Override
+    public void finish() {
         duration = (new Date().getTime() - created.getTime());
         calculateOverallPoints();
-        return overallPoints;
+        cache.finish();
+        cache = null;
     }
 
     /**
-     * Getter for the overal points.
+     * Getter for the overall points.
      *
      * @return sum of all points given by the rules.
      */

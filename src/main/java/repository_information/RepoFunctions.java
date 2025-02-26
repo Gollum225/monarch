@@ -33,4 +33,9 @@ public interface RepoFunctions {
      * @return a JsonNode with the general information.
      */
     JsonNode generalInfo();
+
+    /**
+     * Should be called, after all rules are executed, to shut down the repository.
+     */
+    void finish();
 }
