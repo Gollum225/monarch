@@ -40,27 +40,30 @@ public final class CSVHandler {
     private final String filePath;
 
     /**
-     * Creates a new CSV file with the given schema. Create a schema before calling this method. e.g. with {@link #createResultSchema}
+     * Creates a new CSV file with the given schema.
+     * Create a schema before calling this method.
+     * E.g., with {@link #createResultSchema}
      */
     public void createCsv() {
         if (schema == null) {
             throw new RuntimeException("Schema not set.");
         }
         File file = new File(path.toString());
+        File lastExistingFile = file;
 
-        if (path.toFile().exists()) {
-            if (handleExistingCsv(path)) {
-                System.out.println(filePath + " file with matching schema found. Continue with this file.");
-                return;
-            } else {
-                // The File exists and has no matching scheme.
-                int counter = 2;
-                while (file.exists()) {
-                    file = new File(RESOURCE_PATH.resolve(filePath.replace(".csv", "") + counter + ".csv").toString());
-                    path = file.toPath();
-                    counter++;
-                }
-            }}
+        int counter = 2;
+        while (file.exists()) {
+            lastExistingFile = file;
+            file = new File(RESOURCE_PATH.resolve(filePath.replace(".csv", "") + counter + ".csv").toString());
+            path = file.toPath();
+            counter++;
+        }
+        if (handleExistingCsv(lastExistingFile.toPath())) {
+            System.out.println(lastExistingFile + " file with matching schema found. Continue with this file.");
+            path = lastExistingFile.toPath();
+            return;
+
+        }
         CsvMapper csvMapper = new CsvMapper();
 
         try {
