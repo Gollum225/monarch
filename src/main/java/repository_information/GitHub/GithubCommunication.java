@@ -56,6 +56,8 @@ public final class GithubCommunication implements GitMandatories {
 
     private static final RateLimitMandatories rateLimitCheck = GithubRateLimitCheck.getInstance();
 
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
 
     /**
      * Get the repositories from the GitHub API.
@@ -99,9 +101,7 @@ public final class GithubCommunication implements GitMandatories {
         }
         //System.out.println(Json.parseRepositories(responseBody));
 
-        ObjectMapper objectMapper = new ObjectMapper();
-
-        JsonNode rootNode = objectMapper.readTree(responseBody);
+                JsonNode rootNode = objectMapper.readTree(responseBody);
 
         if (rootNode.get("data").
                 get("search").
@@ -132,7 +132,6 @@ public final class GithubCommunication implements GitMandatories {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        ObjectMapper mapper = new ObjectMapper();
 
         if (response == null) {
             return null;
@@ -140,7 +139,7 @@ public final class GithubCommunication implements GitMandatories {
 
         JsonNode jsonResponse = null;
         try {
-            jsonResponse = mapper.readTree(response);
+            jsonResponse = objectMapper.readTree(response);
         } catch (JsonProcessingException e) {
             return null;
         }
@@ -208,7 +207,6 @@ public final class GithubCommunication implements GitMandatories {
             return null;
         }
 
-        ObjectMapper objectMapper = new ObjectMapper();
         JsonNode jsonNode = null;
         try {
             jsonNode = objectMapper.readTree(response.toString());
@@ -263,7 +261,6 @@ public final class GithubCommunication implements GitMandatories {
         } catch (IOException e) {
             e.printStackTrace(); //TODO
         }
-        ObjectMapper objectMapper = new ObjectMapper();
 
         try {
             return objectMapper.readTree(response);
