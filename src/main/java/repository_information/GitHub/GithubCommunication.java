@@ -27,9 +27,23 @@ import java.util.Random;
 
 public final class GithubCommunication implements GitMandatories {
 
+    /**
+     * The access token for the GitHub API. It is stored in the environment variables.
+     * When set manually, it will be used instead.
+     */
+    private static String ACCESS_TOKEN;
+
+
+    /**
+     * Singleton instance.
+     */
     private static GithubCommunication instance;
 
     private GithubCommunication() {
+
+        if (ACCESS_TOKEN == null) {
+            ACCESS_TOKEN = System.getenv("GitHub_API");
+        }
     }
 
     /**
@@ -54,8 +68,6 @@ public final class GithubCommunication implements GitMandatories {
     private static final String GITHUB_REST_URL = "https://api.github.com";
 
 
-    private static final String ACCESS_TOKEN = System.getenv("GitHub_API");
-
     private static final RateLimitMandatories rateLimitCheck = GithubRateLimitCheck.getInstance();
 
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -78,6 +90,9 @@ public final class GithubCommunication implements GitMandatories {
         try {
             responseBody = sendGetRequest(apiUrl);
         } catch (IOException e) {
+            return null;
+        }
+        if (responseBody == null) {
             return null;
         }
         JsonNode rootNode = objectMapper.readTree(responseBody);
@@ -157,7 +172,9 @@ public final class GithubCommunication implements GitMandatories {
 
             // set GET-Methode and header
             connection.setRequestMethod("GET");
-            connection.setRequestProperty("Authorization", "Bearer " + ACCESS_TOKEN);
+            if (ACCESS_TOKEN != null) {
+                connection.setRequestProperty("Authorization", "Bearer " + ACCESS_TOKEN);
+            }
             connection.setRequestProperty("Accept", "application/vnd.github+json");
 
             // check status code
@@ -237,11 +254,19 @@ public final class GithubCommunication implements GitMandatories {
         }
 
         try {
-            Git.cloneRepository()
-                    .setURI(repoUrl)
-                    .setCredentialsProvider(new UsernamePasswordCredentialsProvider("Gollum225", ACCESS_TOKEN))
-                    .setDirectory(path.toFile())
-                    .call();
+            if (ACCESS_TOKEN == null) {
+                Git.cloneRepository()
+                        .setURI(repoUrl)
+                        .setDirectory(path.toFile())
+                        .call();
+            } else {
+                Git.cloneRepository()
+                        .setURI(repoUrl)
+                        .setCredentialsProvider(new UsernamePasswordCredentialsProvider("git", ACCESS_TOKEN))
+                        .setDirectory(path.toFile())
+                        .call();
+            }
+
 
         } catch (GitAPIException | InvalidPathException e) {
             System.err.println("couldn't clone: " + e.getMessage());
