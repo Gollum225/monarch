@@ -125,16 +125,33 @@ public class ReadReadmeLinks extends Rule {
         URL url = new URL(websiteUrl);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("GET");
-        connection.setConnectTimeout(60000);
-        connection.setReadTimeout(60000);
+        connection.setConnectTimeout(5000);
+        connection.setReadTimeout(5000);
 
+        // Skip, if webpage is too large or not an HTML text.
+        String contentType = connection.getContentType();
+        if (contentType == null) {
+            contentType = "text/html";
+        }
+        if ((connection.getContentLength() > 1000000 ) || !contentType.startsWith("text/html")) {
+            if (!contentType.startsWith("application/pdf")) {
+                return "";
+            }
+        }
+
+        long startTime = System.currentTimeMillis();
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
             String line;
             while ((line = reader.readLine()) != null) {
+                if (System.currentTimeMillis() - startTime > 10000) {
+                    return "";
+                }
                 content.append(line).append("\n");
             }
         } catch (SocketTimeoutException e) {
             return "";
+        } finally {
+            connection.disconnect();
         }
 
         return content.toString();
@@ -220,6 +237,7 @@ public class ReadReadmeLinks extends Rule {
                         !link.contains(".jpg") &&
                         !link.contains(".jpeg") &&
                         !link.contains(".gif") &&
+                        !link.contains(".zip") &&
                         !link.contains(".svg")).collect(Collectors.toCollection(ArrayList::new));
     }
 
@@ -235,6 +253,7 @@ public class ReadReadmeLinks extends Rule {
         excludedConcreteSites.add(repositoryUrl + ".git");
 
         excludedGeneralSites.add("youtube.com");
+        excludedGeneralSites.add("youtu.be");
         excludedGeneralSites.add(repositoryUrl + "/issues");
 
     }
