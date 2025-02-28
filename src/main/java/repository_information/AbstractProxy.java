@@ -42,9 +42,12 @@ public abstract class AbstractProxy implements RepoFunctions{
         if (cloneProhibited) {
             System.out.println("\u001B[31m" + "Couldn't clone " + repositoryName + "of: " + owner + "\u001B[0m");
             throw new CloneProhibitedException();
+        } else if(getRepoSize() < 0) {
+            System.out.println("\u001B[31m" + "Couldn't clone " + repositoryName + "of: " + owner + " due to the unknown size" + "\u001B[0m");
+            throw new CloneProhibitedException();
         } else if (getRepoSize() > MAX_CLONE_SIZE) {
             cloneProhibited = true;
-            System.out.println("\u001B[31m" + "Couldn't clone " + repositoryName + "of: " + owner + "\u001B[0m");
+            System.out.println("\u001B[31m" + "Couldn't clone " + repositoryName + "of: " + owner + " due to the large size" + "\u001B[0m");
             throw new CloneProhibitedException();
         }
         return gitAPI.cloneRepo(owner, repositoryName, repoPath);
@@ -69,6 +72,9 @@ public abstract class AbstractProxy implements RepoFunctions{
     }
 
     public int getRepoSize() {
+        if (cache.generalInfo() == null) {
+            return -1;
+        }
         return cache.generalInfo().get("size").asInt();
     }
 

@@ -109,7 +109,6 @@ public class Repository implements RepoFunctions {
                         path.endsWith(".markdown") ||
                         path.endsWith(".rst") ||
                         path.endsWith(".adoc") ||
-                        //path.endsWith(".pdf") ||
                         path.endsWith(".docx")) {
                     foundTextFiles.add(entry);
                     textFileCount++;
@@ -158,6 +157,9 @@ public class Repository implements RepoFunctions {
      */
     public int getQualityMetrics() {
         JsonNode generalInfo = generalInfo();
+        if (generalInfo == null) {
+            return 0;
+        }
         return generalInfo.get("stargazers_count").asInt();
     }
 
@@ -169,10 +171,6 @@ public class Repository implements RepoFunctions {
      */
     public void saveResult(Class<? extends Rule> rule, RuleReturn points) {
         results.put(rule, points);
-    }
-
-    public String customQuery(String GraphQLQuery) {
-        return ""; //TODO: implement
     }
 
     @Override

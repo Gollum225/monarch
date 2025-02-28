@@ -105,11 +105,10 @@ public class RepoListManager {
     public void finishRepo(Repository repo, RuleCollection ruleCollection) {
         repo.finish();
         System.out.println("\u001B[32m" + "repo: " + repo.getRepositoryName() + " of " + repo.getOwner() + " got: " + repo.getOverallPoints() + " points" + "\u001B[0m");
-        //TODO
         try {
             csvHandler.writeResult(repo, ruleCollection);
         } catch (IOException e) {
-            throw new RuntimeException(e); //TODO
+            System.out.println("\u001B[31m" + "Error while writing to CSV file. Please note: " + repo.getIdentifier() + " got: " + repo.getOverallPoints() + "\u001B[0m");
         }
     }
 

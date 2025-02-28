@@ -233,9 +233,11 @@ public final class GithubCommunication implements GitMandatories {
         try {
             response = sendGetRequest(apiUrl);
         } catch (IOException e) {
-            e.printStackTrace(); //TODO
+            return null;
         }
-
+        if (response == null) {
+            return null;
+        }
         try {
             return objectMapper.readTree(response);
         } catch (JsonProcessingException e) {

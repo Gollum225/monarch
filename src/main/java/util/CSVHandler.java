@@ -121,7 +121,7 @@ public final class CSVHandler {
         schema = schemaBuilder
                 .addColumn("Duration")
                 .addColumn("TotalScore")
-                .addColumn("reachablePoints")
+                //.addColumn("reachablePoints") - not implemented yet, future feature
                 .setUseHeader(true)
                 .build();
     }
@@ -151,7 +151,7 @@ public final class CSVHandler {
         row.put("Duration", String.valueOf(repo.getDuration()));
         row.put("TotalScore", String.valueOf(repo.getOverallPoints()));
 
-        //TODO reachable points
+        //TODO reachable points - future feature
         rows.add(row);
 
 

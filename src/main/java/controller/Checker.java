@@ -64,8 +64,8 @@ public class Checker {
                 completionService.take().get();
             }
         } catch (ExecutionException | InterruptedException e) {
+            // no need to continue
             throw new RuntimeException("Error while processing repos", e);
-            //TODO: handle exception
         } finally {
             executor.shutdown();
             try {

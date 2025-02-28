@@ -31,7 +31,7 @@ public class ReadReadmeLinks extends Rule {
     /**
      * Maximum number of sites to check per repository. More sides
      */
-    private static final int MAXSITES = 400;
+    private static final int MAXSITES = 200;
 
     /**
      * Keywords to search for in the website content. These keywords are more important ones.
@@ -44,12 +44,12 @@ public class ReadReadmeLinks extends Rule {
     private final List<String> SIDE_KEYWORDS = new ArrayList<>();
 
     /**
-     * List of concrete sites to exclude from the search. e.g. https://github.com/owner/repo
+     * List of concrete sites to exclude from the search. E.g., https://github.com/owner/repo
      */
     private final List<String> excludedConcreteSites = new ArrayList<>();
 
     /**
-     * List of general sites to exclude from the search. e.g. youtube.com
+     * List of general sites to exclude from the search. E.g., YouTube.com
      */
     private final List<String> excludedGeneralSites = new ArrayList<>();
 
@@ -57,8 +57,6 @@ public class ReadReadmeLinks extends Rule {
         super(RuleType.MANDATORY, repository);
         MAIN_KEYWORDS.addAll(Json.getSpecificKeywords("general-architecture"));
         MAIN_KEYWORDS.addAll(Json.getSpecificKeywords("UML"));
-//        SIDE_KEYWORDS.addAll(Json.getSpecificKeywords("architecture"));
-//        SIDE_KEYWORDS.addAll(Json.getSpecificKeywords("design-pattern"));
         addExcludedSites();
     }
 

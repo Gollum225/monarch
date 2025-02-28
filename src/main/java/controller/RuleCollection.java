@@ -32,9 +32,9 @@ public class RuleCollection {
     }
 
 
-    //TODO: ist das eine factory?
     /**
      * Equips the {@link Repository} with the rules from the {@link controller.rules} package.
+     * Factory pattern.
      *
      * @param repository the repository, which is given to the rules to work with.
      * @return a list of rules with the given repository.
@@ -66,5 +66,9 @@ public class RuleCollection {
      */
     public ArrayList<Class<? extends Rule>> getRules() {
         return rules;
+    }
+
+    public int getRuleAmount() {
+        return rules.size();
     }
 }

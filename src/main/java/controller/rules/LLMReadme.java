@@ -140,14 +140,13 @@ public class LLMReadme extends Rule {
 
     private static void waitForAPI() {
         Date now = new Date();
-        int timeout = 1000 * 60 / MAX_REQUESTS_PER_MINUTE;
+        int timeout = 1000 * 60 / MAX_REQUESTS_PER_MINUTE + 500;
         long diff = now.getTime() - lastRequest.getTime();
         if (diff < timeout) {
             try {
                 Thread.sleep(diff);
             } catch (InterruptedException e) {
-                //TODO mach was
-                e.printStackTrace();
+                Thread.currentThread().interrupt();
             }
         }
     }
