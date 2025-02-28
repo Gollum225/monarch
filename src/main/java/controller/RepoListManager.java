@@ -84,6 +84,10 @@ public class RepoListManager {
         List<Repository> repos;
         try {
              repos = GithubCommunication.getInstance().getTenRepository();
+             if (repos == null) {
+                 checkRepoAmount();
+                 return;
+             }
         } catch (JsonProcessingException e) {
             throw new InputMismatchException("Error while getting new repositories.");
         }
