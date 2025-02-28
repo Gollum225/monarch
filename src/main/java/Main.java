@@ -9,7 +9,7 @@ public class Main {
     public static void main(String[] args) throws IOException, TimeoutException {
 
         Checker checker = new Checker();
-        checker.checkRepos(1);
+        checker.checkRepos(2);
 
     }
 

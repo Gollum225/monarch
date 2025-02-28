@@ -21,10 +21,10 @@ public class Globals {
      * The maximal size of a repository to still be cloned.
      * Unit: KB
      */
-    public static int MAX_CLONE_SIZE = 10000;
+    public static int MAX_CLONE_SIZE = 100000;
 
     /**
-     * The maximal amount of files to be requested at once. If more files are requested, the repository will be cloned.
+     * The maximal number of files to be requested at once. If more files are requested, the repository will be cloned.
      */
-    public static int MAX_FILE_AMOUNT = 30;
+    public static int MAX_FILE_AMOUNT = 40;
 }
