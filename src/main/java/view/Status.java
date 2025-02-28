@@ -17,9 +17,11 @@ import java.util.Map;
 public class Status {
     private final JFrame frame;
     private final JPanel panel;
+    private JLabel finishedReposLabel;
     private final Map<Repository, JLabel> statusBars;
     private final Map<Repository, Integer> progress = new HashMap<>();
     private final int maxBlocks;
+    private int finishedRepos = 0;
 
     /**
      * Creates a new Status window.
@@ -36,6 +38,11 @@ public class Status {
         frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
         frame.setVisible(true);
         maxBlocks = steps;
+        finishedReposLabel = new JLabel("Finished Repos: 0");
+        panel.add(finishedReposLabel);
+        panel.revalidate();
+        panel.repaint();
+
     }
 
     /**
@@ -51,7 +58,7 @@ public class Status {
 
         JLabel label = new JLabel(getProgressString(0) + " " + repo.getIdentifier() + ": ");
         statusBars.put(repo, label);
-        panel.add(label);
+        panel.add(label, 1);
         panel.revalidate();
         panel.repaint();
     }
@@ -64,7 +71,12 @@ public class Status {
     public void updateStatusBar(Repository repo, String ruleName) {
         JLabel label = statusBars.get(repo);
         if (label != null) {
-            progress.replace(repo, progress.get(repo) + 1);
+            try {
+                progress.replace(repo, progress.get(repo) + 1);
+            } catch (Exception e) {
+                panel.remove(label);
+                return;
+            }
 
             //String text = label.getText();
             //int current = text.lastIndexOf("█") + 1; // Anzahl gefüllter Blöcke
@@ -88,6 +100,10 @@ public class Status {
             label.setText(getProgressString(progress.get(repo)) + " " + repo.getRepositoryName() + ", " + repo.getOwner());
             label.setForeground(new Color(0, 100, 0));
         }
+        finishedRepos++;
+        finishedReposLabel.setText("Finished Repos: " + finishedRepos);
+        panel.revalidate();
+        panel.repaint();
     }
 
     /**
