@@ -12,8 +12,6 @@ import repository_information.GitMandatories;
 import repository_information.RateLimitMandatories;
 import util.Json;
 
-
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -34,6 +32,10 @@ public final class GithubCommunication implements GitMandatories {
     private GithubCommunication() {
     }
 
+    /**
+     * Singleton instance.
+     * @return the instance
+     */
     public static GithubCommunication getInstance() {
         if (instance == null) {
             instance = new GithubCommunication();
@@ -41,7 +43,14 @@ public final class GithubCommunication implements GitMandatories {
         return instance;
     }
 
+    /**
+     * The URL for the GitHub GraphQL API.
+     */
     private static final String GITHUB_GRAPHQL_URL = "https://api.github.com/graphql";
+
+    /**
+     * The URL for the GitHub REST API.
+     */
     private static final String GITHUB_REST_URL = "https://api.github.com";
 
 
@@ -94,6 +103,14 @@ public final class GithubCommunication implements GitMandatories {
         return getStructure(owner, repo, "HEAD");
     }
 
+    /**
+     * Gets the structure of the repository, with a custom treeSha.
+     *
+     * @param owner of the repository
+     * @param repo of the repository
+     * @param treeSha to get the structure from
+     * @return the structure of the repository
+     */
     public JsonNode getStructure(String owner, String repo, String treeSha) {
 
         String response = null;
@@ -122,6 +139,14 @@ public final class GithubCommunication implements GitMandatories {
 
     }
 
+    /**
+     * Send a GET request to the GitHub API.
+     * Updates the rate limit tracker.
+     *
+     * @param apiUrl to send the request to
+     * @return the response
+     * @throws IOException if the request couldn't be sent
+     */
     private String sendGetRequest(String apiUrl) throws IOException {
         HttpURLConnection connection = null;
         BufferedReader in = null;

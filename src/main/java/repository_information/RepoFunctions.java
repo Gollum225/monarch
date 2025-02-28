@@ -8,13 +8,19 @@ import java.util.Map;
 
 public interface RepoFunctions {
 
+    /**
+     * Get the structure of the repository. Files and directories.
+     *
+     * @return JsonTree with the structure.
+     * @throws CloneProhibitedException if the repository should be cloned, but is prohibited.
+     */
     JsonNode getStructure() throws CloneProhibitedException;
 
     /**
      * Get the files from the repository.
      * @param paths the paths of the files to get.
      * @return a map with the path as key and the content as value.
-     * @throws CloneProhibitedException if the repository is too large to clone.
+     * @throws CloneProhibitedException if the repository can't be cloned
      */
     Map<String, String> getFiles(List<String> paths) throws CloneProhibitedException;
 
