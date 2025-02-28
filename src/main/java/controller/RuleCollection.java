@@ -53,7 +53,6 @@ public class RuleCollection {
                 System.err.println("Illegal access when creating rule instance: " + rule.getName());
             } catch (InvocationTargetException e) {
                 System.err.println("Exception while invoking constructor for rule: " + rule.getName());
-                e.getCause().printStackTrace();
             }
         }
         return ruleList;

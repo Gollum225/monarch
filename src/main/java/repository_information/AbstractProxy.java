@@ -89,7 +89,6 @@ public abstract class AbstractProxy implements RepoFunctions{
 
     @Override
     public Map<String, String> getFiles(List<String> paths)  throws CloneProhibitedException{
-        int size = paths.size();
         Map<String, String> results = new HashMap<>();
 
         for (String path : paths) {

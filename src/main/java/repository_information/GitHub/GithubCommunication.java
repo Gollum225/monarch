@@ -128,7 +128,7 @@ public final class GithubCommunication implements GitMandatories {
      */
     public JsonNode getStructure(String owner, String repo, String treeSha) {
 
-        String response = null;
+        String response;
 
         String endpoint = String.format("/repos/%s/%s/git/trees/%s?recursive=1", owner, repo, treeSha);
         String apiUrl = GITHUB_REST_URL + endpoint;
@@ -225,9 +225,9 @@ public final class GithubCommunication implements GitMandatories {
 
         JsonNode jsonNode = null;
         try {
-            jsonNode = objectMapper.readTree(response.toString());
+            jsonNode = objectMapper.readTree(response);
         } catch (JsonProcessingException e) {
-            System.out.println("Couldnt read answer: " + response.toString());
+            System.out.println("Couldnt read answer: " + response);
             return null;
         }
         return decodeBase64(jsonNode.get("content").asText());
@@ -279,7 +279,7 @@ public final class GithubCommunication implements GitMandatories {
     @Override
     public JsonNode generalInfo(String owner, String repo) {
         String apiUrl = GITHUB_REST_URL + "/repos/" + owner + "/" + repo;
-        String response = null;
+        String response;
         try {
             response = sendGetRequest(apiUrl);
         } catch (IOException e) {

@@ -32,7 +32,7 @@ public class Repository implements RepoFunctions {
     /**
      * Date of creation of the repository.
      */
-    private Date created;
+    private final Date created;
 
     private long duration;
 

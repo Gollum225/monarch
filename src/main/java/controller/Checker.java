@@ -34,7 +34,7 @@ public class Checker {
 
     private int ruleAmount;
 
-    private Status status;
+    private final Status status;
 
     /**
      * Creates a new Checker with the default rules.

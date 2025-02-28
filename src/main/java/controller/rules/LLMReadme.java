@@ -34,7 +34,7 @@ public class LLMReadme extends Rule {
     @Override
     public RuleReturn execute() {
 
-        String readme = null;
+        String readme;
         try {
             readme = repository.getReadme();
         } catch (CloneProhibitedException e) {
@@ -45,7 +45,7 @@ public class LLMReadme extends Rule {
             return new RuleReturn("No readme found", repository.getIdentifier(), this.getClass().getSimpleName());
         }
 
-        String llmAnswer = null;
+        String llmAnswer;
 
         try {
             llmAnswer = sendGetRequest(readme);
