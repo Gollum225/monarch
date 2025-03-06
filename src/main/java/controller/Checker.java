@@ -12,8 +12,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.CompletionService;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorCompletionService;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import static util.Globals.CLONED_REPOS_PATH;
 
@@ -55,31 +59,31 @@ public class Checker {
      */
     public void checkRepos(int amount) {
         start();
-        AtomicInteger unprocessedRepos = new AtomicInteger(amount);
         ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
-        CompletionService<Void> completionService = getVoidCompletionService(amount, executor);
+        CompletionService<Void> repoProcessingService = submitRepoAnalyzation(amount, executor);
 
-        try {
-            for (int i = 0; i < amount; i++) {
-                completionService.take().get();
-            }
-        } catch (ExecutionException | InterruptedException e) {
-            // no need to continue
-            throw new RuntimeException("Error while processing repos", e);
-        } finally {
-            executor.shutdown();
+        for (int i = 0; i < amount; i++) {
             try {
-                if (!executor.awaitTermination(60, TimeUnit.SECONDS)) {
-                    System.err.println("Executor did not terminate in the specified time.");
-                    List<Runnable> droppedTasks = executor.shutdownNow();
-                    System.err.println("Executor was abruptly shut down. " + droppedTasks.size() + " tasks will not be executed.");
-                }
+                repoProcessingService.take().get();
+            } catch (ExecutionException e) {
+                System.err.println("Error processing a repository: " + e.getCause().getMessage());
             } catch (InterruptedException e) {
-                System.err.println("Interrupted while waiting for executor to terminate: " + e.getMessage());
-                executor.shutdownNow();
+                Thread.currentThread().interrupt();
+                System.err.println("Error processing a repository: " + e.getCause().getMessage());
             }
-
         }
+        executor.shutdown();
+        try {
+            if (!executor.awaitTermination(60, TimeUnit.SECONDS)) {
+                System.err.println("Executor did not terminate in the specified time.");
+                List<Runnable> droppedTasks = executor.shutdownNow();
+                System.err.println("Executor was abruptly shut down. " + droppedTasks.size() + " tasks will not be executed.");
+            }
+        } catch (InterruptedException e) {
+            System.err.println("Interrupted while waiting for executor to terminate: " + e.getMessage());
+            executor.shutdownNow();
+        }
+
         finish();
 
     }
@@ -87,11 +91,11 @@ public class Checker {
     /**
      * Creates a new CompletionService for the given amount of repositories.
      *
-     * @param amount of repositories to be checked
+     * @param amount of tasks of repositories to be checked
      * @param executor to execute the tasks
      * @return the CompletionService
      */
-    private CompletionService<Void> getVoidCompletionService(int amount, ExecutorService executor) {
+    private CompletionService<Void> submitRepoAnalyzation(int amount, ExecutorService executor) {
         CompletionService<Void> completionService = new ExecutorCompletionService<>(executor);
 
         for (int i = 0; i < amount; i++) {
