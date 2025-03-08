@@ -12,7 +12,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 public class CloneProxy extends AbstractProxy{
 
@@ -57,7 +56,12 @@ public class CloneProxy extends AbstractProxy{
             return new ArrayList<>();
         }
 
-        for (File file : Objects.requireNonNull(folder.listFiles())) {
+        File[] allFiles = folder.listFiles();
+        if (allFiles == null) {
+            return files;
+        }
+
+        for (File file : allFiles) {
 
             if (file.isDirectory()) {
                 ObjectNode node = mapper.createObjectNode();

@@ -12,7 +12,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorCompletionService;
@@ -202,16 +201,23 @@ public class Checker {
     private void deleteClonedRepos() {
         boolean failure = false;
         File folder = new File(String.valueOf(CLONED_REPOS_PATH));
-        for (File file : Objects.requireNonNull(folder.listFiles())) {
-            if (file.isDirectory()) {
-                try {
-                    FileUtils.delete(file, FileUtils.RECURSIVE);
-                } catch (IOException e) {
-                    failure = true;
-                }
-            } else {
-                if (!file.delete()) {
-                    failure = true;
+
+        File[] files = folder.listFiles();
+        if (files == null) {
+            failure = true;
+        } else {
+            for (File file : files) {
+
+                if (file.isDirectory()) {
+                    try {
+                        FileUtils.delete(file, FileUtils.RECURSIVE);
+                    } catch (IOException e) {
+                        failure = true;
+                    }
+                } else {
+                    if (!file.delete()) {
+                        failure = true;
+                    }
                 }
             }
         }
