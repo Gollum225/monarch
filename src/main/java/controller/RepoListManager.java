@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import static util.Globals.DEFAULT_NUMBER_OF_STAR;
+
 
 /**
  * Manages the list of repositories and provides the next repository to check.
@@ -26,6 +28,21 @@ public class RepoListManager {
         csvHandler.createCsv();
     }
 
+    public RepoListManager(RuleCollection ruleCollection, String searchTerm) {
+        this(ruleCollection);
+        this.searchTerm = searchTerm;
+    }
+
+    public RepoListManager(RuleCollection ruleCollection, String searchTerm, int starAmount) {
+        this(ruleCollection, searchTerm);
+        this.starAmount = starAmount;
+    }
+
+    public RepoListManager(RuleCollection ruleCollection, int starAmount) {
+        this(ruleCollection);
+        this.starAmount = starAmount;
+    }
+
     /**
      * Handles the writing of the results to a CSV file.
      */
@@ -37,7 +54,7 @@ public class RepoListManager {
     private final RepoList repoList = RepoList.getInstace();
 
     /**
-     * Starts getting new repositories, when the amount of unprocessed repositories is below this threshold.
+     * Starts getting new repositories, when the number of unprocessed repositories is below this threshold.
      */
     private final int THRESHOLD = 5;
 
@@ -46,6 +63,13 @@ public class RepoListManager {
      */
     private int unprocessedRepos = 0;
 
+
+
+    private String searchTerm;
+
+
+
+    private int starAmount = -1;
 
     /**
      * Gets the next repository to check.
@@ -63,12 +87,12 @@ public class RepoListManager {
                 try {
                     TimeUnit.SECONDS.sleep(1);
                 } catch (InterruptedException e) {
-                    continue; // test again, if list is already filled
+                    continue; // test again if the list is already filled
                 }
             } else {
                 break;
             }
-            throw new TimeoutException("No new repositories available.");
+            return null;
         }
         unprocessedRepos--;
 
@@ -83,9 +107,19 @@ public class RepoListManager {
 
         List<Repository> repos;
         try {
-             repos = GithubCommunication.getInstance().getTenRepository();
+            if (searchTerm != null && starAmount >= 0) {
+                repos = GithubCommunication.getInstance().getTenRepository(searchTerm, starAmount);
+            } else if (searchTerm != null) {
+                repos = GithubCommunication.getInstance().getTenRepository(searchTerm, DEFAULT_NUMBER_OF_STAR);
+            } else if (starAmount >= 0) {
+                repos = GithubCommunication.getInstance().getTenRepository(null, starAmount);
+            } else {
+                repos = GithubCommunication.getInstance().getTenRepository();
+            }
              if (repos == null) {
                  checkRepoAmount();
+                 return;
+             } else if (repos.isEmpty()) {
                  return;
              }
         } catch (JsonProcessingException e) {
@@ -97,8 +131,6 @@ public class RepoListManager {
                 unprocessedRepos++;
             }
         }
-
-        checkRepoAmount();
     }
 
     /**
@@ -121,9 +153,13 @@ public class RepoListManager {
      * Triggers the refill if necessary
      */
     private void checkRepoAmount() {
-        if (repoList.size() < THRESHOLD) {
-            //getTestRepos();
-            getNewRepos();
+
+        // In loop to get repositories, to get other repositories if repositories were found again.
+        for (int i = 0; i < 2; i++) {
+            if (repoList.size() < THRESHOLD){
+                //getTestRepos();
+                getNewRepos();
+            }
         }
     }
 
@@ -134,5 +170,22 @@ public class RepoListManager {
         repoList.addRepo(new Repository("arctic-sea", "52North"));
         repoList.addRepo(new Repository("bigbluebutton", "bigbluebutton"));
         unprocessedRepos = 5;
+    }
+
+    public int getMaxResults() throws JsonProcessingException {
+        if (searchTerm != null && starAmount >= 0) {
+            return GithubCommunication.getInstance().getMaxResults(searchTerm, starAmount);
+        } else if (searchTerm != null) {
+            return GithubCommunication.getInstance().getMaxResults(searchTerm, -1);
+        } else if (starAmount >= 0) {
+            return GithubCommunication.getInstance().getMaxResults(null, starAmount);
+        }
+        return 1000;
+    }
+    public String getSearchTerm() {
+        return searchTerm;
+    }
+    public int getStarAmount() {
+        return starAmount;
     }
 }

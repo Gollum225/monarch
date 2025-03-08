@@ -1,5 +1,6 @@
 package controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import model.RuleReturn;
 import model.RepoList;
 import model.Repository;
@@ -51,6 +52,28 @@ public class Checker {
 
     }
 
+    public Checker(String searchTerm) {
+        rules = new RuleCollection();
+        listManager = new RepoListManager(rules, searchTerm);
+        ruleAmount = rules.getRuleAmount();
+        status = new Status(ruleAmount);
+    }
+
+    public Checker(String searchTerm, int starAmount) {
+        rules = new RuleCollection();
+        listManager = new RepoListManager(rules, searchTerm, starAmount);
+        ruleAmount = rules.getRuleAmount();
+        status = new Status(ruleAmount);
+    }
+
+    public Checker(int starAmount) {
+        rules = new RuleCollection();
+        listManager = new RepoListManager(rules, starAmount);
+        ruleAmount = rules.getRuleAmount();
+        status = new Status(ruleAmount);
+    }
+
+
 
     /**
      * Apply the list of rules to the given amount of repositories.
@@ -60,6 +83,25 @@ public class Checker {
     public void checkRepos(int amount) {
         start();
         ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+
+        int maxResults = 0;
+        try {
+            maxResults = listManager.getMaxResults();
+            if (maxResults >=1000) {
+                System.out.println("Found at least 1000 repositories matching the search.");
+            } else {
+                System.out.println("Found " + maxResults + " repositories");
+            }
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Cannot get number of available repositories.");
+        }
+
+        if (maxResults < amount) {
+            amount = maxResults;
+            System.out.println("Can't find enough repositories with given search. Analyzing " + amount + " repositories.");
+        }
+
+
         CompletionService<Void> repoProcessingService = submitRepoAnalyzation(amount, executor);
 
         for (int i = 0; i < amount; i++) {
@@ -100,7 +142,13 @@ public class Checker {
 
         for (int i = 0; i < amount; i++) {
             completionService.submit(() -> {
-                Repository currentRepo = listManager.getNextRepo();
+
+                Repository currentRepo;
+                    currentRepo = listManager.getNextRepo();
+
+                if (currentRepo == null) {
+                    return null;
+                }
 
                 ArrayList<Rule> equippedRules = rules.equipRules(currentRepo);
                 status.addStatusBar(currentRepo);

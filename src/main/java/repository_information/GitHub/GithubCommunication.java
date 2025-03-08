@@ -27,6 +27,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 
+import static util.Globals.DEFAULT_NUMBER_OF_STAR;
+
 public final class GithubCommunication implements GitMandatories {
 
     /**
@@ -74,7 +76,12 @@ public final class GithubCommunication implements GitMandatories {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
+    private static int page = 0;
+
+    private int maxNumberOfRepos = -1;
+
     HttpClient client = HttpClient.newHttpClient();
+
 
     /**
      * Gets 10 random repositories from the GitHub API.
@@ -82,17 +89,29 @@ public final class GithubCommunication implements GitMandatories {
      * @throws JsonProcessingException if the response couldn't be parsed
      */
     public List<Repository> getTenRepository() throws JsonProcessingException {
-        int starAmount = 100;
+        return getTenRepository(null, DEFAULT_NUMBER_OF_STAR);
 
-        int randomPage = (int) (Math.random() * 100);
-        String randomSearchString = createRandomSearchString();
+    }
 
-        String responseBody = "";
-        String apiUrl = GITHUB_REST_URL + "/search/repositories?q=" + randomSearchString + "+stars:>" + starAmount + "&per_page=10" + "&page=" + randomPage;
+    public List<Repository> getTenRepository(String searchTerm, int starAmount) throws JsonProcessingException {
+
+        if (searchTerm == null) {
+            page = (int) (Math.random() * 100);
+            searchTerm = createRandomSearchString();
+        } else {
+            page ++;
+            if (maxNumberOfRepos >= 0 && page * 10 - 10 > maxNumberOfRepos) {
+                System.out.println("Max number of repositories reached");
+                return new ArrayList<>();
+            } else {
+                System.out.println("Searching for " + searchTerm);
+            }
+        }
+
+        String responseBody;
+        String apiUrl = GITHUB_REST_URL + "/search/repositories?q=" + searchTerm + "+stars" + encode(":>") + starAmount + "&per_page" + encode(":10") + "&page=" + page;
 
         try {
-            responseBody = sendGetRequest(apiUrl);
-        } catch (IOException e) {
             responseBody = sendGetRequest(URI.create(apiUrl));
         } catch (IOException | InterruptedException e) {
             return null;
@@ -101,6 +120,11 @@ public final class GithubCommunication implements GitMandatories {
             return null;
         }
         JsonNode rootNode = objectMapper.readTree(responseBody);
+
+        if (maxNumberOfRepos < 0 ) {
+            maxNumberOfRepos = rootNode.get("total_count").asInt();
+        }
+
         return Json.parseRestRepositories(rootNode);
 
     }
@@ -289,5 +313,34 @@ public final class GithubCommunication implements GitMandatories {
         } catch (JsonProcessingException e) {
             return null;
         }
+    }
+
+    public int getMaxResults(String searchTerm, int numberOfStars) throws JsonProcessingException {
+        String responseBody;
+
+        String apiUrl;
+        String path  = GITHUB_REST_URL + "/search/repositories?q=";
+        if (searchTerm != null && numberOfStars < 0) {
+             apiUrl = path + encode( searchTerm) + "&per_page=1";
+        } else if (searchTerm != null && numberOfStars > 0) {
+            apiUrl = path + encode(searchTerm) + "+stars" + encode(":>") + numberOfStars +"&per_page=1";
+        } else if (searchTerm == null && numberOfStars > 0) {
+            apiUrl = path + "+stars" + encode(":>") + numberOfStars + "&per_page=1";
+        } else {
+            return 0;
+        }
+
+        try {
+            responseBody = sendGetRequest(URI.create(apiUrl));
+        } catch (IOException | InterruptedException e) {
+            return 0;
+        }
+        if (responseBody == null) {
+            return 0;
+        }
+        JsonNode rootNode = objectMapper.readTree(responseBody);
+
+        return rootNode.get("total_count").asInt();
+
     }
 }
