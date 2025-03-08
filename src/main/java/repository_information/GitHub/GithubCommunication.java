@@ -12,17 +12,19 @@ import repository_information.GitMandatories;
 import repository_information.RateLimitMandatories;
 import util.Json;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import java.net.URI;
 import java.net.URLEncoder;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 
 public final class GithubCommunication implements GitMandatories {
@@ -72,6 +74,7 @@ public final class GithubCommunication implements GitMandatories {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
+    HttpClient client = HttpClient.newHttpClient();
 
     /**
      * Gets 10 random repositories from the GitHub API.
@@ -90,6 +93,8 @@ public final class GithubCommunication implements GitMandatories {
         try {
             responseBody = sendGetRequest(apiUrl);
         } catch (IOException e) {
+            responseBody = sendGetRequest(URI.create(apiUrl));
+        } catch (IOException | InterruptedException e) {
             return null;
         }
         if (responseBody == null) {
@@ -133,9 +138,9 @@ public final class GithubCommunication implements GitMandatories {
         String endpoint = String.format("/repos/%s/%s/git/trees/%s?recursive=1", owner, repo, treeSha);
         String apiUrl = GITHUB_REST_URL + endpoint;
         try {
-            response = sendGetRequest(apiUrl);
+            response = sendGetRequest(URI.create(apiUrl));
 
-        } catch (IOException e) {
+        } catch (IOException | InterruptedException e) {
             return null;
         }
 
@@ -143,7 +148,7 @@ public final class GithubCommunication implements GitMandatories {
             return null;
         }
 
-        JsonNode jsonResponse = null;
+        JsonNode jsonResponse;
         try {
             jsonResponse = objectMapper.readTree(response);
         } catch (JsonProcessingException e) {
@@ -162,72 +167,63 @@ public final class GithubCommunication implements GitMandatories {
      * @return the response
      * @throws IOException if the request couldn't be sent
      */
-    private String sendGetRequest(String apiUrl) throws IOException {
-        HttpURLConnection connection = null;
-        BufferedReader in = null;
+    private String sendGetRequest(URI apiUrl) throws IOException, InterruptedException {
 
-        try {
-            URL url = new URL(apiUrl);
-            connection = (HttpURLConnection) url.openConnection();
+            HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
+                    .uri(apiUrl)
+                    .header("Accept", "application/vnd.github+json")
+                    .header("User-Agent", "Java-HttpClient");
 
-            // set GET-Methode and header
-            connection.setRequestMethod("GET");
             if (ACCESS_TOKEN != null) {
-                connection.setRequestProperty("Authorization", "Bearer " + ACCESS_TOKEN);
+                //connection.setRequestProperty("Authorization", "Bearer " + ACCESS_TOKEN);
+                requestBuilder.header("Authorization", "Bearer " + ACCESS_TOKEN);
             }
-            connection.setRequestProperty("Accept", "application/vnd.github+json");
 
-            // check status code
-            int responseCode = connection.getResponseCode();
-            if (responseCode != 200) {
-                System.err.println("Error while getting GitHub response. Code: " + responseCode + " (" + apiUrl + ")");
+            HttpRequest request = requestBuilder.build();
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+            if (response.statusCode() != 200) {
+                System.err.println("Error while getting GitHub response. Code: " + response.statusCode() + " (" + apiUrl + ")");
                 return null;
             }
 
             // Set the Rate Limit tracker.
-            rateLimitCheck.setRateLimit(RateResource.valueOf(connection.getHeaderField("x-ratelimit-resource").toUpperCase()),
-                    Integer.parseInt(connection.getHeaderField("x-ratelimit-limit")),
-                    Integer.parseInt(connection.getHeaderField("x-ratelimit-remaining")),
-                    new Date(Integer.parseInt(connection.getHeaderField("x-ratelimit-reset")) * 1000L));
+            Optional<String> rateResource = response.headers().firstValue("x-ratelimit-resource");
+            Optional<String> rateLimit = response.headers().firstValue("x-ratelimit-limit");
+            Optional<String> rateRemaining = response.headers().firstValue("x-ratelimit-remaining");
+            Optional<String> rateReset = response.headers().firstValue("x-ratelimit-reset");
 
-            in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-            String inputLine;
-            StringBuilder response = new StringBuilder();
-            while ((inputLine = in.readLine()) != null) {
-                response.append(inputLine);
+            if (rateResource.isPresent() && rateLimit.isPresent() && rateRemaining.isPresent() && rateReset.isPresent()) {
+                rateLimitCheck.setRateLimit(
+                        RateResource.valueOf(rateResource.get().toUpperCase()),
+                        Integer.parseInt(rateLimit.get()),
+                        Integer.parseInt(rateRemaining.get()),
+                        new Date(Long.parseLong(rateReset.get()) * 1000L)  // Convert reset time to milliseconds
+                );
             }
-            in.close();
+           return response.body();
 
-            return response.toString();
-        } finally {
-            if (in != null) {
-                in.close();
-            }
-            if (connection != null) {
-                connection.disconnect();
-            }
-        }
     }
 
     @Override
-    public String getFile(String path, String owner, String reponame) {
-        String urlString = GITHUB_REST_URL + "/repos/" + owner + "/" + reponame + "/contents/" + encode(path);
+    public String getFile(String path, String owner, String repoName) {
+        String urlString = GITHUB_REST_URL + "/repos/" + owner + "/" + repoName + "/contents/" + encode(path);
         String response;
         try {
-            response = sendGetRequest(urlString);
-        } catch (IOException e) {
-            System.out.println("Couldnt get file: " + urlString);
+            response = sendGetRequest(URI.create(urlString));
+        } catch (IOException | InterruptedException e) {
+            System.out.println("Couldn't get file: " + urlString);
             return null;
         }
         if (response == null) {
             return null;
         }
 
-        JsonNode jsonNode = null;
+        JsonNode jsonNode;
         try {
             jsonNode = objectMapper.readTree(response);
         } catch (JsonProcessingException e) {
-            System.out.println("Couldnt read answer: " + response);
+            System.out.println("Couldn't read answer: " + response);
             return null;
         }
         return decodeBase64(jsonNode.get("content").asText());
@@ -281,8 +277,8 @@ public final class GithubCommunication implements GitMandatories {
         String apiUrl = GITHUB_REST_URL + "/repos/" + owner + "/" + repo;
         String response;
         try {
-            response = sendGetRequest(apiUrl);
-        } catch (IOException e) {
+            response = sendGetRequest(URI.create(apiUrl));
+        } catch (IOException | InterruptedException e) {
             return null;
         }
         if (response == null) {
