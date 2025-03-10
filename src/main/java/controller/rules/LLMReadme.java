@@ -19,8 +19,8 @@ import java.util.Date;
 
 public class LLMReadme extends Rule {
 
-    // https://community.sambanova.ai/t/rate-limits/321
-    private static final int MAX_REQUESTS_PER_MINUTE = 20;
+    // https://docs.sambanova.ai/cloud/docs/get-started/rate-limits
+    private static final int MAX_REQUESTS_PER_MINUTE = 60;
 
     private final int MAX_POINTS = 5;
 
@@ -92,7 +92,7 @@ public class LLMReadme extends Rule {
                 {
                     "stream": false,
                     "max_tokens": 1,
-                    "model": "Meta-Llama-3.1-70B-Instruct",
+                    "model": "Meta-Llama-3.2-1B-Instruct",
                     "messages": [
                         {
                             "role": "system",
