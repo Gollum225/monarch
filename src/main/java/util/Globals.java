@@ -27,4 +27,6 @@ public class Globals {
      * The maximal number of files to be requested at once. If more files are requested, the repository will be cloned.
      */
     public static int MAX_FILE_AMOUNT = 40;
+
+    public static int DEFAULT_NUMBER_OF_STAR = 100;
 }
