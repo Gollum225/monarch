@@ -76,7 +76,7 @@ public class RepoListManager {
      * @return next repository
      * @throws TimeoutException if no new repositories are available after 10 seconds
      */
-    public synchronized Repository getNextRepo() throws TimeoutException {
+    public synchronized Repository getNextRepo() {
         checkRepoAmount();
 
 
@@ -182,10 +182,5 @@ public class RepoListManager {
         }
         return 1000;
     }
-    public String getSearchTerm() {
-        return searchTerm;
-    }
-    public int getStarAmount() {
-        return starAmount;
-    }
+
 }

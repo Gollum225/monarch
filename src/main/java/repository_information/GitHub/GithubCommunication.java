@@ -185,15 +185,20 @@ public final class GithubCommunication implements GitMandatories {
 
     }
 
-    /**
-     * Send a GET request to the GitHub API.
-     * Updates the rate limit tracker.
-     *
-     * @param apiUrl to send the request to
-     * @return the response
-     * @throws IOException if the request couldn't be sent
-     */
     private String sendGetRequest(URI apiUrl) throws IOException, InterruptedException {
+        return sendGetRequest(apiUrl, false);
+    }
+
+
+        /**
+         * Send a GET request to the GitHub API.
+         * Updates the rate limit tracker.
+         *
+         * @param apiUrl to send the request to
+         * @return the response
+         * @throws IOException if the request couldn't be sent
+         */
+    private String sendGetRequest(URI apiUrl, boolean suppressMessages) throws IOException, InterruptedException {
 
             HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
                     .uri(apiUrl)
@@ -319,6 +324,58 @@ public final class GithubCommunication implements GitMandatories {
         }
     }
 
+    @Override
+    public boolean checkRepositoryExistence(String owner, String repo) {
+        String apiUrl = "https://github.com" + "/" + owner + "/" + repo;
+        String response;
+        try {
+            response = sendGetRequest(URI.create(apiUrl), true);
+        } catch (IOException | InterruptedException e) {
+            return false;
+        }
+        return response != null;
+    }
+
+    @Override
+    public String[] getOwnersRepositories(String owner) {
+        String[] result = getOwnersRepositories(owner, true);
+        if (result.length == 0) {
+            result = getOwnersRepositories(owner, false);
+        }
+        return result;
+    }
+
+    public String[] getOwnersRepositories(String owner, boolean isOrganization) {
+        String query = """
+            {
+                organization(login: "%s") {
+                    repositories(first: 100, privacy: PUBLIC) {
+                        nodes {
+                            name
+                        }
+                    }
+                }
+            }
+        """.formatted(owner);
+
+        String response;
+        try {
+            response = sendGraphQLRequest(query);
+        } catch (IOException | InterruptedException e) {
+            return new String[0];
+        }
+
+        if (response != null) {
+            try {
+                return parseRepositoryNames(response);
+            } catch (JsonProcessingException e) {
+                return new String[0];
+            }
+        } else {
+            return new String[0];
+        }
+    }
+
     public int getMaxResults(String searchTerm, int numberOfStars) throws JsonProcessingException {
         String responseBody;
 
@@ -345,6 +402,45 @@ public final class GithubCommunication implements GitMandatories {
         JsonNode rootNode = objectMapper.readTree(responseBody);
 
         return rootNode.get("total_count").asInt();
-
     }
+
+    private String sendGraphQLRequest(String query) throws IOException, InterruptedException {
+        String jsonQuery = String.format("{\"query\": \"%s\"}", query.replace("\"", "\\\"").replace("\n", " "));
+
+        URI uri = URI.create(GITHUB_GRAPHQL_URL);
+        HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
+                .uri(uri)
+                .header("Accept", "application/vnd.github+json")
+                .header("User-Agent", "Java-HttpClient")
+                .header("Authorization", "Bearer " + ACCESS_TOKEN)
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(jsonQuery, StandardCharsets.UTF_8));
+
+        HttpRequest request = requestBuilder.build();
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+        if (response.statusCode() != 200) {
+            System.err.println("Error while getting GitHub GraphQL response. Code: " + response.statusCode());
+            return null;
+        }
+
+        return response.body();
+    }
+
+    private String[] parseRepositoryNames(String jsonResponse) throws JsonProcessingException {
+        JsonNode rootNode = objectMapper.readTree(jsonResponse);
+
+        JsonNode repositories = rootNode.path("data").path("organization").path("repositories").path("nodes");
+
+        if (!repositories.isArray()) {
+            return new String[0];
+        }
+        String[] repoNames = new String[repositories.size()];
+
+        for (int i = 0; i < repositories.size(); i++) {
+            repoNames[i] = repositories.get(i).get("name").asText();
+        }
+        return repoNames;
+    }
+
 }

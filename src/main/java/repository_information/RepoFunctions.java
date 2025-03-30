@@ -44,4 +44,6 @@ public interface RepoFunctions {
      * Should be called, after all rules are executed, to shut down the repository.
      */
     void finish();
+
+    String[] getOwnersRepos();
 }

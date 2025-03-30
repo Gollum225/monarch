@@ -181,6 +181,11 @@ public class Repository implements RepoFunctions {
         cache = null;
     }
 
+    @Override
+    public String[] getOwnersRepos() {
+        return cache.getOwnersRepos();
+    }
+
     /**
      * Getter for the overall points.
      *

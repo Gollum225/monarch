@@ -58,6 +58,15 @@ public class APIProxy extends AbstractProxy{
     }
 
     @Override
+    public String[] getOwnersRepos() {
+        if (rateLimitMandatories.checkHardRateLimit(RateResource.GRAPHQL)) {
+            return gitAPI.getOwnersRepositories(owner);
+        } else {
+            return new String[0];
+        }
+    }
+
+    @Override
     String getSingleFile(String path) {
         return gitAPI.getFile(path, owner, repositoryName);
     }

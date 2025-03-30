@@ -89,6 +89,11 @@ public class CloneProxy extends AbstractProxy{
         deleteFolder(new File(String.valueOf(repoPath)));
     }
 
+    @Override
+    public String[] getOwnersRepos() {
+        return gitAPI.getOwnersRepositories(owner);
+    }
+
     private void deleteFolder(File folder) {
         try {
             FileUtils.delete(folder, FileUtils.RECURSIVE);

@@ -43,4 +43,21 @@ public interface GitMandatories {
      * @return a JsonNode with the general information.
      */
     JsonNode generalInfo(String owner, String repositoryName);
+
+    /**
+     * Checks if the repository exists.
+     *
+     * @param owner of the repository
+     * @param repositoryName of the repository
+     * @return true, if the repository exists.
+     */
+    boolean checkRepositoryExistence(String owner, String repositoryName);
+
+    /**
+     * Gets the names from other repositories of this owner.
+     *
+     * @param owner of the repositories
+     * @return the names of the repositories.
+     */
+    String[] getOwnersRepositories(String owner);
 }

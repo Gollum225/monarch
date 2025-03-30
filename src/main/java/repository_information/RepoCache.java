@@ -77,6 +77,11 @@ public class RepoCache implements RepoFunctions {
         proxy.finish();
     }
 
+    @Override
+    public String[] getOwnersRepos() {
+        return proxy.getOwnersRepos();
+    }
+
     /**
      * Sets the proxy to the given one. Useful, when the repo was cloned.
      * @param proxy new {@link AbstractProxy} to use.
