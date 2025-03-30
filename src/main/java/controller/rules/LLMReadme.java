@@ -20,7 +20,7 @@ import java.util.Date;
 public class LLMReadme extends Rule {
 
     // https://docs.sambanova.ai/cloud/docs/get-started/rate-limits
-    private static final int MAX_REQUESTS_PER_MINUTE = 60;
+    private static final int MAX_REQUESTS_PER_MINUTE = 30;
 
     private final int MAX_POINTS = 5;
 
@@ -84,7 +84,7 @@ public class LLMReadme extends Rule {
         String formattetReadme = objectMapper.writeValueAsString(readme);
 
         String roleContent
-                = " \"You are a machine to evaluate README files of Git Repositories. The user is looking for Repositories with architecture documentation. Give 0 to " + MAX_POINTS + " Points according to the likelihood of the existence of documentation for the repository. Answer only with the one number.\"";
+                = " \"You are a machine to evaluate README files of Git Repositories. The user is looking for Repositories with architecture documentation. Give 0 to " + MAX_POINTS + " points according to the likelihood of the existence of documentation for the repository. If no hints are given give 0 points. Answer only with the one number.\"";
 
 
 
@@ -92,7 +92,7 @@ public class LLMReadme extends Rule {
                 {
                     "stream": false,
                     "max_tokens": 1,
-                    "model": "Meta-Llama-3.2-1B-Instruct",
+                    "model": "Meta-Llama-3.3-70B-Instruct",
                     "messages": [
                         {
                             "role": "system",
