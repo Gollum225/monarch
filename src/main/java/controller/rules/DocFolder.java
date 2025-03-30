@@ -39,6 +39,7 @@ public class DocFolder extends Rule {
                 if (contains(getLastFolder(path), docPath)) {
                     counter++;
                     lastFoundPath = path;
+                    break;
 
                 }
             }
