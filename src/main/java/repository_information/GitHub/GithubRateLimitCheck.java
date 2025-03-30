@@ -58,17 +58,22 @@ public class GithubRateLimitCheck implements RateLimitMandatories {
             return true;
         }
         System.out.println("Rate limit for " + resource + " at " + RATE_LIMIT_THRESHOLD * 100 + "%. Trying to switch to cloning.");
+        System.out.println("Rate limit resets at " + rateLimit.getResetTime());
         return false;
     }
 
     @Override
     public boolean checkHardRateLimit(RateResource resource) {
-        return false;
+        return rateLimits.get(resource).getMaxRequests() > 0;
     }
 
     @Override
     public long getTimeTillReset(RateResource rateResource) {
-        return 0;
+        RateLimit rateLimit = rateLimits.get(rateResource);
+        if (rateLimit.getResetTime() != null) {
+            return rateLimit.getResetTime().getTime() - new Date().getTime();
+        }
+        return Long.MAX_VALUE;
     }
 
 

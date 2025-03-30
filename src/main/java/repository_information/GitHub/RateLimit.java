@@ -5,14 +5,14 @@ import java.util.Date;
 public class RateLimit {
 
     /**
-     * Amount of requests per hour.
+     * Number of requests per hour.
      */
-    private int maxRequests;
+    private int maxRequests = 1;
 
     /**
-     * Amount of requests left.
+     * Number of requests left.
      */
-    private int requestsLeft;
+    private int requestsLeft = 1;
 
     /**
      * Time when the rate limit resets.

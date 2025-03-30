@@ -94,22 +94,24 @@ public final class GithubCommunication implements GitMandatories {
     }
 
     public List<Repository> getTenRepository(String searchTerm, int starAmount) throws JsonProcessingException {
+        if (!GithubRateLimitCheck.getInstance().checkHardRateLimit(RateResource.SEARCH)) {
+            System.out.println("Couldn't get new repositories. Rate limit reached.");
+            return null;
+        }
 
         if (searchTerm == null) {
-            page = (int) (Math.random() * 100);
+            page = (int) (Math.random() * 101);
             searchTerm = createRandomSearchString();
         } else {
             page ++;
             if (maxNumberOfRepos >= 0 && page * 10 - 10 > maxNumberOfRepos) {
                 System.out.println("Max number of repositories reached");
                 return new ArrayList<>();
-            } else {
-                System.out.println("Searching for " + searchTerm);
             }
         }
 
         String responseBody;
-        String apiUrl = GITHUB_REST_URL + "/search/repositories?q=" + searchTerm + "+stars" + encode(":>") + starAmount + "&per_page" + encode(":10") + "&page=" + page;
+        String apiUrl = GITHUB_REST_URL + "/search/repositories?q=" + searchTerm + "+stars" + encode(":>") + starAmount + "&per_page=10" + "&page=" + page;
 
         try {
             responseBody = sendGetRequest(URI.create(apiUrl));
@@ -207,7 +209,9 @@ public final class GithubCommunication implements GitMandatories {
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
             if (response.statusCode() != 200) {
-                System.err.println("Error while getting GitHub response. Code: " + response.statusCode() + " (" + apiUrl + ")");
+                if (!suppressMessages) {
+                    System.err.println("Error while getting GitHub response. Code: " + response.statusCode() + " (" + apiUrl + ")");
+                }
                 return null;
             }
 

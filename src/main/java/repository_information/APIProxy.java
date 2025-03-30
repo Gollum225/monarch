@@ -89,7 +89,7 @@ public class APIProxy extends AbstractProxy{
      * @return if the repository has been cloned.
      */
     private boolean checkForClone() throws CloneProhibitedException {
-        if (checkRateLimit(RateResource.GRAPHQL, false)) {
+        if (checkRateLimit(RateResource.CORE, false)) {
             return false;
         }
 
@@ -98,7 +98,7 @@ public class APIProxy extends AbstractProxy{
             return true;
         } else {
             // couldn't clone, try for the hard rate limit or wait for the rate limit to reset.
-            while (!checkRateLimit(RateResource.GRAPHQL, true)) {
+            while (!checkRateLimit(RateResource.CORE, true)) {
                 try {
                     Thread.sleep(rateLimitMandatories.getTimeTillReset(RateResource.GRAPHQL));
                 } catch (InterruptedException e) {
