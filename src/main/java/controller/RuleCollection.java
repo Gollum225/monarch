@@ -1,7 +1,6 @@
 package controller;
 
 import controller.rules.DocFolder;
-import controller.rules.FileExtensions;
 import controller.rules.searchOwnerRepo;
 import controller.rules.KeyWord;
 import controller.rules.LLMReadme;
@@ -30,7 +29,6 @@ public class RuleCollection {
         rules.add(DocFolder.class);
         rules.add(ReadReadmeLinks.class);
         rules.add(searchOwnerRepo.class);
-        rules.add(FileExtensions.class);
 
         rules.add(controller.rules.QualityMetric.class);
     }
