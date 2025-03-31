@@ -29,14 +29,14 @@ public class Checker {
     /**
      * The rules that will be applied to the repositories.
      */
-    private RuleCollection rules;
+    private final RuleCollection rules;
 
     /**
      * Manages repositories.
      */
     private final RepoListManager listManager;
 
-    private int ruleAmount;
+    private final int ruleAmount;
 
     private final Status status;
 
@@ -75,7 +75,7 @@ public class Checker {
 
 
     /**
-     * Apply the list of rules to the given amount of repositories.
+     * Apply the list of rules to the given number of repositories.
      *
      * @param amount of repositories to be checked
      */
@@ -83,7 +83,7 @@ public class Checker {
         start();
         ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
-        int maxResults = 0;
+        int maxResults;
         try {
             maxResults = listManager.getMaxResults();
             if (maxResults >=1000) {
