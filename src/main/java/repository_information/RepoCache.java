@@ -11,11 +11,11 @@ import java.util.List;
 public class RepoCache implements RepoFunctions {
 
 
-    private AbstractProxy proxy;
+    private CloneProxy cloneProxy;
     private JsonNode generalInfo;
 
     public RepoCache(String repositoryName, String owner) {
-        this.proxy = new APIProxy(repositoryName, owner, this);
+        this.cloneProxy = new CloneProxy(repositoryName, owner);
     }
 
     //Cached information:
@@ -32,7 +32,7 @@ public class RepoCache implements RepoFunctions {
     @Override
     public JsonNode getStructure() throws CloneProhibitedException {
         if (structure == null) {
-            structure = proxy.getStructure();
+            structure = cloneProxy.getStructure();
         }
         return structure;
 
@@ -50,7 +50,7 @@ public class RepoCache implements RepoFunctions {
                 notCached.add(path);
             }
         }
-        Map<String, String> requestResults = proxy.getFiles(notCached);
+        Map<String, String> requestResults = cloneProxy.getFiles(notCached);
         files.putAll(requestResults);
         results.putAll(requestResults);
 
@@ -59,13 +59,13 @@ public class RepoCache implements RepoFunctions {
 
     @Override
     public boolean changeToClone(String reason) throws CloneProhibitedException {
-        return proxy.changeToClone(reason);
+        return cloneProxy.changeToClone(reason);
     }
 
     @Override
     public JsonNode generalInfo() {
         if (generalInfo == null) {
-            generalInfo = proxy.generalInfo();
+            generalInfo = cloneProxy.generalInfo();
         }
         return generalInfo;
     }
@@ -74,19 +74,12 @@ public class RepoCache implements RepoFunctions {
     public void finish() {
         structure = null;
         files.clear();
-        proxy.finish();
+        cloneProxy.finish();
     }
 
     @Override
     public String[] getOwnersRepos() {
-        return proxy.getOwnersRepos();
+        return cloneProxy.getOwnersRepos();
     }
 
-    /**
-     * Sets the proxy to the given one. Useful, when the repo was cloned.
-     * @param proxy new {@link AbstractProxy} to use.
-     */
-    public void setProxy(AbstractProxy proxy) {
-        this.proxy = proxy;
-    }
 }

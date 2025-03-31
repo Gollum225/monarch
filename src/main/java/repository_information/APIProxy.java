@@ -1,63 +1,61 @@
 package repository_information;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import exceptions.APIOverloaded;
 import exceptions.CloneProhibitedException;
+import repository_information.GitHub.GithubCommunication;
+import repository_information.GitHub.GithubRateLimitCheck;
 import repository_information.GitHub.RateResource;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static util.Globals.CLONE_THRESHOLD;
 import static util.Globals.MAX_FILE_AMOUNT;
 
-public class APIProxy extends AbstractProxy{
+public class APIProxy {
 
 
-    public APIProxy(String repositoryName, String owner, RepoCache cache) {
-        super(repositoryName, owner, cache);
+    public APIProxy(String repositoryName, String owner) {
+        this.repositoryName = repositoryName;
+        this.owner = owner;
     }
+    final String repositoryName;
+    final String owner;
 
-    @Override
-    public JsonNode getStructure() throws CloneProhibitedException {
+    final GitMandatories gitAPI = GithubCommunication.getInstance();
+    final RateLimitMandatories rateLimitMandatories = GithubRateLimitCheck.getInstance();
+
+
+
+    public JsonNode getStructure() throws CloneProhibitedException, APIOverloaded {
         if (checkForClone()) {
             // If checkForClone returns true, the rate limit is reached and the repository has been cloned.
             // The new proxy is a CloneProxy, so we can just call getStructure on it.
-            return cache.getStructure();
+            throw new APIOverloaded("rate limit reached");
         }
 
-        JsonNode structure = gitAPI.getStructure(owner, repositoryName);
-        if (structure == null) {
-            changeToClone("couldn't get structure");
-            return cache.getStructure();
-        } else if (structure != null && structure.size() > CLONE_THRESHOLD) {
-            // If the structure is too large: try to clone, but don't throw an exception, because it is not the
-            // callers fault.
-            try {
-                changeToClone("large structure: " + structure.size() + " elements");
-            } catch (CloneProhibitedException e) {
-                return structure;
-            }
-        }
-        return structure;
+        return gitAPI.getStructure(owner, repositoryName);
+
     }
 
-    @Override
-    public Map<String, String> getFiles(List<String> paths) throws CloneProhibitedException {
+    public Map<String, String> getFiles(List<String> paths) throws CloneProhibitedException, APIOverloaded {
         if (checkForClone()) {
-            return cache.getFiles(paths);
+            throw new APIOverloaded();
         }
         if (paths.size() > MAX_FILE_AMOUNT) {
-            changeToClone("too many files requested: " + paths.size());
+            throw new APIOverloaded("too many files requested: " + paths.size());
         }
-        return super.getFiles(paths);
+        Map<String, String> results = new HashMap<>();
+
+        for (String path : paths) {
+            results.put(path, getSingleFile(path));
+        }
+        return results;
     }
 
-    @Override
-    public void finish() {
-        //Nothing to do here
-    }
 
-    @Override
+
     public String[] getOwnersRepos() {
         if (rateLimitMandatories.checkHardRateLimit(RateResource.GRAPHQL)) {
             return gitAPI.getOwnersRepositories(owner);
@@ -66,8 +64,7 @@ public class APIProxy extends AbstractProxy{
         }
     }
 
-    @Override
-    String getSingleFile(String path) {
+    private String getSingleFile(String path) {
         return gitAPI.getFile(path, owner, repositoryName);
     }
 
@@ -92,29 +89,20 @@ public class APIProxy extends AbstractProxy{
     }
 
     /**
-     * Checks if the rate limit is reached and if so, changes to the clone.
+     * Checks if the rate limit is reached, and if so, changes to the clone.
      * If the repository couldn't be cloned, it may wait for the rate limit to reset.
      *
      * @return if the repository has been cloned.
      */
-    private boolean checkForClone() throws CloneProhibitedException {
+    private boolean checkForClone() throws APIOverloaded {
         if (checkRateLimit(RateResource.CORE, false)) {
             return false;
         }
+        throw new APIOverloaded("rate limit reached");
 
-        //try to clone
-        if (changeToClone("rate limit near")) {
-            return true;
-        } else {
-            // couldn't clone, try for the hard rate limit or wait for the rate limit to reset.
-            while (!checkRateLimit(RateResource.CORE, true)) {
-                try {
-                    Thread.sleep(rateLimitMandatories.getTimeTillReset(RateResource.GRAPHQL));
-                } catch (InterruptedException e) {
-                    //Do nothing, wait for the next loop.
-                }
-            }
-        }
-        return false;
     }
+    public JsonNode generalInfo() {
+        return gitAPI.generalInfo(owner, repositoryName);
+    }
+
 }
