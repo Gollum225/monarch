@@ -15,18 +15,18 @@ public class Globals {
     /**
      * If the request limit is at the {@link #RATE_LIMIT_THRESHOLD} * maximal requests, the program will try to switch to cloning repositories.
      */
-    public static double RATE_LIMIT_THRESHOLD = 0.9;
+    public static double RATE_LIMIT_THRESHOLD = 0.85;
 
     /**
      * The maximal size of a repository to still be cloned.
      * Unit: KB
      */
-    public static int MAX_CLONE_SIZE = 100000;
+    public static int MAX_CLONE_SIZE = 300000;
 
     /**
      * The maximal number of files to be requested at once. If more files are requested, the repository will be cloned.
      */
-    public static int MAX_FILE_AMOUNT = 40;
+    public static int MAX_FILE_AMOUNT = 35;
 
     public static int DEFAULT_NUMBER_OF_STAR = 100;
 }
