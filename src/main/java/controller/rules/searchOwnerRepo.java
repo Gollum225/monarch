@@ -3,7 +3,7 @@ package controller.rules;
 import controller.Rule;
 import controller.RuleType;
 import model.Repository;
-import model.RuleReturn;
+import model.RepositoryAspectEval;
 
 import java.util.List;
 
@@ -14,7 +14,7 @@ public class searchOwnerRepo extends Rule {
     }
 
     @Override
-    public RuleReturn execute() {
+    public RepositoryAspectEval execute() {
         String[] repoNames = repository.getOwnersRepos();
 
         int maxScore = 0;
@@ -30,6 +30,6 @@ public class searchOwnerRepo extends Rule {
             }
         }
 
-        return new RuleReturn(maxScore);
+        return new RepositoryAspectEval(maxScore);
     }
 }

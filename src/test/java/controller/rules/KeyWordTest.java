@@ -2,7 +2,7 @@ package controller.rules;
 
 import model.MockRepository;
 import model.Repository;
-import model.RuleReturn;
+import model.RepositoryAspectEval;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -21,7 +21,7 @@ class KeyWordTest {
 
     @Test
     void executeRule() {
-        RuleReturn result = keyWordRule.execute();
+        RepositoryAspectEval result = keyWordRule.execute();
         assertEquals(1, result.getPoints());
     }
 }

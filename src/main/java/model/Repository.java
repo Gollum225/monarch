@@ -57,7 +57,7 @@ public class Repository implements RepoFunctions {
     /**
      * Maps the rule to the points it has given.
      */
-    private HashMap<Class<? extends Rule>, RuleReturn> results = new HashMap<>();
+    private HashMap<Class<? extends Rule>, RepositoryAspectEval> results = new HashMap<>();
 
     /**
      * The overall points of the repository. Starting with 0.
@@ -169,7 +169,7 @@ public class Repository implements RepoFunctions {
      * @param rule that was executed
      * @param points the rule gave
      */
-    public void saveResult(Class<? extends Rule> rule, RuleReturn points) {
+    public void saveResult(Class<? extends Rule> rule, RepositoryAspectEval points) {
         results.put(rule, points);
     }
 
@@ -198,7 +198,7 @@ public class Repository implements RepoFunctions {
 
     private void calculateOverallPoints() {
         overallPoints = 0;
-        for (RuleReturn rule : results.values()) {
+        for (RepositoryAspectEval rule : results.values()) {
             if (rule.isApplicable()) {
                 overallPoints += rule.getPoints();
             }
@@ -210,7 +210,7 @@ public class Repository implements RepoFunctions {
      *
      * @return map of rules and their results.
      */
-    public HashMap<Class<? extends Rule>, RuleReturn> getResults() {
+    public HashMap<Class<? extends Rule>, RepositoryAspectEval> getResults() {
         return results;
     }
 

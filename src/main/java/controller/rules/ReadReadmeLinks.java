@@ -4,7 +4,7 @@ import controller.Rule;
 import controller.RuleType;
 import exceptions.CloneProhibitedException;
 import model.Repository;
-import model.RuleReturn;
+import model.RepositoryAspectEval;
 import util.Json;
 
 import java.io.BufferedReader;
@@ -61,16 +61,16 @@ public class ReadReadmeLinks extends Rule {
     }
 
     @Override
-    public RuleReturn execute() {
+    public RepositoryAspectEval execute() {
         String readme;
 
         try {
             readme = repository.getReadme();
         } catch (CloneProhibitedException e) {
-            return new RuleReturn(e.getMessage(), repository.getIdentifier(), this.getClass().getSimpleName());
+            return new RepositoryAspectEval(e.getMessage(), repository.getIdentifier(), this.getClass().getSimpleName());
         }
         if (readme == null) {
-            return new RuleReturn("No readme found", repository.getIdentifier(), this.getClass().getSimpleName());
+            return new RepositoryAspectEval("No readme found", repository.getIdentifier(), this.getClass().getSimpleName());
         }
 
         ArrayList<String> links = extractLinks(readme);
@@ -80,7 +80,7 @@ public class ReadReadmeLinks extends Rule {
 
 
         if (set.isEmpty()) {
-            return new RuleReturn("No links found in readme", repository.getIdentifier(), this.getClass().getSimpleName());
+            return new RepositoryAspectEval("No links found in readme", repository.getIdentifier(), this.getClass().getSimpleName());
         }
 
         ConcurrentMap<String, Integer> concurrentMap = set.parallelStream().collect(Collectors.toConcurrentMap(
@@ -110,7 +110,7 @@ public class ReadReadmeLinks extends Rule {
         } else {
             points = 10;
         }
-        return new RuleReturn(points);
+        return new RepositoryAspectEval(points);
     }
 
     /**

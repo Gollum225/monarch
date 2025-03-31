@@ -1,7 +1,7 @@
 package controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import model.RuleReturn;
+import model.RepositoryAspectEval;
 import model.RepoList;
 import model.Repository;
 import org.eclipse.jgit.util.FileUtils;
@@ -165,7 +165,7 @@ public class Checker {
                             currentRepo.saveResult(rule.getClass(), rule.execute());
                         }
                     } else if (rule.getType() == RuleType.QUALITY) {
-                        currentRepo.saveResult(rule.getClass(), new RuleReturn("Did not get mandatory points", currentRepo.getIdentifier(), rule.getClass().getSimpleName()));
+                        currentRepo.saveResult(rule.getClass(), new RepositoryAspectEval("Did not get mandatory points", currentRepo.getIdentifier(), rule.getClass().getSimpleName()));
                     }
                 }
 

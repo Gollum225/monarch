@@ -3,7 +3,7 @@ package controller.rules;
 import controller.Rule;
 import controller.RuleType;
 import model.Repository;
-import model.RuleReturn;
+import model.RepositoryAspectEval;
 
 /**
  * Checks the quality metric of the repository. e.g. GitHub stars.
@@ -15,21 +15,21 @@ public class QualityMetric extends Rule {
     }
 
     @Override
-    public RuleReturn execute() {
+    public RepositoryAspectEval execute() {
         int metric = repository.getQualityMetrics();
 
         if (metric < 100) {
-            return new RuleReturn(0);
+            return new RepositoryAspectEval(0);
         } else if (metric < 5000) {
-            return new RuleReturn(1);
+            return new RepositoryAspectEval(1);
         } else if (metric < 10000) {
-            return new RuleReturn(2);
+            return new RepositoryAspectEval(2);
         } else if (metric < 25000) {
-            return new RuleReturn(3);
+            return new RepositoryAspectEval(3);
         } else if (metric < 100000) {
-            return new RuleReturn(4);
+            return new RepositoryAspectEval(4);
         } else {
-            return new RuleReturn(5);
+            return new RepositoryAspectEval(5);
         }
     }
 }

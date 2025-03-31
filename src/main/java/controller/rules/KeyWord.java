@@ -4,7 +4,7 @@ import controller.Rule;
 import controller.RuleType;
 import exceptions.CloneProhibitedException;
 import model.Repository;
-import model.RuleReturn;
+import model.RepositoryAspectEval;
 import util.Json;
 import model.TextFile;
 
@@ -34,17 +34,17 @@ public class KeyWord extends Rule {
     }
 
     @Override
-    public RuleReturn execute() {
+    public RepositoryAspectEval execute() {
 
         try {
             textFiles = repository.getTextfiles();
         } catch (CloneProhibitedException e) {
-            return new RuleReturn(e.getMessage(), repository.getIdentifier(), this.getClass().getSimpleName());
+            return new RepositoryAspectEval(e.getMessage(), repository.getIdentifier(), this.getClass().getSimpleName());
         }
 
 
         if (KEYWORDS == null || KEYWORDS.length == 0) {
-            return new RuleReturn("No keywords found in the JSON file.", repository.getIdentifier(), this.getClass().getSimpleName());
+            return new RepositoryAspectEval("No keywords found in the JSON file.", repository.getIdentifier(), this.getClass().getSimpleName());
         }
 
         AtomicInteger keywordCount = new AtomicInteger();
@@ -74,17 +74,17 @@ public class KeyWord extends Rule {
                     }
                 });
         if (keywordCount.get() >= LAST_LIMIT) {
-            return new RuleReturn(5);
+            return new RepositoryAspectEval(5);
         } else if (keywordCount.get() >= FOURTH_LIMIT) {
-            return new RuleReturn(4);
+            return new RepositoryAspectEval(4);
         } else if (keywordCount.get() >= THIRD_LIMIT) {
-            return new RuleReturn(3);
+            return new RepositoryAspectEval(3);
         } else if (keywordCount.get() >= SECOND_LIMIT) {
-            return new RuleReturn(2);
+            return new RepositoryAspectEval(2);
         } else if (keywordCount.get() >= FIRST_LIMIT) {
-            return new RuleReturn(1);
+            return new RepositoryAspectEval(1);
         } else {
-            return new RuleReturn(0);
+            return new RepositoryAspectEval(0);
         }
     }
 }

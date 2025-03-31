@@ -1,6 +1,6 @@
 package controller;
 
-import model.RuleReturn;
+import model.RepositoryAspectEval;
 import model.Repository;
 
 import java.util.List;
@@ -37,7 +37,7 @@ public abstract class Rule {
      *
      * @return an object representing the outcome of the rule. May be points or a failure message.
      */
-    public abstract RuleReturn execute();
+    public abstract RepositoryAspectEval execute();
 
     /**
      * Getter for the type of the rule.

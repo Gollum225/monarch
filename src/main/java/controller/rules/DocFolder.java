@@ -5,7 +5,7 @@ import controller.Rule;
 import controller.RuleType;
 import exceptions.CloneProhibitedException;
 import model.Repository;
-import model.RuleReturn;
+import model.RepositoryAspectEval;
 
 /**
  * Checks if the repository contains a folder with documentation.
@@ -18,14 +18,14 @@ public class DocFolder extends Rule {
     }
 
     @Override
-    public RuleReturn execute() {
+    public RepositoryAspectEval execute() {
 
         String[] docPaths = {"doc", "docs", "documentation", "documentations", };
         JsonNode structure = null;
         try {
             structure = repository.getStructure();
         } catch (CloneProhibitedException e) {
-            return new RuleReturn(e.getMessage(), repository.getIdentifier(), this.getClass().getSimpleName());
+            return new RepositoryAspectEval(e.getMessage(), repository.getIdentifier(), this.getClass().getSimpleName());
         }
         int counter = 0;
         String lastFoundPath = "";
@@ -46,16 +46,16 @@ public class DocFolder extends Rule {
         }
 
         if (counter == 0) {
-            return new RuleReturn(0);
+            return new RepositoryAspectEval(0);
         } else if (counter == 1) {
             System.out.println("Found 1 documentation folder in " + repository.getIdentifier() + " at: " + lastFoundPath);
-            return new RuleReturn(3);
+            return new RepositoryAspectEval(3);
         } else if (counter <= 5){
             System.out.println("Found " + counter + " documentation folders in " + repository.getIdentifier() + " e.g.: " + lastFoundPath);
-            return new RuleReturn(4);
+            return new RepositoryAspectEval(4);
         } else {
             System.out.println("Found " + counter + " documentation folders in " + repository.getIdentifier() + " e.g.: " + lastFoundPath);
-            return new RuleReturn(MAX_POINTS);
+            return new RepositoryAspectEval(MAX_POINTS);
         }
     }
 

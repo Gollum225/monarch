@@ -5,7 +5,7 @@ import controller.Rule;
 /**
  * Return value (of the {@link Rule#execute()} methode) of a rule.
  */
-public class RuleReturn{
+public class RepositoryAspectEval {
 
     /**
      * Points the repository received.
@@ -23,24 +23,24 @@ public class RuleReturn{
     private final boolean isApplicable;
 
     /**
-     * Creates a new {@link RuleReturn} in case of successfully executing the rule.
+     * Creates a new {@link RepositoryAspectEval} in case of successfully executing the rule.
      *
      * @param points the received points. Should be bigger than 0.
      */
-    public RuleReturn(int points){
+    public RepositoryAspectEval(int points){
         this.points = Math.max(points, 0);
         this.failureMessage = null;
         this.isApplicable = true;
     }
 
     /**
-     * Creates a new {@link RuleReturn} in case of not being able to execute the rule.
+     * Creates a new {@link RepositoryAspectEval} in case of not being able to execute the rule.
      *
      * @param failureMessage reason, why the rule couldn't be executed.
      * @param repoIdentifier identifies the repository with name and owner. {@link Repository#getIdentifier()} can be used.
      * @param ruleName of the executing rule. {@link Rule#getClass()#getSimpleName()} can be used.
      */
-    public RuleReturn(String failureMessage, String repoIdentifier, String ruleName){
+    public RepositoryAspectEval(String failureMessage, String repoIdentifier, String ruleName){
         points = 0;
         this.isApplicable = false;
         this.failureMessage = failureMessage;
