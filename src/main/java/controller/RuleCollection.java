@@ -1,6 +1,8 @@
 package controller;
 
 import controller.rules.DocFolder;
+import controller.rules.FileExtensions;
+import controller.rules.searchOwnerRepo;
 import controller.rules.KeyWord;
 import controller.rules.LLMReadme;
 import controller.rules.ReadReadmeLinks;
@@ -20,13 +22,15 @@ public class RuleCollection {
     private final ArrayList<Class <? extends Rule>> rules = new ArrayList<>();
 
     /**
-     * Creates a new RuleColection. Adds the rules in the constructor to the list to be executed.
+     * Creates a new RuleCollection. Adds the rules in the constructor to the list to be executed.
      */
     public RuleCollection() {
         rules.add(KeyWord.class);
         rules.add(LLMReadme.class);
         rules.add(DocFolder.class);
         rules.add(ReadReadmeLinks.class);
+        rules.add(searchOwnerRepo.class);
+        rules.add(FileExtensions.class);
 
         rules.add(controller.rules.QualityMetric.class);
     }
