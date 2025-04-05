@@ -11,7 +11,7 @@ import java.util.List;
 public class RepoCache implements RepoFunctions {
 
 
-    private CloneProxy cloneProxy;
+    private final CloneProxy cloneProxy;
     private JsonNode generalInfo;
 
     public RepoCache(String repositoryName, String owner) {
@@ -27,7 +27,7 @@ public class RepoCache implements RepoFunctions {
     /**
      * The path of the file based on the repository root mapped to the content.
      */
-    private Map<String, String> files = new HashMap<>();
+    private final Map<String, String> files = new HashMap<>();
 
     @Override
     public JsonNode getStructure() throws CloneProhibitedException {

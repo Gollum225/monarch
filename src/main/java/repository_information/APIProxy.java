@@ -2,7 +2,6 @@ package repository_information;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import exceptions.APIOverloaded;
-import exceptions.CloneProhibitedException;
 import repository_information.GitHub.GithubCommunication;
 import repository_information.GitHub.GithubRateLimitCheck;
 import repository_information.GitHub.RateResource;
@@ -11,7 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static util.Globals.MAX_FILE_AMOUNT;
+import static util.Globals.MAX_NUMBER_OF_FILES;
 
 public class APIProxy {
 
@@ -28,7 +27,7 @@ public class APIProxy {
 
 
 
-    public JsonNode getStructure() throws CloneProhibitedException, APIOverloaded {
+    public JsonNode getStructure() throws APIOverloaded {
         if (checkForClone()) {
             // If checkForClone returns true, the rate limit is reached and the repository has been cloned.
             // The new proxy is a CloneProxy, so we can just call getStructure on it.
@@ -39,11 +38,11 @@ public class APIProxy {
 
     }
 
-    public Map<String, String> getFiles(List<String> paths) throws CloneProhibitedException, APIOverloaded {
+    public Map<String, String> getFiles(List<String> paths) throws APIOverloaded {
         if (checkForClone()) {
             throw new APIOverloaded();
         }
-        if (paths.size() > MAX_FILE_AMOUNT) {
+        if (paths.size() > MAX_NUMBER_OF_FILES) {
             throw new APIOverloaded("too many files requested: " + paths.size());
         }
         Map<String, String> results = new HashMap<>();
@@ -68,12 +67,9 @@ public class APIProxy {
         return gitAPI.getFile(path, owner, repositoryName);
     }
 
-    private boolean checkRateLimit() {
-        return rateLimitMandatories.checkRateLimit();
-    }
 
     /**
-     * Checks the rate limit, if the call is connected to a specific resource.
+     * Checks the rate limit if the call is connected to a specific resource.
      *
      * @param resource the resource to check the rate limit for.
      * @param critical if the request has a higher priority to be sent per API.

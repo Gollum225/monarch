@@ -35,7 +35,7 @@ public abstract class Rule {
     /**
      * Executes the rule.
      *
-     * @return an object representing the outcome of the rule. May be points or a failure message.
+     * @return an object representing the outcome of the rule. This may be points or a failure message.
      */
     public abstract RepositoryAspectEval execute();
 
@@ -50,7 +50,7 @@ public abstract class Rule {
 
     /**
      * Checks if the text contains the term. The search is case-insensitive.
-     * Only returns true, if the term is not surrounded by other letters.
+     * Only returns true if the term is not surrounded by other letters.
      *
      * @param text to search in
      * @param term to search for
@@ -61,9 +61,9 @@ public abstract class Rule {
     }
 
     /**
-     * Counts the number of occurrences of the term in the text.
+     * Counts the number of times the word occurs in the text.
      * The search is case-insensitive.
-     * Only returns true, if the term is not surrounded by other letters.
+     * Only returns true if the term is not surrounded by other letters.
      *
      * @param text to search in
      * @param term to search for
@@ -90,7 +90,7 @@ public abstract class Rule {
 
     /**
      * Counts one occurrence of every term in the text.
-     * Only returns true, if the term is not surrounded by other letters.
+     * Only returns true if the term is not surrounded by other letters.
      *
      * @param text to search in
      * @param terms to search for
@@ -106,7 +106,7 @@ public abstract class Rule {
 
     /**
      * Scans the text for the term.
-     * Only returns true, if the term is not surrounded by other letters.
+     * Only returns true if the term is not surrounded by other letters.
      * For performance reasons the method can stop after the first occurrence.
      * May not work in all regions, because of call to {@link String#toLowerCase()}.
      *

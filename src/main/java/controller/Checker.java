@@ -36,7 +36,10 @@ public class Checker {
      */
     private final RepoListManager listManager;
 
-    private final int ruleAmount;
+    /**
+     * Number of rules the repositories are checked with.
+     */
+    private final int numberOfRules;
 
     private final Status status;
 
@@ -46,30 +49,30 @@ public class Checker {
     public Checker() {
         rules = new RuleCollection();
         listManager = new RepoListManager(rules);
-        ruleAmount = rules.getRuleAmount();
-        status = new Status(ruleAmount);
+        numberOfRules = rules.getNumberOfRules();
+        status = new Status(numberOfRules);
 
     }
 
     public Checker(String searchTerm) {
         rules = new RuleCollection();
         listManager = new RepoListManager(rules, searchTerm);
-        ruleAmount = rules.getRuleAmount();
-        status = new Status(ruleAmount);
+        numberOfRules = rules.getNumberOfRules();
+        status = new Status(numberOfRules);
     }
 
-    public Checker(String searchTerm, int starAmount) {
+    public Checker(String searchTerm, int numberOfStars) {
         rules = new RuleCollection();
-        listManager = new RepoListManager(rules, searchTerm, starAmount);
-        ruleAmount = rules.getRuleAmount();
-        status = new Status(ruleAmount);
+        listManager = new RepoListManager(rules, searchTerm, numberOfStars);
+        numberOfRules = rules.getNumberOfRules();
+        status = new Status(numberOfRules);
     }
 
-    public Checker(int starAmount) {
+    public Checker(int numberOfStars) {
         rules = new RuleCollection();
-        listManager = new RepoListManager(rules, starAmount);
-        ruleAmount = rules.getRuleAmount();
-        status = new Status(ruleAmount);
+        listManager = new RepoListManager(rules, numberOfStars);
+        numberOfRules = rules.getNumberOfRules();
+        status = new Status(numberOfRules);
     }
 
 
@@ -77,10 +80,10 @@ public class Checker {
     /**
      * Apply the list of rules to the given number of repositories.
      *
-     * @param amount of repositories to be checked
+     * @param number of repositories to be checked
      */
-    public void checkRepos(int amount) {
-        start();
+    public void checkRepos(int number) {
+        Json.checkJson();
         ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
         int maxResults;
@@ -95,15 +98,15 @@ public class Checker {
             throw new RuntimeException("Cannot get number of available repositories.");
         }
 
-        if (maxResults < amount) {
-            amount = maxResults;
-            System.out.println("Can't find enough repositories with given search. Analyzing " + amount + " repositories.");
+        if (maxResults < number) {
+            number = maxResults;
+            System.out.println("Can't find enough repositories with given search. Analyzing " + number + " repositories.");
         }
 
 
-        CompletionService<Void> repoProcessingService = submitRepoAnalyzation(amount, executor);
+        CompletionService<Void> repoProcessingService = submitRepoAnalysation(number, executor);
 
-        for (int i = 0; i < amount; i++) {
+        for (int i = 0; i < number; i++) {
             try {
                 repoProcessingService.take().get();
             } catch (ExecutionException e) {
@@ -130,16 +133,16 @@ public class Checker {
     }
 
     /**
-     * Creates a new CompletionService for the given amount of repositories.
+     * Creates a new CompletionService for the given number of repositories.
      *
-     * @param amount of tasks of repositories to be checked
+     * @param number of tasks of repositories to be checked
      * @param executor to execute the tasks
      * @return the CompletionService
      */
-    private CompletionService<Void> submitRepoAnalyzation(int amount, ExecutorService executor) {
+    private CompletionService<Void> submitRepoAnalysation(int number, ExecutorService executor) {
         CompletionService<Void> completionService = new ExecutorCompletionService<>(executor);
 
-        for (int i = 0; i < amount; i++) {
+        for (int i = 0; i < number; i++) {
             completionService.submit(() -> {
 
                 Repository currentRepo;
@@ -179,15 +182,6 @@ public class Checker {
         return completionService;
     }
 
-    private void start() {
-        try {
-            Json.setup();
-        } catch (IOException e) {
-            // No need to handle this exception, as the program cannot continue without the keywords.
-            throw new RuntimeException("Cant proceed, Error with setting up Json " + e);
-        }
-    }
-
     private void finish() {
         status.finish();
         deleteClonedRepos();
@@ -206,6 +200,7 @@ public class Checker {
         if (files == null) {
             failure = true;
         } else {
+            // Delete recursive, to partly delete folders, if OS prevents deletion due to open files.
             for (File file : files) {
 
                 if (file.isDirectory()) {
@@ -222,7 +217,7 @@ public class Checker {
             }
         }
         if (failure) {
-            System.out.println("\u001B[33m" + "Couldnt delete all repos. Please delete path manually if necessary: " + CLONED_REPOS_PATH + "\u001B[0m");
+            System.out.println("\u001B[33m" + "Couldn't delete all repos. Please delete path manually if necessary: " + CLONED_REPOS_PATH + "\u001B[0m");
         }
 
     }

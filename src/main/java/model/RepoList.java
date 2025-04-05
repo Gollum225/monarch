@@ -18,7 +18,7 @@ public class RepoList {
      * List of {@link Repository}.
      * Set up as a Queue.
      */
-    private LinkedHashSet<Repository> unprocessedRepos = new LinkedHashSet<>();
+    private final LinkedHashSet<Repository> unprocessedRepos = new LinkedHashSet<>();
     private final Set<String> startedRepos = new HashSet<>();
 
     /**
@@ -33,7 +33,7 @@ public class RepoList {
      *
      * @return The instance of the {@link RepoList}.
      */
-    public static RepoList getInstace() {
+    public static RepoList getInstance() {
         if (instance == null) {
             instance = new RepoList();
         }
@@ -55,7 +55,7 @@ public class RepoList {
     }
 
     /**
-     * Getter for the amount of unprocessed {@link Repository}.
+     * Getter for the number of unprocessed {@link Repository}.
      *
      * @return unprocessed {@link Repository}
      */
@@ -68,7 +68,7 @@ public class RepoList {
      * @param repos to be added
      * @return true, if all repos are new and could be added
      */
-    public boolean addRepo(Repository[] repos) {
+    public boolean addMultipleRepos(Repository[] repos) {
         boolean everythingNew = true;
         for (Repository repo : repos) {
             everythingNew = this.unprocessedRepos.add(repo);
@@ -81,7 +81,7 @@ public class RepoList {
      * @param repo to be added
      * @return true, if the repo is new and could be added
      */
-    public boolean addRepo(Repository repo) {
+    public boolean addSingleRepo(Repository repo) {
         if (startedRepos.contains(repo.getIdentifier())) {
             return false;
         }

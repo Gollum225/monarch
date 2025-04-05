@@ -5,7 +5,7 @@ import repository_information.GitHub.RateResource;
 import java.util.Date;
 
 /**
- * To abstract the mandatory functions a class handling the rate limits of a git repository should have.
+ * To abstract the mandatory functions, a class handling the rate limits of a git repository should have.
  * This interface is based on the assumption that the git system has different types of rate limits, which are defined in {@link repository_information.GitHub.RateResource}.
  */
 public interface RateLimitMandatories {
@@ -38,8 +38,8 @@ public interface RateLimitMandatories {
     /**
      * Returns the time till the rate limit resets for a specific resource in milliseconds.
      *
-     * @param rateResource
-     * @return
+     * @param rateResource the resource the reset time is requested.
+     * @return number of milliseconds since January 1, 1970, 00:00:00 GMT till the rate limit resets
      */
     long getTimeTillReset(RateResource rateResource);
 }

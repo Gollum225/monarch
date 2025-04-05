@@ -36,7 +36,7 @@ public class RepositoryAspectEval {
     /**
      * Creates a new {@link RepositoryAspectEval} in case of not being able to execute the rule.
      *
-     * @param failureMessage reason, why the rule couldn't be executed.
+     * @param failureMessage reason why the rule couldn't be executed.
      * @param repoIdentifier identifies the repository with name and owner. {@link Repository#getIdentifier()} can be used.
      * @param ruleName of the executing rule. {@link Rule#getClass()#getSimpleName()} can be used.
      */
@@ -49,7 +49,7 @@ public class RepositoryAspectEval {
 
     /**
      * Received points of the repository.
-     * @return amount, not negative.
+     * @return number of points, not negative.
      */
     public int getPoints(){
         return points;
@@ -67,14 +67,14 @@ public class RepositoryAspectEval {
     /**
      * Returns if the rule was applicable on the repository.
      *
-     * @return true, if an amount of points could be given.
+     * @return true, if a number of points could be given.
      */
     public boolean isApplicable(){
         return isApplicable;
     }
 
     /**
-     * Returns the points, if the rule could be executed, failure message else.
+     * Returns the points if the rule could be executed, failure message else.
      *
      * @return points or failure reason as string.
      */

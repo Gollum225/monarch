@@ -18,15 +18,14 @@ import java.util.regex.Pattern;
  */
 public class KeyWord extends Rule {
 
-    private final String[] KEYWORDS = Json.getAllKeywords();
-    private List<TextFile> textFiles;
+    private static final String[] KEYWORDS = Json.getAllKeywords();
 
-    // The limits determine, how many keywords need to be found for a point.
-    private final int FIRST_LIMIT = 1;
-    private final int SECOND_LIMIT = 5;
-    private final int THIRD_LIMIT = 20;
-    private final int FOURTH_LIMIT = 50;
-    private final int LAST_LIMIT = 200;
+    // The limits determine how many keywords need to be found for a point.
+    private static final int FIRST_LIMIT = 1;
+    private static final int SECOND_LIMIT = 5;
+    private static final int THIRD_LIMIT = 20;
+    private static final int FOURTH_LIMIT = 50;
+    private static final int LAST_LIMIT = 200;
 
 
     public KeyWord(Repository repository) {
@@ -36,6 +35,7 @@ public class KeyWord extends Rule {
     @Override
     public RepositoryAspectEval execute() {
 
+        List<TextFile> textFiles;
         try {
             textFiles = repository.getTextfiles();
         } catch (CloneProhibitedException e) {
@@ -63,8 +63,8 @@ public class KeyWord extends Rule {
                         if (keyword == null || keyword.isEmpty() || textFile.getContent() == null || textFile.getContent().isEmpty()) {
                             continue;
                         }
-                        // Following condition is taken from StackOverflow: https://stackoverflow.com/a/90780
-                        // This is necessary, because the method "contains" is case-sensitive.
+                        // The following condition is taken from StackOverflow: https://stackoverflow.com/a/90780
+                        // This is necessary because the method "contains" is case-sensitive.
                         if (Pattern.compile(Pattern.quote(keyword), Pattern.CASE_INSENSITIVE).matcher(textFile.getContent()).find()) {
                             count++;
                         }

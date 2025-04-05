@@ -8,12 +8,13 @@ public class Globals {
     public static Path CLONED_REPOS_PATH = (Paths.get("").toAbsolutePath()).resolve(Paths.get("src/main/resources/cloned_repos"));
 
     /**
-     * If the repository has more than {@link #CLONE_THRESHOLD} elements, it will be cloned.
+     * If the repository has more than this number of elements, it will be cloned.
      */
     public static int CLONE_THRESHOLD = 2500;
 
     /**
-     * If the request limit is at the {@link #RATE_LIMIT_THRESHOLD} * maximal requests, the program will try to switch to cloning repositories.
+     * If the request limit is at the specified fraction * maximal requests,
+     * the program will try to switch to cloning repositories.
      */
     public static double RATE_LIMIT_THRESHOLD = 0.85;
 
@@ -26,7 +27,7 @@ public class Globals {
     /**
      * The maximal number of files to be requested at once. If more files are requested, the repository will be cloned.
      */
-    public static int MAX_FILE_AMOUNT = 35;
+    public static int MAX_NUMBER_OF_FILES = 35;
 
     public static int DEFAULT_NUMBER_OF_STAR = 100;
 }

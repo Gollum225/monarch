@@ -8,7 +8,7 @@ public class TextFile extends File {
     /**
      * The content of the file.
      */
-    private String content;
+    private final String content;
 
     /**
      * Creates a new text file.

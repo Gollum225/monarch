@@ -134,7 +134,7 @@ public class CloneProxy implements RepoFunctions{
         ObjectMapper mapper = new ObjectMapper();
 
         if (folder.listFiles() == null) {
-            System.err.println("Repository isn't cloned yet. Exptected at:" + path);
+            System.err.println("Repository isn't cloned yet. Expected at:" + path);
             return new ArrayList<>();
         }
 

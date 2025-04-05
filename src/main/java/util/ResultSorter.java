@@ -1,7 +1,6 @@
 package util;
 
 import com.fasterxml.jackson.databind.MappingIterator;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import java.io.File;
@@ -15,7 +14,6 @@ import static util.Globals.RESOURCE_PATH;
 
 /**
  * ChatGPT entirely generated this class. The functionality has been checked manually, take care anyway when using it.
- *
  */
 public class ResultSorter {
 
@@ -23,7 +21,7 @@ public class ResultSorter {
      * Reads in a CSV file, sorts the rows according to the "TotalScore" column and writes the result to a new file.
      *
      * @param inputFile path to input CSV-file
-     * @param outputFile Pfad zur Ausgabe-CSV-Datei
+     * @param outputFile path to output CSV-file
      * @throws IOException if an error occurs when reading or writing the files
      */
     public static void sortCsvByTotalScore(String inputFile, String outputFile) throws IOException {
@@ -50,9 +48,9 @@ public class ResultSorter {
             try {
                 double score1 = Double.parseDouble(map1.get("TotalScore"));
                 double score2 = Double.parseDouble(map2.get("TotalScore"));
-                return Double.compare(score2, score1); // Absteigend sortieren (höchste Werte zuerst)
+                return Double.compare(score2, score1); // sort descending (highest value first)
             } catch (NumberFormatException e) {
-                // Falls TotalScore keine Zahl ist, alphabetisch sortieren
+                // sort alphabetical, if TotalScore is not a number (shouldn't occur)
                 return map1.get("TotalScore").compareTo(map2.get("TotalScore"));
             }
         });
@@ -60,19 +58,17 @@ public class ResultSorter {
         // Create a schema for the output (with all columns from the first data set)
         CsvSchema.Builder schemaBuilder = CsvSchema.builder();
         if (!data.isEmpty()) {
-            for (String column : data.get(0).keySet()) {
+            for (String column : data.getFirst().keySet()) {
                 schemaBuilder.addColumn(column);
             }
         }
         CsvSchema outputSchema = schemaBuilder.build().withHeader();
 
         // Write data to a new CSV file
-        ObjectMapper mapper = new ObjectMapper();
         csvMapper.writer(outputSchema)
                 .writeValue(new File(outputFile), data);
 
-        System.out.println("CSV-Datei wurde erfolgreich nach TotalScore sortiert und in " +
-                outputFile + " gespeichert.");
+        System.out.println("CSV-file successfully order by TotalScore and stored in  " + outputFile);
     }
 
     // Example call of the method
@@ -82,7 +78,8 @@ public class ResultSorter {
         try {
             sortCsvByTotalScore(path.toString(), outputPath.toString());
         } catch (IOException e) {
-            System.err.println("Fehler beim Verarbeiten der CSV-Datei: " + e.getMessage());
+            // No need to catch the exception.
+            System.err.println("Error while processing CSV-file: " + e.getMessage());
             e.printStackTrace();
         }
     }

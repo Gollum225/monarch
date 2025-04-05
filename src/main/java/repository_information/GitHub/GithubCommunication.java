@@ -93,7 +93,7 @@ public final class GithubCommunication implements GitMandatories {
 
     }
 
-    public List<Repository> getTenRepository(String searchTerm, int starAmount) throws JsonProcessingException {
+    public List<Repository> getTenRepository(String searchTerm, int numberOfStars) throws JsonProcessingException {
         if (!GithubRateLimitCheck.getInstance().checkHardRateLimit(RateResource.SEARCH)) {
             System.out.println("Couldn't get new repositories. Rate limit reached.");
             return null;
@@ -111,7 +111,7 @@ public final class GithubCommunication implements GitMandatories {
         }
 
         String responseBody;
-        String apiUrl = GITHUB_REST_URL + "/search/repositories?q=" + searchTerm + "+stars" + encode(":>") + starAmount + "&per_page=10" + "&page=" + page;
+        String apiUrl = GITHUB_REST_URL + "/search/repositories?q=" + searchTerm + "+stars" + encode(":>") + numberOfStars + "&per_page=10" + "&page=" + page;
 
         try {
             responseBody = sendGetRequest(URI.create(apiUrl));
@@ -338,14 +338,6 @@ public final class GithubCommunication implements GitMandatories {
 
     @Override
     public String[] getOwnersRepositories(String owner) {
-        String[] result = getOwnersRepositories(owner, true);
-        if (result.length == 0) {
-            result = getOwnersRepositories(owner, false);
-        }
-        return result;
-    }
-
-    public String[] getOwnersRepositories(String owner, boolean isOrganization) {
         String query = """
             {
                 organization(login: "%s") {

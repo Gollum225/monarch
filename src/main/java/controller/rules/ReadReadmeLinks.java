@@ -24,14 +24,14 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
- * Checks the links in the readme file, if they refer to a website with potential documentation.
+ * Checks the links in the readme file if they refer to a website with potential documentation.
  */
 public class ReadReadmeLinks extends Rule {
 
     /**
      * Maximum number of sites to check per repository. More sides
      */
-    private static final int MAXSITES = 200;
+    private static final int MAX_SITES = 200;
 
     /**
      * Keywords to search for in the website content. These keywords are more important ones.
@@ -44,7 +44,8 @@ public class ReadReadmeLinks extends Rule {
     private final List<String> SIDE_KEYWORDS = new ArrayList<>();
 
     /**
-     * List of concrete sites to exclude from the search. E.g., https://github.com/owner/repo
+     * List of concrete sites to exclude from the search.
+     * E.g., <a href="https://github.com/owner/repo">github.com/owner/repo</a>
      */
     private final List<String> excludedConcreteSites = new ArrayList<>();
 
@@ -76,7 +77,7 @@ public class ReadReadmeLinks extends Rule {
         ArrayList<String> links = extractLinks(readme);
         links = filterImages(links);
 
-        Set<String> set = links.stream().limit(MAXSITES).collect(Collectors.toSet());
+        Set<String> set = links.stream().limit(MAX_SITES).collect(Collectors.toSet());
 
 
         if (set.isEmpty()) {
@@ -94,7 +95,7 @@ public class ReadReadmeLinks extends Rule {
 
         System.out.println("Best documentation page in " + repository.getIdentifier() + ": " + maxKey + " with score: " + maxScore);
 
-        maxScore = maxScore / Math.min(links.size(), MAXSITES);
+        maxScore = maxScore / Math.min(links.size(), MAX_SITES);
 
         int points;
         if (maxScore == 0) {
@@ -128,7 +129,7 @@ public class ReadReadmeLinks extends Rule {
         connection.setConnectTimeout(5000);
         connection.setReadTimeout(5000);
 
-        // Skip, if webpage is too large or not an HTML text.
+        // Skip if the webpage is too large or not an HTML text.
         String contentType = connection.getContentType();
         if (contentType == null) {
             contentType = "text/html";
@@ -185,7 +186,7 @@ public class ReadReadmeLinks extends Rule {
     }
 
     /**
-     * Counts the number of occurrences of the keywords in a website and calculates a score based on that.
+     * Counts the number out of a website's keywords and calculates a score based on that.
      *
      * @param websiteContent content of the website
      * @return score of the website
@@ -195,7 +196,7 @@ public class ReadReadmeLinks extends Rule {
         if (excludedConcreteSites.contains(websiteContent) || excludedGeneralSites.stream().anyMatch(websiteContent::contains)) {
             return 0;
         }
-        String content = "";
+        String content;
         try {
             content = fetchWebsiteContent(websiteContent);
         } catch (IOException e) {
@@ -209,7 +210,7 @@ public class ReadReadmeLinks extends Rule {
         if (score > 0) {
             score += countMultipleKeywordsSingleOccurrence(content, SIDE_KEYWORDS);
 
-            // Triple the score of the website, when the repository name is in the content, because the website
+            // Triple the score of the website when the repository name is in the content, because the website
             // is more likely to contain documentation for this specific repository.
             if (contains(content, repository.getRepositoryName())) {
                 score *= 3;

@@ -1,6 +1,5 @@
 package util;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -18,7 +17,7 @@ import java.util.Map;
 public final class Json {
 
     private static Map<String, List<String>> list;
-    private static final String jsonFilePath = "src/main/resources/keywords.json";
+    private static final String JSON_FILE_PATH = "src/main/resources/keywords.json";
 
 
     private Json() {
@@ -28,10 +27,10 @@ public final class Json {
     /**
      * Read the JSON file.
      */
-    public static void setup() throws IOException {
+    private static void setup() throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
 
-        list = objectMapper.readValue(new File(jsonFilePath), new TypeReference<Map<String, List<String>>>() {});
+        list = objectMapper.readValue(new File(JSON_FILE_PATH), new TypeReference<>() {});
 
     }
 
@@ -42,23 +41,14 @@ public final class Json {
      */
     public static String[] getAllKeywords() {
 
-        if (list == null) {
-            try {
-                setup();
-            } catch (IOException e) {
-                System.out.println("Couldn't read the JSON file.");
-                return null;
-            }
-            if (list == null) {
-                return null;
-            }
-        }
+        checkJson();
 
         List<String> allKeywords = new ArrayList<>();
         for (List<String> keywords : list.values()) {
             allKeywords.addAll(keywords);
         }
 
+        // Convert to a native array for faster iteration.
         return allKeywords.toArray(new String[0]);
     }
 
@@ -74,14 +64,19 @@ public final class Json {
         return list.get(key);
     }
 
-    private static void checkJson() {
+    /**
+     * Loads the JSON file content, if not done before.
+     */
+    public static void checkJson() {
         if (list == null) {
             try {
                 setup();
             } catch (IOException e) {
-                System.out.println("Couldn't read the JSON file.");
                 throw new RuntimeException("Couldn't read the JSON file.");
             }
+        }
+        if (list == null) {
+            throw new RuntimeException("Couldn't read the JSON file.");
         }
     }
 
@@ -92,7 +87,7 @@ public final class Json {
      * @param rootNode the root node of the JSON response
      * @return a list of repositories
      */
-    public static List<Repository> parseGraphQLRepositories(JsonNode rootNode) throws JsonProcessingException {
+    public static List<Repository> parseGraphQLRepositories(JsonNode rootNode) {
 
         JsonNode edges = rootNode.at("/data/search/edges");
 
@@ -109,7 +104,7 @@ public final class Json {
         return repositories;
     }
 
-    public static List<Repository> parseRestRepositories(JsonNode rootNode) throws JsonProcessingException {
+    public static List<Repository> parseRestRepositories(JsonNode rootNode) {
         JsonNode items = rootNode.get("items");
         List<Repository> repositories = new ArrayList<>();
         for (JsonNode item : items) {
@@ -119,9 +114,5 @@ public final class Json {
         }
         return repositories;
     }
-
-
-
-
 
 }

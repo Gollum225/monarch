@@ -26,7 +26,7 @@ public interface GitMandatories {
     String getFile(String path, String owner, String repositoryName);
 
     /**
-     * Clones the reopsitory.
+     * Clones the repository.
      *
      * @param owner of the repository
      * @param repositoryName of the repository

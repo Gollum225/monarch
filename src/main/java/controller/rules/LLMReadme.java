@@ -22,7 +22,7 @@ public class LLMReadme extends Rule {
     // https://docs.sambanova.ai/cloud/docs/get-started/rate-limits
     private static final int MAX_REQUESTS_PER_MINUTE = 30;
 
-    private final int MAX_POINTS = 5;
+    private static final int MAX_POINTS = 5;
 
     static Date lastRequest = new Date();
 
@@ -37,15 +37,17 @@ public class LLMReadme extends Rule {
         String readme;
         try {
             readme = repository.getReadme();
-        } catch (CloneProhibitedException e) {
-            return new RepositoryAspectEval(e.getMessage(), repository.getIdentifier(), this.getClass().getSimpleName());
+        } catch (CloneProhibitedException cpe) {
+            // The readme has caused the repository to be cloned, which it is not allowed to do.
+            return new RepositoryAspectEval(cpe.getMessage(), repository.getIdentifier(), this.getClass().getSimpleName());
         }
+
+        String llmAnswer;
 
         if (readme == null) {
             return new RepositoryAspectEval("No readme found", repository.getIdentifier(), this.getClass().getSimpleName());
         }
 
-        String llmAnswer;
 
         try {
             llmAnswer = sendGetRequest(readme);
@@ -69,42 +71,20 @@ public class LLMReadme extends Rule {
     }
 
     private String sendGetRequest(String readme) throws IOException {
-        // Verbindung öffnen
+        // open connection
         URL url = new URL("https://api.sambanova.ai/v1/chat/completions");
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
-        // GET-Methode und Header setzen
+        // set GET-methode and Header
         connection.setRequestMethod("POST");
         connection.setRequestProperty("Authorization", "Bearer " + System.getenv("SambaNova_API"));
         connection.setRequestProperty("Content-Type", "application/json");
         connection.setDoOutput(true);
-        //readme = "This is the readme of the Monarch GitHub page. This Project is a well documented Repository miner. All architecural documents are in the \"docs\" Folder. There are UML Files for class diagrams as well as sequence Diagramms and components diagram and others. Every diagram is well described in words as well. A big thanks to Niklas Weber for supporting this Project. Feel free to support this Project with Money or your support. ";
 
         ObjectMapper objectMapper = new ObjectMapper();
-        String formattetReadme = objectMapper.writeValueAsString(readme);
+        String formattedReadme = objectMapper.writeValueAsString(readme);
 
-        String roleContent
-                = " \"You are a machine to evaluate README files of Git Repositories. The user is looking for Repositories with architecture documentation. Give 0 to " + MAX_POINTS + " points according to the likelihood of the existence of documentation for the repository. If no hints are given give 0 points. Answer only with the one number.\"";
-
-
-
-        String jsonInput = """
-                {
-                    "stream": false,
-                    "max_tokens": 1,
-                    "model": "Meta-Llama-3.3-70B-Instruct",
-                    "messages": [
-                        {
-                            "role": "system",
-                            "content": """ + roleContent + """
-                        },
-                        {
-                            "role": "user",
-                            "content": """ + formattetReadme + """
-                        }
-                    ]
-                }
-            """;
+        String jsonInput = getJsonInput(formattedReadme);
 
 
         waitForAPI();
@@ -114,14 +94,14 @@ public class LLMReadme extends Rule {
             os.write(input, 0, input.length);
         }
         requestDone();
-        // Statuscode überprüfen
+        // check status-code
         int responseCode = connection.getResponseCode();
         if (responseCode != 200) {
             System.err.println("Error while getting Samba Nova response. Code: " + responseCode +" "+ connection.getResponseMessage());
             return null;
         }
 
-        // Antwort lesen
+        // read answer
         BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
         String inputLine;
         StringBuilder response = new StringBuilder();
@@ -136,6 +116,30 @@ public class LLMReadme extends Rule {
         JsonNode contentNode = rootNode.path("choices").get(0).path("message").path("content");
 
         return contentNode.asText().replace("\"", "");
+    }
+
+    private String getJsonInput(String formattedReadme) {
+        String roleContent
+                = " \"You are a machine to evaluate README files of Git Repositories. The user is looking for Repositories with architecture documentation. Give 0 to " + MAX_POINTS + " points according to the likelihood of the existence of documentation for the repository. If no hints are given give 0 points. Answer only with the one number.\"";
+
+
+        return """
+                {
+                    "stream": false,
+                    "max_tokens": 1,
+                    "model": "Meta-Llama-3.3-70B-Instruct",
+                    "messages": [
+                        {
+                            "role": "system",
+                            "content": """ + roleContent + """
+                        },
+                        {
+                            "role": "user",
+                            "content": """ + formattedReadme + """
+                        }
+                    ]
+                }
+            """;
     }
 
     private static void waitForAPI() {

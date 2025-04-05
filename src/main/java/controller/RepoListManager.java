@@ -11,14 +11,13 @@ import java.io.IOException;
 import java.util.InputMismatchException;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 import static util.Globals.DEFAULT_NUMBER_OF_STAR;
 
 
 /**
  * Manages the list of repositories and provides the next repository to check.
- * Keeps track of processed repositories. Gets new repositories, if the amount of unprocessed is under {@link #THRESHOLD}.
+ * Keeps track of processed repositories. Gets new repositories, if the number of unprocessed is under {@link #THRESHOLD}.
  */
 public class RepoListManager {
 
@@ -33,14 +32,14 @@ public class RepoListManager {
         this.searchTerm = searchTerm;
     }
 
-    public RepoListManager(RuleCollection ruleCollection, String searchTerm, int starAmount) {
+    public RepoListManager(RuleCollection ruleCollection, String searchTerm, int numberOfStars) {
         this(ruleCollection, searchTerm);
-        this.starAmount = starAmount;
+        this.numberOfStars = numberOfStars;
     }
 
-    public RepoListManager(RuleCollection ruleCollection, int starAmount) {
+    public RepoListManager(RuleCollection ruleCollection, int numberOfStars) {
         this(ruleCollection);
-        this.starAmount = starAmount;
+        this.numberOfStars = numberOfStars;
     }
 
     /**
@@ -51,37 +50,30 @@ public class RepoListManager {
     /**
      * List of repositories this class handles.
      */
-    private final RepoList repoList = RepoList.getInstace();
+    private final RepoList repoList = RepoList.getInstance();
 
     /**
-     * Starts getting new repositories, when the number of unprocessed repositories is below this threshold.
+     * Starts getting new repositories when the number of unprocessed repositories is below this threshold.
      */
-    private final int THRESHOLD = 5;
-
-    /**
-     * Number of unprocessed, ready repositories.
-     */
-    private int unprocessedRepos = 0;
-
+    private static final int THRESHOLD = 5;
 
 
     private String searchTerm;
 
 
 
-    private int starAmount = -1;
+    private int numberOfStars = -1;
 
     /**
      * Gets the next repository to check.
      * @return next repository
-     * @throws TimeoutException if no new repositories are available after 10 seconds
      */
     public synchronized Repository getNextRepo() {
-        checkRepoAmount();
+        checkUnprocessedRepoNumber();
 
 
         // If no new repositories are available, wait for 10 seconds.
-        // If still no new repositories are available, throw a TimeoutException
+        // If still no new repositories are available, throw an TimeoutException
         for (int i = 0; i < 10; i++) {
             if (repoList.size() == 0) {
                 try {
@@ -94,7 +86,6 @@ public class RepoListManager {
             }
             return null;
         }
-        unprocessedRepos--;
 
         return repoList.getNext();
     }
@@ -107,17 +98,17 @@ public class RepoListManager {
 
         List<Repository> repos;
         try {
-            if (searchTerm != null && starAmount >= 0) {
-                repos = GithubCommunication.getInstance().getTenRepository(searchTerm, starAmount);
+            if (searchTerm != null && numberOfStars >= 0) {
+                repos = GithubCommunication.getInstance().getTenRepository(searchTerm, numberOfStars);
             } else if (searchTerm != null) {
                 repos = GithubCommunication.getInstance().getTenRepository(searchTerm, DEFAULT_NUMBER_OF_STAR);
-            } else if (starAmount >= 0) {
-                repos = GithubCommunication.getInstance().getTenRepository(null, starAmount);
+            } else if (numberOfStars >= 0) {
+                repos = GithubCommunication.getInstance().getTenRepository(null, numberOfStars);
             } else {
                 repos = GithubCommunication.getInstance().getTenRepository();
             }
              if (repos == null) {
-                 checkRepoAmount();
+                 checkUnprocessedRepoNumber();
                  return;
              } else if (repos.isEmpty()) {
                  return;
@@ -127,9 +118,7 @@ public class RepoListManager {
         }
 
         for (Repository repo : repos) {
-            if (repoList.addRepo(repo)) {
-                unprocessedRepos++;
-            }
+            repoList.addSingleRepo(repo);
         }
     }
 
@@ -149,10 +138,10 @@ public class RepoListManager {
     }
 
     /**
-     * Checks if the amount of unprocessed repositories is below the threshold.
+     * Checks if the number of unprocessed repositories is below the threshold.
      * Triggers the refill if necessary
      */
-    private void checkRepoAmount() {
+    private void checkUnprocessedRepoNumber() {
 
         // In loop to get repositories, to get other repositories if repositories were found again.
         for (int i = 0; i < 2; i++) {
@@ -173,12 +162,12 @@ public class RepoListManager {
     }
 
     public int getMaxResults() throws JsonProcessingException {
-        if (searchTerm != null && starAmount >= 0) {
-            return GithubCommunication.getInstance().getMaxResults(searchTerm, starAmount);
+        if (searchTerm != null && numberOfStars >= 0) {
+            return GithubCommunication.getInstance().getMaxResults(searchTerm, numberOfStars);
         } else if (searchTerm != null) {
             return GithubCommunication.getInstance().getMaxResults(searchTerm, -1);
-        } else if (starAmount >= 0) {
-            return GithubCommunication.getInstance().getMaxResults(null, starAmount);
+        } else if (numberOfStars >= 0) {
+            return GithubCommunication.getInstance().getMaxResults(null, numberOfStars);
         }
         return 1000;
     }

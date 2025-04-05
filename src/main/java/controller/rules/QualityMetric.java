@@ -6,7 +6,7 @@ import model.Repository;
 import model.RepositoryAspectEval;
 
 /**
- * Checks the quality metric of the repository. e.g. GitHub stars.
+ * Checks the quality metric of the repository. E.g., GitHub stars.
  */
 public class QualityMetric extends Rule {
 

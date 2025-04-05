@@ -11,7 +11,7 @@ import model.RepositoryAspectEval;
  * Checks if the repository contains a folder with documentation.
  */
 public class DocFolder extends Rule {
-    private final int MAX_POINTS = 5;
+    private static final int MAX_POINTS = 5;
 
     public DocFolder(Repository repository) {
         super(RuleType.MANDATORY, repository);
@@ -21,7 +21,7 @@ public class DocFolder extends Rule {
     public RepositoryAspectEval execute() {
 
         String[] docPaths = {"doc", "docs", "documentation", "documentations", };
-        JsonNode structure = null;
+        JsonNode structure;
         try {
             structure = repository.getStructure();
         } catch (CloneProhibitedException e) {
@@ -35,7 +35,7 @@ public class DocFolder extends Rule {
             }
             String path = node.get("path").asText();
             for (String docPath : docPaths) {
-                // Takes the String of each last path and checks, if it contains one of the docPaths.
+                // Takes the String of each last path and checks if it contains one of the docPaths.
                 if (contains(getLastFolder(path), docPath)) {
                     counter++;
                     lastFoundPath = path;

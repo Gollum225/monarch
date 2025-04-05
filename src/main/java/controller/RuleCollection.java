@@ -69,7 +69,12 @@ public class RuleCollection {
         return rules;
     }
 
-    public int getRuleAmount() {
+    /**
+     * Getter for the number of rules.
+     *
+     * @return number of rules
+     */
+    public int getNumberOfRules() {
         return rules.size();
     }
 }

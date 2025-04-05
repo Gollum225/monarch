@@ -31,18 +31,18 @@ public class Main {
 
         if (args.length > 1) {
             System.out.println("Looking only for repositories with search term: " + args[1]);
-            int starAmount;
+            int numberOfStars;
             try {
-                starAmount = Integer.parseInt(args[2]);
+                numberOfStars = Integer.parseInt(args[2]);
             } catch (NumberFormatException e) {
-                starAmount = -1;
+                numberOfStars = -1;
             }
-            if (starAmount < 0) {
+            if (numberOfStars < 0) {
                 System.out.println("The third argument must be a positive number of repositories to analyze.");
                 checker = new Checker(args[1]);
             } else {
                 System.out.println("Looking for repositories with more than " + args[2] + " quality points");
-                checker = new Checker(args[1], starAmount);
+                checker = new Checker(args[1], numberOfStars);
             }
         } else {
             checker = new Checker();

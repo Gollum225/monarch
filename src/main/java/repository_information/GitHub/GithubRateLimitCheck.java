@@ -10,7 +10,7 @@ public class GithubRateLimitCheck implements RateLimitMandatories {
 
     private static GithubRateLimitCheck rateLimitCheck;
 
-    private Map<RateResource, RateLimit> rateLimits;
+    private final Map<RateResource, RateLimit> rateLimits;
 
     private GithubRateLimitCheck() {
         rateLimits = new HashMap<>();

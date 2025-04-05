@@ -30,14 +30,15 @@ public class Repository implements RepoFunctions {
     private RepoCache cache;
 
     /**
-     * Date of creation of the repository.
+     * Creation date of the repository.
      */
     private final Date created;
 
     private long duration;
 
     /**
-     * Content of the readme file. null if no readme file is found, or if the readme file is not yet requested.
+     * Content of the readme file.
+     * null if no readme file is found, or if the readme file is not yet requested
      */
     private String readme;
 
@@ -57,7 +58,7 @@ public class Repository implements RepoFunctions {
     /**
      * Maps the rule to the points it has given.
      */
-    private HashMap<Class<? extends Rule>, RepositoryAspectEval> results = new HashMap<>();
+    private final HashMap<Class<? extends Rule>, RepositoryAspectEval> results = new HashMap<>();
 
     /**
      * The overall points of the repository. Starting with 0.
@@ -84,7 +85,7 @@ public class Repository implements RepoFunctions {
 
     /**
      * Returns all textfiles of a {@link Repository}. The textfiles are identified by their file extension.
-     * Searched extensions are: txt, md, markdown, rst, adoc, pdf, docx.
+     * Searched extensions are: txt, md, Markdown, rst, adoc, PDF, docx.
      * @return list of {@link TextFile}
      * @throws CloneProhibitedException if this call lead to cloning of the repository, where cloning is prohibited.
      */
@@ -151,7 +152,7 @@ public class Repository implements RepoFunctions {
     }
 
     /**
-     * Gets the quality metric of a repository. e.g., GitHub stars.
+     * Gets the quality metric of a repository. E.g., GitHub stars.
      *
      * @return number of points
      */
@@ -232,7 +233,7 @@ public class Repository implements RepoFunctions {
     }
 
     /**
-     * Returns the date where the repository was discovered. This is not the date, where it was begun to be analyzed.
+     * Returns the date where the repository was discovered. This is not the date where it was begun to be analyzed.
      *
      * @return date of discovery.
      */
@@ -275,7 +276,7 @@ public class Repository implements RepoFunctions {
 
     /**
      * Returns the identifier of the repository. The identifier is the name of the repository and the owner.
-     * Identifier is used mainly for logging, because it is a nicely formatted string.
+     * Identifier is used mainly for logging because it is a nicely formatted string.
      * Use {@link #getRepositoryName()} and {@link #getOwner()} for other code-purposes.
      *
      * @return identifier of the repository.
