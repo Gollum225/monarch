@@ -68,26 +68,23 @@ public class CloneProxy implements RepoFunctions{
         }
         if (structure == null) {
             changeToClone("couldn't get structure");
-        } else if (structure != null && structure.size() > CLONE_THRESHOLD) {
+            ObjectMapper mapper = new ObjectMapper();
+            ObjectNode node = mapper.createObjectNode();
+            ArrayNode tree = mapper.createArrayNode();
+            tree.addAll(getStructure(repoPath));
+            node.set("tree", tree);
+            structure = node.get("tree");
+        } else if (structure.size() > CLONE_THRESHOLD) {
             // If the structure is too large: try to clone, but don't throw an exception, because it is not the
-            // callers fault.
+            // fault of the caller.
             try {
                 changeToClone("large structure: " + structure.size() + " elements");
             } catch (CloneProhibitedException e) {
                 //do nothing
             }
-            return structure;
-        } else if (structure != null){
-            return structure;
         }
 
-        ObjectMapper mapper = new ObjectMapper();
-        ObjectNode node = mapper.createObjectNode();
-        ArrayNode tree = mapper.createArrayNode();
-        tree.addAll(getStructure(repoPath));
-        node.set("tree", tree);
-
-        return node.get("tree");
+        return structure;
     }
 
     @Override
