@@ -5,7 +5,7 @@ import model.RepositoryAspectEval;
 import model.RepoList;
 import model.Repository;
 import org.eclipse.jgit.util.FileUtils;
-import util.Json;
+import util.JsonKeywords;
 import view.Status;
 
 import java.io.File;
@@ -83,7 +83,7 @@ public class Checker {
      * @param number of repositories to be checked
      */
     public void checkRepos(int number) {
-        Json.checkJson();
+        JsonKeywords.checkJson();
         ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
         int maxResults;

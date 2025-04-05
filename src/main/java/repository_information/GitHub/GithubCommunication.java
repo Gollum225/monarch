@@ -10,7 +10,7 @@ import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.eclipse.jgit.dircache.InvalidPathException;
 import repository_information.GitMandatories;
 import repository_information.RateLimitMandatories;
-import util.Json;
+import util.JsonUtil;
 
 import java.io.IOException;
 import java.net.URI;
@@ -127,7 +127,7 @@ public final class GithubCommunication implements GitMandatories {
             maxNumberOfRepos = rootNode.get("total_count").asInt();
         }
 
-        return Json.parseRestRepositories(rootNode);
+        return JsonUtil.parseRestRepositories(rootNode);
 
     }
 

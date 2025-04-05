@@ -12,74 +12,15 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Responsible for the communication with the JSON files.
+ * Utility class for general JSON related operations.
  */
-public final class Json {
+public final class JsonUtil {
 
-    private static Map<String, List<String>> list;
     private static final String JSON_FILE_PATH = "src/main/resources/keywords.json";
 
-
-    private Json() {
+    private JsonUtil() {
         throw new UnsupportedOperationException("Utility-class shouldn't be instantiated.");
     }
-
-    /**
-     * Read the JSON file.
-     */
-    private static void setup() throws IOException {
-        ObjectMapper objectMapper = new ObjectMapper();
-
-        list = objectMapper.readValue(new File(JSON_FILE_PATH), new TypeReference<>() {});
-
-    }
-
-    /**
-     * Reads the JSON file with the keywords.
-     *
-     * @return a single array with all the keywords.
-     */
-    public static String[] getAllKeywords() {
-
-        checkJson();
-
-        List<String> allKeywords = new ArrayList<>();
-        for (List<String> keywords : list.values()) {
-            allKeywords.addAll(keywords);
-        }
-
-        // Convert to a native array for faster iteration.
-        return allKeywords.toArray(new String[0]);
-    }
-
-    /**
-     * Get specific keywords from the JSON file.
-     *
-     * @param key of the keywords to get
-     * @return list of words under the index
-     */
-    public static List<String> getSpecificKeywords(String key) {
-
-        checkJson();
-        return list.get(key);
-    }
-
-    /**
-     * Loads the JSON file content, if not done before.
-     */
-    public static void checkJson() {
-        if (list == null) {
-            try {
-                setup();
-            } catch (IOException e) {
-                throw new RuntimeException("Couldn't read the JSON file.");
-            }
-        }
-        if (list == null) {
-            throw new RuntimeException("Couldn't read the JSON file.");
-        }
-    }
-
 
     /**
      * Parses the JSON response from the GitHub API and returns a list of repositories.
@@ -113,6 +54,12 @@ public final class Json {
             repositories.add(new Repository(name, owner));
         }
         return repositories;
+    }
+
+    public static Map<String, List<String>> getGroupedKeywords() throws IOException {
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        return objectMapper.readValue(new File(JSON_FILE_PATH), new TypeReference<>() {});
     }
 
 }

@@ -5,7 +5,7 @@ import controller.RuleType;
 import exceptions.CloneProhibitedException;
 import model.Repository;
 import model.RepositoryAspectEval;
-import util.Json;
+import util.JsonKeywords;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -56,8 +56,8 @@ public class ReadReadmeLinks extends Rule {
 
     public ReadReadmeLinks(Repository repository) {
         super(RuleType.MANDATORY, repository);
-        MAIN_KEYWORDS.addAll(Json.getSpecificKeywords("general-architecture"));
-        MAIN_KEYWORDS.addAll(Json.getSpecificKeywords("UML"));
+        MAIN_KEYWORDS.addAll(JsonKeywords.getSpecificKeywords("general-architecture"));
+        MAIN_KEYWORDS.addAll(JsonKeywords.getSpecificKeywords("UML"));
         addExcludedSites();
     }
 

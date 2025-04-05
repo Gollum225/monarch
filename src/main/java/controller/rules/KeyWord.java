@@ -5,7 +5,7 @@ import controller.RuleType;
 import exceptions.CloneProhibitedException;
 import model.Repository;
 import model.RepositoryAspectEval;
-import util.Json;
+import util.JsonKeywords;
 import model.TextFile;
 
 import java.util.List;
@@ -18,7 +18,7 @@ import java.util.regex.Pattern;
  */
 public class KeyWord extends Rule {
 
-    private static final String[] KEYWORDS = Json.getAllKeywords();
+    private static final String[] KEYWORDS = JsonKeywords.getAllKeywords();
 
     // The limits determine how many keywords need to be found for a point.
     private static final int FIRST_LIMIT = 1;
@@ -43,7 +43,7 @@ public class KeyWord extends Rule {
         }
 
 
-        if (KEYWORDS == null || KEYWORDS.length == 0) {
+        if (KEYWORDS.length == 0) {
             return new RepositoryAspectEval("No keywords found in the JSON file.", repository.getIdentifier(), this.getClass().getSimpleName());
         }
 
