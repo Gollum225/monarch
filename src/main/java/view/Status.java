@@ -70,14 +70,9 @@ public class Status {
     public void updateStatusBar(Repository repo, String ruleName) {
         JLabel label = statusBars.get(repo);
         if (label != null) {
-            try {
-                progress.replace(repo, progress.get(repo) + 1);
-            } catch (Exception e) {
-                panel.remove(label);
-                return;
-            }
+            progress.replace(repo, progress.get(repo) + 1);
 
-                label.setText(getProgressString(progress.get(repo)) + " " + ruleName + ": " + repo.getRepositoryName() + ", " + repo.getOwner());
+            label.setText(getProgressString(progress.get(repo)) + " " + ruleName + ": " + repo.getRepositoryName() + ", " + repo.getOwner());
         }
         else {
             System.out.println("No status bar found for " + repo.getRepositoryName());
