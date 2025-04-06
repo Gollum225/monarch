@@ -7,9 +7,9 @@ import model.RepositoryAspectEval;
 
 import java.util.List;
 
-public class searchOwnerRepo extends Rule {
+public class SearchOwnerRepo extends Rule {
 
-    public searchOwnerRepo(Repository repository) {
+    public SearchOwnerRepo(Repository repository) {
         super(RuleType.MANDATORY, repository);
     }
 
