@@ -4,8 +4,8 @@ import com.fasterxml.jackson.databind.MappingIterator;
 import com.fasterxml.jackson.databind.SequenceWriter;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
-import controller.Rule;
 import controller.RuleCollection;
+import controller.RuleFactory;
 import model.Repository;
 
 import java.io.File;
@@ -114,8 +114,8 @@ public final class CSVHandler {
                 .addColumn("RepoName")
                 .addColumn("repoOwner");
 
-        for (Class<? extends Rule> rule : ruleCollection.getRules()) {
-            schemaBuilder.addColumn(rule.getSimpleName());
+        for (RuleFactory rule : ruleCollection.getRules()) {
+            schemaBuilder.addColumn(rule.getName());
         }
 
         schema = schemaBuilder
@@ -144,14 +144,13 @@ public final class CSVHandler {
         Map<String, String> row = new HashMap<>();
         row.put("RepoName", repo.getRepositoryName());
         row.put("repoOwner", repo.getOwner());
-        for (Class<? extends Rule> rule : ruleCollection.getRules()) {
+        for (RuleFactory rule : ruleCollection.getRules()) {
 
-            row.put(rule.getSimpleName(), String.valueOf(repo.getResults().get(rule).getResultString()));
+            row.put(rule.getName(), String.valueOf(repo.getResults().get(rule.getName()).getResultString()));
         }
         row.put("Duration", String.valueOf(repo.getDuration()));
         row.put("TotalScore", String.valueOf(repo.getOverallPoints()));
 
-        //TODO reachable points - future feature
         rows.add(row);
 
 

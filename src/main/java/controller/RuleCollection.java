@@ -1,14 +1,15 @@
 package controller;
 
 import controller.rules.DocFolder;
-import controller.rules.searchOwnerRepo;
+import controller.rules.QualityMetric;
+import controller.rules.SearchOwnerRepo;
 import controller.rules.KeyWord;
 import controller.rules.LLMReadme;
 import controller.rules.ReadReadmeLinks;
 import model.Repository;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Collection of rules from the {@link controller.rules} package.
@@ -18,19 +19,18 @@ public class RuleCollection {
     /**
      * The rules to be applied to the {@link Repository}.
      */
-    private final ArrayList<Class <? extends Rule>> rules = new ArrayList<>();
+    private final List<RuleFactory> rules = new ArrayList<>();
 
     /**
      * Creates a new RuleCollection. Adds the rules in the constructor to the list to be executed.
      */
     public RuleCollection() {
-        rules.add(KeyWord.class);
-        rules.add(LLMReadme.class);
-        rules.add(DocFolder.class);
-        rules.add(ReadReadmeLinks.class);
-        rules.add(searchOwnerRepo.class);
-
-        rules.add(controller.rules.QualityMetric.class);
+        rules.add(new RuleFactory("Keyword", KeyWord::new));
+        rules.add(new RuleFactory("LLMReadme", LLMReadme::new));
+        rules.add(new RuleFactory("DocFolder", DocFolder::new));
+        rules.add(new RuleFactory("ReadReadmeLinks", ReadReadmeLinks::new));
+        rules.add(new RuleFactory("SearchOwnerRepo", SearchOwnerRepo::new));
+        rules.add(new RuleFactory("QualityMetric", QualityMetric::new));
     }
 
 
@@ -41,23 +41,13 @@ public class RuleCollection {
      * @param repository the repository, which is given to the rules to work with.
      * @return a list of rules with the given repository.
      */
-    public ArrayList<Rule> equipRules(Repository repository) {
+    public List<RuleFactory> equipRules(Repository repository) {
         ArrayList<Rule> ruleList = new ArrayList<>();
 
-        for (Class<? extends Rule> rule : rules) {
-            try {
-                ruleList.add(rule.getDeclaredConstructor(Repository.class).newInstance(repository));
-            } catch (NoSuchMethodException e) {
-                System.err.println("Constructor not found for rule: " + rule.getName());
-            } catch (InstantiationException e) {
-                System.err.println("Failed to instantiate rule: " + rule.getName());
-            } catch (IllegalAccessException e) {
-                System.err.println("Illegal access when creating rule instance: " + rule.getName());
-            } catch (InvocationTargetException e) {
-                System.err.println("Exception while invoking constructor for rule: " + rule.getName());
-            }
+        for (RuleFactory factory : rules) {
+            ruleList.add(factory.create(repository));
         }
-        return ruleList;
+        return rules;
     }
 
     /**
@@ -65,7 +55,7 @@ public class RuleCollection {
      *
      * @return the list of rules
      */
-    public ArrayList<Class<? extends Rule>> getRules() {
+    public List<RuleFactory> getRules() {
         return rules;
     }
 

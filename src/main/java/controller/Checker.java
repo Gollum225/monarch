@@ -10,7 +10,6 @@ import view.Status;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutionException;
@@ -152,23 +151,25 @@ public class Checker {
                     return null;
                 }
 
-                ArrayList<Rule> equippedRules = rules.equipRules(currentRepo);
+                List<RuleFactory> equippedRules = rules.equipRules(currentRepo);
                 status.addStatusBar(currentRepo);
-                for (Rule rule : equippedRules) {
+                for (RuleFactory ruleFactory : equippedRules) {
+                    Rule rule = ruleFactory.create(currentRepo);
                     if (rule.getType() == RuleType.MANDATORY) {
                         status.updateStatusBar(currentRepo, rule.getClass().getSimpleName());
 
-                        currentRepo.saveResult(rule.getClass(), rule.execute());
+                        currentRepo.saveResult(ruleFactory, rule.execute());
                     }
                 }
-                for (Rule rule : equippedRules) {
+                for (RuleFactory ruleFactory : equippedRules) {
+                    Rule rule = ruleFactory.create(currentRepo);
                     if (currentRepo.getOverallPoints() > 0) {
                         if (rule.getType() == RuleType.QUALITY) {
                             status.updateStatusBar(currentRepo, rule.getClass().getSimpleName());
-                            currentRepo.saveResult(rule.getClass(), rule.execute());
+                            currentRepo.saveResult(ruleFactory, rule.execute());
                         }
                     } else if (rule.getType() == RuleType.QUALITY) {
-                        currentRepo.saveResult(rule.getClass(), new RepositoryAspectEval("Did not get mandatory points", currentRepo.getIdentifier(), rule.getClass().getSimpleName()));
+                        currentRepo.saveResult(ruleFactory, new RepositoryAspectEval("Did not get mandatory points", currentRepo.getIdentifier(), rule.getClass().getSimpleName()));
                     }
                 }
 

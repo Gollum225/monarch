@@ -1,9 +1,9 @@
 package model;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import controller.RuleFactory;
 import exceptions.CloneProhibitedException;
 import repository_information.RepoCache;
-import controller.Rule;
 import repository_information.RepoFunctions;
 
 import java.util.ArrayList;
@@ -58,7 +58,7 @@ public class Repository implements RepoFunctions {
     /**
      * Maps the rule to the points it has given.
      */
-    private final HashMap<Class<? extends Rule>, RepositoryAspectEval> results = new HashMap<>();
+    private final HashMap<String, RepositoryAspectEval> results = new HashMap<>();
 
     /**
      * The overall points of the repository. Starting with 0.
@@ -170,8 +170,8 @@ public class Repository implements RepoFunctions {
      * @param rule that was executed
      * @param points the rule gave
      */
-    public void saveResult(Class<? extends Rule> rule, RepositoryAspectEval points) {
-        results.put(rule, points);
+    public void saveResult(RuleFactory rule, RepositoryAspectEval points) {
+        results.put(rule.getName(), points);
     }
 
     @Override
@@ -211,7 +211,7 @@ public class Repository implements RepoFunctions {
      *
      * @return map of rules and their results.
      */
-    public HashMap<Class<? extends Rule>, RepositoryAspectEval> getResults() {
+    public HashMap<String, RepositoryAspectEval> getResults() {
         return results;
     }
 
