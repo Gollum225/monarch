@@ -1,12 +1,14 @@
 package model;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import org.apache.commons.io.FilenameUtils;
 import controller.RuleFactory;
 import exceptions.CloneProhibitedException;
 import repository_information.RepoCache;
 import repository_information.RepoFunctions;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -41,6 +43,8 @@ public class Repository implements RepoFunctions {
      * null if no readme file is found, or if the readme file is not yet requested
      */
     private String readme;
+
+    private static final String[] ALLOWED_EXTENSIONS = {"txt", "md", "markdown", "rst", "adoc", "docx"};
 
     /**
      * Constructor for the Repository.
@@ -102,20 +106,16 @@ public class Repository implements RepoFunctions {
         System.out.println("Found " + tree.size() + " files in " + repoIdentifier);
         int textFileCount = 0;
 
+
         for (JsonNode entry : tree) {
             if (entry.get("type").asText().equals("blob")) {
                 String path = entry.get("path").asText();
-                if (path.endsWith(".txt") ||
-                        path.endsWith(".md") ||
-                        path.endsWith(".markdown") ||
-                        path.endsWith(".rst") ||
-                        path.endsWith(".adoc") ||
-                        path.endsWith(".docx")) {
+
+                if (Arrays.asList(ALLOWED_EXTENSIONS).contains(FilenameUtils.getExtension(path))) {
                     foundTextFiles.add(entry);
                     textFileCount++;
-
-
                 }
+
             }
         }
         System.out.println("Found " + textFileCount + " textfiles in " + repoIdentifier);
@@ -152,7 +152,7 @@ public class Repository implements RepoFunctions {
     }
 
     /**
-     * Gets the quality metric of a repository. E.g., GitHub stars.
+     * Gets the quality metric of a repository. For example, GitHub stars.
      *
      * @return number of points
      */
@@ -220,7 +220,7 @@ public class Repository implements RepoFunctions {
      *
      * @param path the path of the file to check.
      * @return true, if the file exists.
-     * @throws CloneProhibitedException if this methode lead to a clone of the repository, but the repository is prohibited to clone.
+     * @throws CloneProhibitedException if this methode leads to a clone of the repository, but the repository is prohibited to clone.
      */
     public boolean checkFileExistence(String path) throws CloneProhibitedException {
         JsonNode structure = getStructure();
