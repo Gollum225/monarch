@@ -36,12 +36,12 @@ public class ReadReadmeLinks extends Rule {
     /**
      * Keywords to search for in the website content. These keywords are more important ones.
      */
-    private final List<String> MAIN_KEYWORDS = new ArrayList<>();
+    private static final List<String> MAIN_KEYWORDS = new ArrayList<>();
 
     /**
      * Keywords to search for in the website content. These keywords are less important ones.
      */
-    private final List<String> SIDE_KEYWORDS = new ArrayList<>();
+    private static final List<String> SIDE_KEYWORDS = new ArrayList<>();
 
     /**
      * List of concrete sites to exclude from the search.
@@ -59,8 +59,10 @@ public class ReadReadmeLinks extends Rule {
 
     public ReadReadmeLinks(Repository repository, int[] limits) {
         super(RuleType.MANDATORY, repository);
-        MAIN_KEYWORDS.addAll(JsonKeywords.getSpecificKeywords("general-architecture"));
-        MAIN_KEYWORDS.addAll(JsonKeywords.getSpecificKeywords("UML"));
+        if (ReadReadmeLinks.MAIN_KEYWORDS.isEmpty()) {
+            MAIN_KEYWORDS.addAll(JsonKeywords.getSpecificKeywords("general-architecture"));
+            MAIN_KEYWORDS.addAll(JsonKeywords.getSpecificKeywords("UML"));
+        }
         addExcludedSites();
         if (ReadReadmeLinks.limits == null) {
             ReadReadmeLinks.limits = limits;
