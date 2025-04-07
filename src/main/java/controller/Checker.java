@@ -151,25 +151,23 @@ public class Checker {
                     return null;
                 }
 
-                List<RuleFactory> equippedRules = rules.equipRules(currentRepo);
+                List<Rule> equippedRules = rules.equipRules(currentRepo);
                 status.addStatusBar(currentRepo);
-                for (RuleFactory ruleFactory : equippedRules) {
-                    Rule rule = ruleFactory.create(currentRepo);
+                for (Rule rule : equippedRules) {
                     if (rule.getType() == RuleType.MANDATORY) {
                         status.updateStatusBar(currentRepo, rule.getClass().getSimpleName());
 
-                        currentRepo.saveResult(ruleFactory, rule.execute());
+                        currentRepo.saveResult(rule, rule.execute());
                     }
                 }
-                for (RuleFactory ruleFactory : equippedRules) {
-                    Rule rule = ruleFactory.create(currentRepo);
+                for (Rule rule : equippedRules) {
                     if (currentRepo.getOverallPoints() > 0) {
                         if (rule.getType() == RuleType.QUALITY) {
                             status.updateStatusBar(currentRepo, rule.getClass().getSimpleName());
-                            currentRepo.saveResult(ruleFactory, rule.execute());
+                            currentRepo.saveResult(rule, rule.execute());
                         }
                     } else if (rule.getType() == RuleType.QUALITY) {
-                        currentRepo.saveResult(ruleFactory, new RepositoryAspectEval("Did not get mandatory points", currentRepo.getIdentifier(), rule.getClass().getSimpleName()));
+                        currentRepo.saveResult(rule, new RepositoryAspectEval("Did not get mandatory points", currentRepo.getIdentifier(), rule.getClass().getSimpleName()));
                     }
                 }
 

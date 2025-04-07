@@ -1,8 +1,8 @@
 package model;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import controller.Rule;
 import org.apache.commons.io.FilenameUtils;
-import controller.RuleFactory;
 import exceptions.CloneProhibitedException;
 import repository_information.RepoCache;
 import repository_information.RepoFunctions;
@@ -170,8 +170,8 @@ public class Repository implements RepoFunctions {
      * @param rule that was executed
      * @param points the rule gave
      */
-    public void saveResult(RuleFactory rule, RepositoryAspectEval points) {
-        results.put(rule.getName(), points);
+    public void saveResult(Rule rule, RepositoryAspectEval points) {
+        results.put(rule.getClass().getSimpleName(), points);
     }
 
     @Override

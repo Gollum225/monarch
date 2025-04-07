@@ -114,7 +114,7 @@ public final class CSVHandler {
                 .addColumn("RepoName")
                 .addColumn("repoOwner");
 
-        for (RuleFactory rule : ruleCollection.getRules()) {
+        for (RuleFactory rule : ruleCollection.getAllRules()) {
             schemaBuilder.addColumn(rule.getName());
         }
 
@@ -144,7 +144,7 @@ public final class CSVHandler {
         Map<String, String> row = new HashMap<>();
         row.put("RepoName", repo.getRepositoryName());
         row.put("repoOwner", repo.getOwner());
-        for (RuleFactory rule : ruleCollection.getRules()) {
+        for (RuleFactory rule : ruleCollection.getAllRules()) {
 
             row.put(rule.getName(), String.valueOf(repo.getResults().get(rule.getName()).getResultString()));
         }

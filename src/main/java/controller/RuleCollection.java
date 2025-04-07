@@ -25,12 +25,7 @@ public class RuleCollection {
      * Creates a new RuleCollection. Adds the rules in the constructor to the list to be executed.
      */
     public RuleCollection() {
-        rules.add(new RuleFactory("KeyWord", repository -> new KeyWord(repository,new int[]{0, 1, 5, 20, 50, 200})));
-        rules.add(new RuleFactory("LLMReadme", repository -> new LLMReadme(repository,5)));
-        rules.add(new RuleFactory("DocFolder", repository -> new DocFolder(repository,new int[]{0, 0, 0, 1, 2, 5})));
-        rules.add(new RuleFactory("ReadReadmeLinks", repository -> new ReadReadmeLinks(repository,new int[]{0, 0, 1, 5, 5, 9, 9, 11, 11, 16})));
-        rules.add(new RuleFactory("SearchOwnerRepo", repository -> new SearchOwnerRepo(repository,new int[]{12, 18, 23})));
-        rules.add(new RuleFactory("QualityMetric", repository -> new QualityMetric(repository,new int[]{0, 100, 5000, 10000, 25000, 100000})));
+        setStandardRuleSet();
     }
 
 
@@ -41,13 +36,13 @@ public class RuleCollection {
      * @param repository the repository, which is given to the rules to work with.
      * @return a list of rules with the given repository.
      */
-    public List<RuleFactory> equipRules(Repository repository) {
+    public List<Rule> equipRules(Repository repository) {
         ArrayList<Rule> ruleList = new ArrayList<>();
 
         for (RuleFactory factory : rules) {
             ruleList.add(factory.create(repository));
         }
-        return rules;
+        return ruleList;
     }
 
     /**
@@ -55,7 +50,7 @@ public class RuleCollection {
      *
      * @return the list of rules
      */
-    public List<RuleFactory> getRules() {
+    public List<RuleFactory> getAllRules() {
         return rules;
     }
 
@@ -66,5 +61,15 @@ public class RuleCollection {
      */
     public int getNumberOfRules() {
         return rules.size();
+    }
+
+    private void setStandardRuleSet() {
+        rules.add(new RuleFactory("KeyWord", repository -> new KeyWord(repository,new int[]{0, 1, 5, 20, 50, 200})));
+        rules.add(new RuleFactory("LLMReadme", repository -> new LLMReadme(repository,5)));
+        rules.add(new RuleFactory("DocFolder", repository -> new DocFolder(repository,new int[]{0, 0, 0, 1, 2, 5})));
+        rules.add(new RuleFactory("ReadReadmeLinks", repository -> new ReadReadmeLinks(repository,new int[]{0, 0, 1, 5, 5, 9, 9, 11, 11, 16})));
+        rules.add(new RuleFactory("SearchOwnerRepo", repository -> new SearchOwnerRepo(repository,new int[]{12, 18, 23})));
+        rules.add(new RuleFactory("QualityMetric", repository -> new QualityMetric(repository,new int[]{0, 100, 5000, 10000, 25000, 100000})));
+
     }
 }
