@@ -152,12 +152,33 @@ public class RepoListManager {
     }
 
     private void getTestRepos() {
-        repoList.addRepo(new Repository("TeaStore", "DescartesResearch"));
-        repoList.addRepo(new Repository("teammates", "TEAMMATES"));
-        repoList.addRepo(new Repository("javaPS", "52North"));
-        repoList.addRepo(new Repository("arctic-sea", "52North"));
-        repoList.addRepo(new Repository("bigbluebutton", "bigbluebutton"));
-        unprocessedRepos = 5;
+        //Gold Standard:
+        repoList.addSingleRepo(new Repository("TeaStore", "DescartesResearch"));
+        repoList.addSingleRepo(new Repository("teammates", "TEAMMATES"));
+        repoList.addSingleRepo(new Repository("javaPS", "52North"));
+        repoList.addSingleRepo(new Repository("arctic-sea", "52North"));
+        repoList.addSingleRepo(new Repository("bigbluebutton", "bigbluebutton"));
+        repoList.addSingleRepo(new Repository("htmlSanityCheck", "aim42"));
+        repoList.addSingleRepo(new Repository("biking2", "michael-simons"));
+        repoList.addSingleRepo(new Repository("asterisk", "asterisk"));
+        repoList.addSingleRepo(new Repository("graphite-web", "graphite-project"));
+        repoList.addSingleRepo(new Repository("jitsi-meet", "jitsi"));
+        repoList.addSingleRepo(new Repository("Jackson", "FasterXML"));
+        repoList.addSingleRepo(new Repository("cwa-app-android", "corona-warn-app"));
+
+
+        repoList.addSingleRepo(new Repository("vert.x", "eclipse-vertx"));
+        repoList.addSingleRepo(new Repository("vercel", "vercel"));
+        repoList.addSingleRepo(new Repository("webui-aria2", "ziahamza"));
+        repoList.addSingleRepo(new Repository("vegeta", "tsenart"));
+        repoList.addSingleRepo(new Repository("velocity", "julianshapiro"));
+        repoList.addSingleRepo(new Repository("yolov5-flask", "robmarkcole"));
+        repoList.addSingleRepo(new Repository("YYEVA", "yylive"));
+        repoList.addSingleRepo(new Repository("verdaccio", "verdaccio"));
+        repoList.addSingleRepo(new Repository("yii2-tech", "itswuanran"));
+        repoList.addSingleRepo(new Repository("Vencord", "Vendicated"));
+
+
     }
 
     public int getMaxResults() throws JsonProcessingException {
