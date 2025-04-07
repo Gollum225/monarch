@@ -27,11 +27,22 @@ public class LLMReadme extends Rule {
 
     static Date lastRequest = new Date();
 
+    /**
+     * The access token for the API.
+     * It is stored in the environment variables.
+     * When set manually, it will be used instead.
+     */
+    private static String ACCESS_TOKEN;
+
+
 
     public LLMReadme(Repository repository, int maxPoints) {
         super(RuleType.MANDATORY, repository);
         if (LLMReadme.maxPoints < 0) {
             LLMReadme.maxPoints = maxPoints;
+        }
+        if (ACCESS_TOKEN == null) {
+            ACCESS_TOKEN = System.getenv("SambaNova_API");
         }
     }
 
@@ -81,7 +92,7 @@ public class LLMReadme extends Rule {
 
         // set GET-methode and Header
         connection.setRequestMethod("POST");
-        connection.setRequestProperty("Authorization", "Bearer " + System.getenv("SambaNova_API"));
+        connection.setRequestProperty("Authorization", "Bearer " + ACCESS_TOKEN);
         connection.setRequestProperty("Content-Type", "application/json");
         connection.setDoOutput(true);
 

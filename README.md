@@ -21,14 +21,14 @@ The points are given based on different rules. One rule is for example the exist
 ---
 
 # What are the API keys for?:
-The programm uses lots of data, provided by the GitHub API. The number of requests is limited without authentication. I recommend trying it out with an API key, otherwise only about two repositories can be analyzed, until the rate limits reset after an hour. Here is the official documentation on how to get the key: https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-fine-grained-personal-access-token.
+The programm uses lots of data, provided by the GitHub API. The number of requests is limited without authentication. I recommend trying it out with an API key; otherwise only about two repositories can be analyzed until the rate limits reset after an hour. Here is the official documentation on how to get the key: [GitHub docs](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-fine-grained-personal-access-token).
 The SambaNova API key is needed for a rule.
 Both rules are expected in the environmental variables under GitHub_API and SambaNova_API.
 
 ---
 
 # Set up:
-• Clone commit ebfc562: https://github.com/Gollum225/monarch/tree/ebfc56261c9cc633fc2e3309b1f2c024b5eb2d98
+• Clone lastest commit
 
 • Run „mvn clean install“
 
@@ -49,6 +49,6 @@ Both rules are expected in the environmental variables under GitHub_API and Samb
 
 ---
 
-#Configure
-• The set of applied rules can be changed or motified in src/main/java/controller/RuleCollection.  Either create a new set and place it in line 28 or modify the setStandardRuleSet() method.
-• A set of hig-quality repositories for debugging is in src/main/java/controller/RepoListManager.getTestRepos() and can be changed in line 148-149.
+# Configure
+• The set of applied rules can be changed or modified in src/main/java/controller/RuleCollection.  Either create a new set and place it in line 28 or modify the setStandardRuleSet() method.
+• A set of high-quality repositories for debugging is in src/main/java/controller/RepoListManager.getTestRepos() and can be changed in line 148-149.
