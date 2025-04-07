@@ -22,13 +22,16 @@ public class LLMReadme extends Rule {
     // https://docs.sambanova.ai/cloud/docs/get-started/rate-limits
     private static final int MAX_REQUESTS_PER_MINUTE = 30;
 
-    private static final int MAX_POINTS = 5;
+    private static int maxPoints = -1;
 
     static Date lastRequest = new Date();
 
 
-    public LLMReadme(Repository repository) {
+    public LLMReadme(Repository repository, int maxPoints) {
         super(RuleType.MANDATORY, repository);
+        if (LLMReadme.maxPoints < 0) {
+            LLMReadme.maxPoints = maxPoints;
+        }
     }
 
     @Override
@@ -60,7 +63,7 @@ public class LLMReadme extends Rule {
         }
 
 
-        for (int i = 0; i <= MAX_POINTS; i++) {
+        for (int i = 0; i <= maxPoints; i++) {
             if (llmAnswer.contains(String.valueOf(i))) {
                 System.out.println("LLM gave: " + i + " points to " + repository.getIdentifier());
                 return new RepositoryAspectEval(i);
@@ -120,7 +123,7 @@ public class LLMReadme extends Rule {
 
     private String getJsonInput(String formattedReadme) {
         String roleContent
-                = " \"You are a machine to evaluate README files of Git Repositories. The user is looking for Repositories with architecture documentation. Give 0 to " + MAX_POINTS + " points according to the likelihood of the existence of documentation for the repository. If no hints are given give 0 points. Answer only with the one number.\"";
+                = " \"You are a machine to evaluate README files of Git Repositories. The user is looking for Repositories with architecture documentation. Give 0 to " + maxPoints + " points according to the likelihood of the existence of documentation for the repository. If no hints are given give 0 points. Answer only with the one number.\"";
 
 
         return """

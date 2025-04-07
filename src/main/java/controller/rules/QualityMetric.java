@@ -6,30 +6,24 @@ import model.Repository;
 import model.RepositoryAspectEval;
 
 /**
- * Checks the quality metric of the repository. E.g., GitHub stars.
+ * Checks the quality metric of the repository. For example, GitHub stars.
  */
 public class QualityMetric extends Rule {
 
-    public QualityMetric(Repository repository) {
+    private static int[] limits;
+
+    public QualityMetric(Repository repository, int[] limits) {
         super(RuleType.QUALITY, repository);
+        if (QualityMetric.limits == null) {
+            QualityMetric.limits = limits;
+        }
     }
 
     @Override
     public RepositoryAspectEval execute() {
         int metric = repository.getQualityMetrics();
 
-        if (metric < 100) {
-            return new RepositoryAspectEval(0);
-        } else if (metric < 5000) {
-            return new RepositoryAspectEval(1);
-        } else if (metric < 10000) {
-            return new RepositoryAspectEval(2);
-        } else if (metric < 25000) {
-            return new RepositoryAspectEval(3);
-        } else if (metric < 100000) {
-            return new RepositoryAspectEval(4);
-        } else {
-            return new RepositoryAspectEval(5);
-        }
+        return new RepositoryAspectEval(calculatePointsWithLimits(limits, metric));
+
     }
 }

@@ -11,16 +11,22 @@ import model.RepositoryAspectEval;
  * Checks if the repository contains a folder with documentation.
  */
 public class DocFolder extends Rule {
-    private static final int MAX_POINTS = 5;
 
-    public DocFolder(Repository repository) {
+    private static int[] limits;
+
+    private static final String[] DOC_PATHS = {"doc", "docs", "documentation", "documentations", };
+
+
+    public DocFolder(Repository repository, int[] limits) {
         super(RuleType.MANDATORY, repository);
+        if (DocFolder.limits == null) {
+            DocFolder.limits = limits;
+        }
     }
 
     @Override
     public RepositoryAspectEval execute() {
 
-        String[] docPaths = {"doc", "docs", "documentation", "documentations", };
         JsonNode structure;
         try {
             structure = repository.getStructure();
@@ -34,7 +40,7 @@ public class DocFolder extends Rule {
                 continue;
             }
             String path = node.get("path").asText();
-            for (String docPath : docPaths) {
+            for (String docPath : DOC_PATHS) {
                 // Takes the String of each last path and checks if it contains one of the docPaths.
                 if (contains(getLastFolder(path), docPath)) {
                     counter++;
@@ -44,19 +50,10 @@ public class DocFolder extends Rule {
                 }
             }
         }
-
-        if (counter == 0) {
-            return new RepositoryAspectEval(0);
-        } else if (counter == 1) {
-            System.out.println("Found 1 documentation folder in " + repository.getIdentifier() + " at: " + lastFoundPath);
-            return new RepositoryAspectEval(3);
-        } else if (counter <= 5){
+        if (counter > 0) {
             System.out.println("Found " + counter + " documentation folders in " + repository.getIdentifier() + " e.g.: " + lastFoundPath);
-            return new RepositoryAspectEval(4);
-        } else {
-            System.out.println("Found " + counter + " documentation folders in " + repository.getIdentifier() + " e.g.: " + lastFoundPath);
-            return new RepositoryAspectEval(MAX_POINTS);
         }
+        return new RepositoryAspectEval(calculatePointsWithLimits(limits, counter));
     }
 
     /**

@@ -21,15 +21,13 @@ public class KeyWord extends Rule {
     private static final String[] KEYWORDS = JsonKeywords.getAllKeywords();
 
     // The limits determine how many keywords need to be found for a point.
-    private static final int FIRST_LIMIT = 1;
-    private static final int SECOND_LIMIT = 5;
-    private static final int THIRD_LIMIT = 20;
-    private static final int FOURTH_LIMIT = 50;
-    private static final int LAST_LIMIT = 200;
+    private static int[] limits;
 
-
-    public KeyWord(Repository repository) {
+    public KeyWord(Repository repository, int[] limits) {
         super(RuleType.MANDATORY, repository);
+        if (KeyWord.limits == null) {
+            KeyWord.limits = limits;
+        }
     }
 
     @Override
@@ -69,22 +67,10 @@ public class KeyWord extends Rule {
                             count++;
                         }
                     }
-                    if (keywordCount.addAndGet(count) > LAST_LIMIT) {
+                    if (keywordCount.addAndGet(count) > limits[limits.length -1]) {
                         stopProcessing.set(true);
                     }
                 });
-        if (keywordCount.get() >= LAST_LIMIT) {
-            return new RepositoryAspectEval(5);
-        } else if (keywordCount.get() >= FOURTH_LIMIT) {
-            return new RepositoryAspectEval(4);
-        } else if (keywordCount.get() >= THIRD_LIMIT) {
-            return new RepositoryAspectEval(3);
-        } else if (keywordCount.get() >= SECOND_LIMIT) {
-            return new RepositoryAspectEval(2);
-        } else if (keywordCount.get() >= FIRST_LIMIT) {
-            return new RepositoryAspectEval(1);
-        } else {
-            return new RepositoryAspectEval(0);
-        }
+        return new RepositoryAspectEval(calculatePointsWithLimits(limits, keywordCount.get()));
     }
 }

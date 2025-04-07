@@ -25,12 +25,12 @@ public class RuleCollection {
      * Creates a new RuleCollection. Adds the rules in the constructor to the list to be executed.
      */
     public RuleCollection() {
-        rules.add(new RuleFactory("Keyword", KeyWord::new));
-        rules.add(new RuleFactory("LLMReadme", LLMReadme::new));
-        rules.add(new RuleFactory("DocFolder", DocFolder::new));
-        rules.add(new RuleFactory("ReadReadmeLinks", ReadReadmeLinks::new));
-        rules.add(new RuleFactory("SearchOwnerRepo", SearchOwnerRepo::new));
-        rules.add(new RuleFactory("QualityMetric", QualityMetric::new));
+        rules.add(new RuleFactory("KeyWord", repository -> new KeyWord(repository,new int[]{0, 1, 5, 20, 50, 200})));
+        rules.add(new RuleFactory("LLMReadme", repository -> new LLMReadme(repository,5)));
+        rules.add(new RuleFactory("DocFolder", repository -> new DocFolder(repository,new int[]{0, 0, 0, 1, 2, 5})));
+        rules.add(new RuleFactory("ReadReadmeLinks", repository -> new ReadReadmeLinks(repository,new int[]{0, 0, 1, 5, 5, 9, 9, 11, 11, 16})));
+        rules.add(new RuleFactory("SearchOwnerRepo", repository -> new SearchOwnerRepo(repository,new int[]{12, 18, 23})));
+        rules.add(new RuleFactory("QualityMetric", repository -> new QualityMetric(repository,new int[]{0, 100, 5000, 10000, 25000, 100000})));
     }
 
 

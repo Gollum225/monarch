@@ -139,4 +139,22 @@ public abstract class Rule {
         return counter;
     }
 
+    /**
+     * Returns the first index the metric is as big as the entry at the index.
+     * @param limits Array of limits. "Translation" to real points. Ascending list!
+     * @param internalMetric internal score of a rule
+     * @return points the rule can give.
+     */
+    protected int calculatePointsWithLimits(int[] limits, int internalMetric) {
+        if (limits.length == 0 || limits [0] >= internalMetric) {
+            return 0;
+        }
+        for (int i = 0; i < limits.length; i++) {
+            if (internalMetric < limits[i]) {
+                return Math.max(0, i-1);
+            }
+        }
+        return limits.length;
+    }
+
 }

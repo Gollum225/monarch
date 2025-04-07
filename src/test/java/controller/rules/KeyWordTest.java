@@ -16,7 +16,7 @@ class KeyWordTest {
     @BeforeEach
     void setUp() {
         repository = new MockRepository("name123", "repository123");
-        keyWordRule = new KeyWord(repository);
+        keyWordRule = new KeyWord(repository, new int[]{0, 1, 5, 20, 50, 200});
     }
 
     @Test

@@ -54,11 +54,17 @@ public class ReadReadmeLinks extends Rule {
      */
     private final List<String> excludedGeneralSites = new ArrayList<>();
 
-    public ReadReadmeLinks(Repository repository) {
+    private static int[] limits;
+
+
+    public ReadReadmeLinks(Repository repository, int[] limits) {
         super(RuleType.MANDATORY, repository);
         MAIN_KEYWORDS.addAll(JsonKeywords.getSpecificKeywords("general-architecture"));
         MAIN_KEYWORDS.addAll(JsonKeywords.getSpecificKeywords("UML"));
         addExcludedSites();
+        if (ReadReadmeLinks.limits == null) {
+            ReadReadmeLinks.limits = limits;
+        }
     }
 
     @Override
@@ -97,21 +103,7 @@ public class ReadReadmeLinks extends Rule {
 
         maxScore = maxScore / Math.min(links.size(), MAX_SITES);
 
-        int points;
-        if (maxScore == 0) {
-            points = 0;
-        } else if (maxScore <= 4) {
-            points = 2;
-        } else if (maxScore <= 8) {
-            points = 4;
-        } else if (maxScore <= 10) {
-            points = 6;
-        } else if (maxScore <= 15) {
-            points = 8;
-        } else {
-            points = 10;
-        }
-        return new RepositoryAspectEval(points);
+        return new RepositoryAspectEval(calculatePointsWithLimits(limits, maxScore));
     }
 
     /**
