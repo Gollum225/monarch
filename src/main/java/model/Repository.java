@@ -94,16 +94,13 @@ public class Repository implements RepoFunctions {
      * @throws CloneProhibitedException if this call lead to cloning of the repository, where cloning is prohibited.
      */
     public List<TextFile> getTextfiles() throws CloneProhibitedException {
-        String repoIdentifier ="repository: " + repositoryName + " of owner: " + owner;
         List <JsonNode> foundTextFiles = new ArrayList<>();
 
         List <TextFile> parsedTextFiles = new ArrayList<>();
         JsonNode tree = getStructure();
         if (tree == null || !tree.isArray()) {
-            System.out.println("No files found in " + repoIdentifier);
             return new ArrayList<>();
         }
-        System.out.println("Found " + tree.size() + " files in " + repoIdentifier);
         int textFileCount = 0;
 
 
@@ -118,7 +115,6 @@ public class Repository implements RepoFunctions {
 
             }
         }
-        System.out.println("Found " + textFileCount + " textfiles in " + repoIdentifier);
         List<String> paths = new ArrayList<>(textFileCount);
         for (JsonNode file: foundTextFiles) {
             paths.add(file.get("path").asText());

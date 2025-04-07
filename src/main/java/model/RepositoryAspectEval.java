@@ -37,14 +37,11 @@ public class RepositoryAspectEval {
      * Creates a new {@link RepositoryAspectEval} in case of not being able to execute the rule.
      *
      * @param failureMessage reason why the rule couldn't be executed.
-     * @param repoIdentifier identifies the repository with name and owner. {@link Repository#getIdentifier()} can be used.
-     * @param ruleName of the executing rule. {@link Rule#getClass()#getSimpleName()} can be used.
      */
-    public RepositoryAspectEval(String failureMessage, String repoIdentifier, String ruleName){
+    public RepositoryAspectEval(String failureMessage){
         points = 0;
         this.isApplicable = false;
         this.failureMessage = failureMessage;
-        System.out.println("Rule " + ruleName + " not applicable for " + repoIdentifier + ". Reason: " + failureMessage);
     }
 
     /**

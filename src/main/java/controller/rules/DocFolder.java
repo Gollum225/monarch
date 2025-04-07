@@ -6,6 +6,7 @@ import controller.RuleType;
 import exceptions.CloneProhibitedException;
 import model.Repository;
 import model.RepositoryAspectEval;
+import util.CLIOutput;
 
 /**
  * Checks if the repository contains a folder with documentation.
@@ -31,7 +32,7 @@ public class DocFolder extends Rule {
         try {
             structure = repository.getStructure();
         } catch (CloneProhibitedException e) {
-            return new RepositoryAspectEval(e.getMessage(), repository.getIdentifier(), this.getClass().getSimpleName());
+            return new RepositoryAspectEval(e.getMessage());
         }
         int counter = 0;
         String lastFoundPath = "";
@@ -51,7 +52,7 @@ public class DocFolder extends Rule {
             }
         }
         if (counter > 0) {
-            System.out.println("Found " + counter + " documentation folders in " + repository.getIdentifier() + " e.g.: " + lastFoundPath);
+            CLIOutput.found(String.valueOf(counter), "documentation folders in", repository.getIdentifier() + " e.g.: " + lastFoundPath);
         }
         return new RepositoryAspectEval(calculatePointsWithLimits(limits, counter));
     }

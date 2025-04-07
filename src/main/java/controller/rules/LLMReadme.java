@@ -7,6 +7,7 @@ import controller.RuleType;
 import exceptions.CloneProhibitedException;
 import model.Repository;
 import model.RepositoryAspectEval;
+import util.CLIOutput;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -42,35 +43,35 @@ public class LLMReadme extends Rule {
             readme = repository.getReadme();
         } catch (CloneProhibitedException cpe) {
             // The readme has caused the repository to be cloned, which it is not allowed to do.
-            return new RepositoryAspectEval(cpe.getMessage(), repository.getIdentifier(), this.getClass().getSimpleName());
+            return new RepositoryAspectEval(cpe.getMessage());
         }
 
         String llmAnswer;
 
         if (readme == null) {
-            return new RepositoryAspectEval("No readme found", repository.getIdentifier(), this.getClass().getSimpleName());
+            return new RepositoryAspectEval("No readme found");
         }
 
 
         try {
             llmAnswer = sendGetRequest(readme);
         } catch (IOException e) {
-            return new RepositoryAspectEval("Error while getting LLM response", repository.getIdentifier(), this.getClass().getSimpleName());
+            return new RepositoryAspectEval("Error while getting LLM response");
         }
 
         if (llmAnswer == null) {
-            return new RepositoryAspectEval("No answer from LLM", repository.getIdentifier(), this.getClass().getSimpleName());
+            return new RepositoryAspectEval("No answer from LLM");
         }
 
 
         for (int i = 0; i <= maxPoints; i++) {
             if (llmAnswer.contains(String.valueOf(i))) {
-                System.out.println("LLM gave: " + i + " points to " + repository.getIdentifier());
+                CLIOutput.ruleInfo(this.getClass().getSimpleName(), repository.getIdentifier(), "rewarded " + i + " points");
                 return new RepositoryAspectEval(i);
             }
         }
 
-        return new RepositoryAspectEval( "LLM gave an unexpected answer: " + llmAnswer, repository.getIdentifier(), this.getClass().getSimpleName());
+        return new RepositoryAspectEval( "LLM gave an unexpected answer: " + llmAnswer);
     }
 
     private String sendGetRequest(String readme) throws IOException {

@@ -59,7 +59,7 @@ public final class CSVHandler {
             counter++;
         }
         if (handleExistingCsv(lastExistingFile.toPath())) {
-            System.out.println(lastExistingFile + " file with matching schema found. Continue with this file.");
+            CLIOutput.info(lastExistingFile + " file with matching schema found. Continue with this file.");
             path = lastExistingFile.toPath();
             return;
 
@@ -72,7 +72,7 @@ public final class CSVHandler {
         } catch (IOException e) {
             throw new RuntimeException("Couldn't create CSV file at: " + filePath);
         }
-        System.out.println("\u001B[33m" + "New CSV file created at:  " + path + "\u001B[0m");
+        CLIOutput.warning("New CSV file created at:  " + path + "\u001B[0m");
 
     }
 

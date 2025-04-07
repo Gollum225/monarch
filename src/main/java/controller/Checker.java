@@ -5,6 +5,7 @@ import model.RepositoryAspectEval;
 import model.RepoList;
 import model.Repository;
 import org.eclipse.jgit.util.FileUtils;
+import util.CLIOutput;
 import util.JsonKeywords;
 import view.Status;
 
@@ -67,12 +68,6 @@ public class Checker {
         status = new Status(numberOfRules);
     }
 
-    public Checker(int numberOfStars) {
-        rules = new RuleCollection();
-        listManager = new RepoListManager(rules, numberOfStars);
-        numberOfRules = rules.getNumberOfRules();
-        status = new Status(numberOfRules);
-    }
 
 
 
@@ -89,9 +84,9 @@ public class Checker {
         try {
             maxResults = listManager.getMaxResults();
             if (maxResults >=1000) {
-                System.out.println("Found at least 1000 repositories matching the search.");
+                CLIOutput.found("At least 1000", "repositories", "matching the search");
             } else {
-                System.out.println("Found " + maxResults + " repositories");
+                CLIOutput.found(String.valueOf(maxResults), "repositories", "matching the search");
             }
         } catch (JsonProcessingException e) {
             throw new RuntimeException("Cannot get number of available repositories.");
@@ -99,7 +94,7 @@ public class Checker {
 
         if (maxResults < number) {
             number = maxResults;
-            System.out.println("Can't find enough repositories with given search. Analyzing " + number + " repositories.");
+            CLIOutput.info("Can't find enough repositories with given search. Analyzing " + number + " repositories.");
         }
 
 
@@ -109,10 +104,10 @@ public class Checker {
             try {
                 repoProcessingService.take().get();
             } catch (ExecutionException e) {
-                System.err.println("Error processing a repository: " + e.getCause().getMessage());
+                CLIOutput.repositoryProcessingError(e.getCause().getMessage());
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
-                System.err.println("Error processing a repository: " + e.getCause().getMessage());
+                CLIOutput.repositoryProcessingError(e.getCause().getMessage());
             }
         }
         executor.shutdown();
@@ -167,7 +162,7 @@ public class Checker {
                             currentRepo.saveResult(rule, rule.execute());
                         }
                     } else if (rule.getType() == RuleType.QUALITY) {
-                        currentRepo.saveResult(rule, new RepositoryAspectEval("Did not get mandatory points", currentRepo.getIdentifier(), rule.getClass().getSimpleName()));
+                        currentRepo.saveResult(rule, new RepositoryAspectEval("Did not get mandatory points"));
                     }
                 }
 
@@ -216,7 +211,7 @@ public class Checker {
             }
         }
         if (failure) {
-            System.out.println("\u001B[33m" + "Couldn't delete all repos. Please delete path manually if necessary: " + CLONED_REPOS_PATH + "\u001B[0m");
+            CLIOutput.warning("Couldn't delete all repos. Please delete path manually if necessary: " + CLONED_REPOS_PATH);
         }
 
     }

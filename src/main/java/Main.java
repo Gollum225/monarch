@@ -1,4 +1,5 @@
 import controller.Checker;
+import util.CLIOutput;
 
 
 public class Main {
@@ -13,7 +14,7 @@ public class Main {
         int repositoriesToCheck;
 
         if (args.length == 0) {
-            System.out.println("Please insert number of repositories to check.");
+            CLIOutput.info("Please insert number of repositories to check.");
             return;
         } else {
             try {
@@ -22,15 +23,15 @@ public class Main {
                 repositoriesToCheck = -1;
             }
             if (repositoriesToCheck < 0) {
-                System.out.println("The first argument must be a positive number of repositories to analyze. " + args[0] + " is invalid.");
+                CLIOutput.info("The first argument must be a positive number of repositories to analyze. " + args[0] + " is invalid.");
                 return;
             } else {
-                System.out.println("Analyze " + args[0] + " repositories.");
+                CLIOutput.info("Analyze " + args[0] + " repositories.");
             }
         }
 
         if (args.length > 1) {
-            System.out.println("Looking only for repositories with search term: " + args[1]);
+            CLIOutput.info("Looking only for repositories with search term: " + args[1]);
             int numberOfStars;
             try {
                 numberOfStars = Integer.parseInt(args[2]);
@@ -38,10 +39,10 @@ public class Main {
                 numberOfStars = -1;
             }
             if (numberOfStars < 0) {
-                System.out.println("The third argument must be a positive number of repositories to analyze.");
+                CLIOutput.info("The third argument must be a positive number of repositories to analyze.");
                 checker = new Checker(args[1]);
             } else {
-                System.out.println("Looking for repositories with more than " + args[2] + " quality points");
+                CLIOutput.info("Looking for repositories with more than " + args[2] + " quality points");
                 checker = new Checker(args[1], numberOfStars);
             }
         } else {

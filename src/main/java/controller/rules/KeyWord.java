@@ -5,6 +5,7 @@ import controller.RuleType;
 import exceptions.CloneProhibitedException;
 import model.Repository;
 import model.RepositoryAspectEval;
+import util.CLIOutput;
 import util.JsonKeywords;
 import model.TextFile;
 
@@ -37,12 +38,19 @@ public class KeyWord extends Rule {
         try {
             textFiles = repository.getTextfiles();
         } catch (CloneProhibitedException e) {
-            return new RepositoryAspectEval(e.getMessage(), repository.getIdentifier(), this.getClass().getSimpleName());
+            return new RepositoryAspectEval(e.getMessage());
+        }
+
+        if (textFiles == null || textFiles.isEmpty()) {
+            CLIOutput.ruleInfo(this.getClass().getSimpleName(), repository.getIdentifier(), "No files found");
+            return new RepositoryAspectEval("No files found.");
+        } else {
+            CLIOutput.found(String.valueOf(textFiles.size()), "textfiles in", repository.getIdentifier());
         }
 
 
         if (KEYWORDS.length == 0) {
-            return new RepositoryAspectEval("No keywords found in the JSON file.", repository.getIdentifier(), this.getClass().getSimpleName());
+            return new RepositoryAspectEval("No keywords found in the JSON file.");
         }
 
         AtomicInteger keywordCount = new AtomicInteger();

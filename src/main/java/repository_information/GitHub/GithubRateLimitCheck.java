@@ -1,6 +1,7 @@
 package repository_information.GitHub;
 
 import repository_information.RateLimitMandatories;
+import util.CLIOutput;
 
 import java.util.*;
 
@@ -57,8 +58,8 @@ public class GithubRateLimitCheck implements RateLimitMandatories {
         if (rateLimit.getRequestsLeft() >= (rateLimit.getMaxRequests()) * RATE_LIMIT_THRESHOLD) {
             return true;
         }
-        System.out.println("Rate limit for " + resource + " at " + RATE_LIMIT_THRESHOLD * 100 + "%. Trying to switch to cloning.");
-        System.out.println("Rate limit resets at " + rateLimit.getResetTime());
+        CLIOutput.info("Rate limit for " + resource + " at " + RATE_LIMIT_THRESHOLD * 100 + "%. Trying to switch to cloning.");
+        CLIOutput.info("Rate limit resets at " + rateLimit.getResetTime());
         return false;
     }
 

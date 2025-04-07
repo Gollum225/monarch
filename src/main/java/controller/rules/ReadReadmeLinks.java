@@ -5,6 +5,7 @@ import controller.RuleType;
 import exceptions.CloneProhibitedException;
 import model.Repository;
 import model.RepositoryAspectEval;
+import util.CLIOutput;
 import util.JsonKeywords;
 
 import java.io.BufferedReader;
@@ -79,10 +80,10 @@ public class ReadReadmeLinks extends Rule {
         try {
             readme = repository.getReadme();
         } catch (CloneProhibitedException e) {
-            return new RepositoryAspectEval(e.getMessage(), repository.getIdentifier(), this.getClass().getSimpleName());
+            return new RepositoryAspectEval(e.getMessage());
         }
         if (readme == null) {
-            return new RepositoryAspectEval("No readme found", repository.getIdentifier(), this.getClass().getSimpleName());
+            return new RepositoryAspectEval("No readme found");
         }
 
         ArrayList<String> links = extractLinks(readme);
@@ -92,7 +93,7 @@ public class ReadReadmeLinks extends Rule {
 
 
         if (set.isEmpty()) {
-            return new RepositoryAspectEval("No links found in readme", repository.getIdentifier(), this.getClass().getSimpleName());
+            return new RepositoryAspectEval("No links found in readme");
         }
 
         ConcurrentMap<String, Integer> concurrentMap = set.parallelStream().collect(Collectors.toConcurrentMap(
@@ -104,7 +105,7 @@ public class ReadReadmeLinks extends Rule {
 
         int maxScore = concurrentMap.get(maxKey);
 
-        System.out.println("Best documentation page in " + repository.getIdentifier() + ": " + maxKey + " with score: " + maxScore);
+        CLIOutput.ruleInfo(this.getClass().getSimpleName(), repository.getIdentifier(), "Best documentation page: " + maxKey + " with score: " + maxScore);
 
         maxScore = maxScore / Math.min(links.size(), MAX_SITES);
 
@@ -174,7 +175,7 @@ public class ReadReadmeLinks extends Rule {
         while (matcher.find()) {
             links.add(matcher.group());
         }
-        System.out.println("found " + links.size() + " links in readme of " + repository.getIdentifier());
+        CLIOutput.found(String.valueOf(links.size()), "links in readme of", repository.getIdentifier());
         return links;
     }
 

@@ -1,6 +1,7 @@
 package view;
 
 import model.Repository;
+import util.CLIOutput;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -75,7 +76,7 @@ public class Status {
             label.setText(getProgressString(progress.get(repo)) + " " + ruleName + ": " + repo.getRepositoryName() + ", " + repo.getOwner());
         }
         else {
-            System.out.println("No status bar found for " + repo.getRepositoryName());
+            CLIOutput.info("No status bar found for " + repo.getRepositoryName());
         }
         panel.revalidate();
         panel.repaint();

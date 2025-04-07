@@ -10,6 +10,7 @@ import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.eclipse.jgit.dircache.InvalidPathException;
 import repository_information.GitMandatories;
 import repository_information.RateLimitMandatories;
+import util.CLIOutput;
 import util.JsonUtil;
 
 import java.io.IOException;
@@ -95,7 +96,7 @@ public final class GithubCommunication implements GitMandatories {
 
     public List<Repository> getTenRepository(String searchTerm, int numberOfStars) throws JsonProcessingException {
         if (!GithubRateLimitCheck.getInstance().checkHardRateLimit(RateResource.SEARCH)) {
-            System.out.println("Couldn't get new repositories. Rate limit reached.");
+            CLIOutput.info("Couldn't get new repositories. Rate limit reached.");
             return null;
         }
 
@@ -105,7 +106,7 @@ public final class GithubCommunication implements GitMandatories {
         } else {
             page ++;
             if (maxNumberOfRepos >= 0 && page * 10 - 10 > maxNumberOfRepos) {
-                System.out.println("Max number of repositories reached");
+                CLIOutput.info("Max number of repositories reached");
                 return new ArrayList<>();
             }
         }
@@ -245,7 +246,7 @@ public final class GithubCommunication implements GitMandatories {
         try {
             response = sendGetRequest(URI.create(urlString));
         } catch (IOException | InterruptedException e) {
-            System.out.println("Couldn't get file: " + urlString);
+            CLIOutput.info("Couldn't get file: " + urlString);
             return null;
         }
         if (response == null) {
@@ -256,7 +257,7 @@ public final class GithubCommunication implements GitMandatories {
         try {
             jsonNode = objectMapper.readTree(response);
         } catch (JsonProcessingException e) {
-            System.out.println("Couldn't read answer: " + response);
+            CLIOutput.info("Couldn't read answer: " + response);
             return null;
         }
         return decodeBase64(jsonNode.get("content").asText());
@@ -274,11 +275,11 @@ public final class GithubCommunication implements GitMandatories {
     @Override
     public boolean cloneRepo(String owner, String repo, Path path) {
 
-        System.out.println("Cloning: " + owner + "/" + repo);
+        CLIOutput.info("Cloning: " + owner + "/" + repo);
         String repoUrl = "https://github.com/" + owner + "/" + repo + ".git";
 
         if (path.toFile().exists()) {
-            System.out.println("Repository already cloned to: " + path);
+            CLIOutput.info("Repository already cloned to: " + path);
             return true;
         }
 
@@ -298,10 +299,10 @@ public final class GithubCommunication implements GitMandatories {
 
 
         } catch (GitAPIException | InvalidPathException e) {
-            System.err.println("couldn't clone: " + e.getMessage());
+            CLIOutput.error("Couldn't clone repository: " + e.getMessage());
             return false;
         }
-        System.out.println("Repository cloned to: " + path);
+        CLIOutput.info("Repository cloned to: " + path);
         return true;
     }
 
@@ -412,7 +413,7 @@ public final class GithubCommunication implements GitMandatories {
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
         if (response.statusCode() != 200) {
-            System.err.println("Error while getting GitHub GraphQL response. Code: " + response.statusCode());
+            CLIOutput.error("Error while getting GitHub GraphQL response. Code: " + response.statusCode());
             return null;
         }
 

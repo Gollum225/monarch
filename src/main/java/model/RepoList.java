@@ -85,7 +85,6 @@ public class RepoList {
         if (startedRepos.contains(repo.getIdentifier())) {
             return false;
         }
-        System.out.println("Added repo: " + repo.getRepositoryName() + " by " + repo.getOwner());
         return unprocessedRepos.add(repo);
     }
 }

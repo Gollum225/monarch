@@ -68,7 +68,7 @@ public class ResultSorter {
         csvMapper.writer(outputSchema)
                 .writeValue(new File(outputFile), data);
 
-        System.out.println("CSV-file successfully order by TotalScore and stored in  " + outputFile);
+        CLIOutput.info("CSV-file successfully order by TotalScore and stored in  " + outputFile);
     }
 
     // Example call of the method

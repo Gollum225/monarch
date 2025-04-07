@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import model.RepoList;
 import model.Repository;
 import repository_information.GitHub.GithubCommunication;
+import util.CLIOutput;
 import util.CSVHandler;
 
 import java.io.IOException;
@@ -118,7 +119,9 @@ public class RepoListManager {
         }
 
         for (Repository repo : repos) {
-            repoList.addSingleRepo(repo);
+            if (repoList.addSingleRepo(repo)) {
+                CLIOutput.info("Added repo: " + repo.getRepositoryName() + " by " + repo.getOwner());
+            }
         }
     }
 
@@ -129,11 +132,11 @@ public class RepoListManager {
      */
     public void finishRepo(Repository repo, RuleCollection ruleCollection) {
         repo.finish();
-        System.out.println("\u001B[32m" + "repo: " + repo.getRepositoryName() + " of " + repo.getOwner() + " got: " + repo.getOverallPoints() + " points" + "\u001B[0m");
+        CLIOutput.success("repo: " + repo.getRepositoryName() + " of " + repo.getOwner() + " got: " + repo.getOverallPoints() + " points");
         try {
             csvHandler.writeResult(repo, ruleCollection);
         } catch (IOException e) {
-            System.out.println("\u001B[31m" + "Error while writing to CSV file. Please note: " + repo.getIdentifier() + " got: " + repo.getOverallPoints() + "\u001B[0m");
+            CLIOutput.error("Error while writing to CSV file. Please note: " + repo.getIdentifier() + " got: " + repo.getOverallPoints());
         }
     }
 

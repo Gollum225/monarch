@@ -10,6 +10,7 @@ import org.eclipse.jgit.util.FileUtils;
 import repository_information.GitHub.GithubCommunication;
 import repository_information.GitHub.GithubRateLimitCheck;
 import repository_information.GitHub.RateResource;
+import util.CLIOutput;
 
 import java.io.File;
 import java.io.IOException;
@@ -213,14 +214,14 @@ public class CloneProxy implements RepoFunctions{
 
 
         if (cloneProhibited) {
-            System.out.println("\u001B[31m" + "Couldn't clone " + repositoryName + "of: " + owner + "\u001B[0m");
+            CLIOutput.cannotClone(repositoryName, owner, null);
             throw new CloneProhibitedException();
         } else if(getRepoSize() < 0) {
-            System.out.println("\u001B[31m" + "Couldn't clone " + repositoryName + "of: " + owner + " due to the unknown size" + "\u001B[0m");
+            CLIOutput.cannotClone(repositoryName, owner, "unknown size");
             throw new CloneProhibitedException();
         } else if (getRepoSize() > MAX_CLONE_SIZE) {
             cloneProhibited = true;
-            System.out.println("\u001B[31m" + "Couldn't clone " + repositoryName + "of: " + owner + " due to the large size" + "\u001B[0m");
+            CLIOutput.cannotClone(repositoryName, owner, "large size");
             throw new CloneProhibitedException();
         }
         isCloned = gitAPI.cloneRepo(owner, repositoryName, repoPath);
@@ -228,13 +229,13 @@ public class CloneProxy implements RepoFunctions{
     }
 
     boolean changeToClone() throws CloneProhibitedException {
-        System.out.println("\u001B[34m" + "Trying to clone: " + repositoryName + " of owner: " + owner + "\u001B[0m");
+        CLIOutput.tryToClone(repositoryName, owner, null);
 
         return cloneRepo();
     }
 
     public boolean changeToClone(String reason) throws CloneProhibitedException {
-        System.out.println("\u001B[34m" + "Trying to clone: " + repositoryName + " of owner: " + owner + " because of " + reason + "\u001B[0m");
+        CLIOutput.tryToClone(repositoryName, owner, reason);
         return cloneRepo();
     }
 
