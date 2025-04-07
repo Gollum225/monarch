@@ -51,4 +51,5 @@ Both rules are expected in the environmental variables under GitHub_API and Samb
 
 # Configure
 • The set of applied rules can be changed or modified in src/main/java/controller/RuleCollection.  Either create a new set and place it in line 28 or modify the setStandardRuleSet() method.
+
 • A set of high-quality repositories for debugging is in src/main/java/controller/RepoListManager.getTestRepos() and can be changed in line 148-149.
