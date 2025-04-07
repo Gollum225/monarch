@@ -56,6 +56,9 @@ public class ReadReadmeLinks extends Rule {
 
     private static int[] limits;
 
+    // Regex from https://stackoverflow.com/questions/163360/regular-expression-to-match-urls-in-java
+    private static final Pattern WEBSITE_PATTERN = Pattern.compile("\\b(https?)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]", Pattern.CASE_INSENSITIVE);
+
 
     public ReadReadmeLinks(Repository repository, int[] limits) {
         super(RuleType.MANDATORY, repository);
@@ -161,11 +164,7 @@ public class ReadReadmeLinks extends Rule {
     private ArrayList<String> extractLinks(String readme) {
         ArrayList<String> links = new ArrayList<>();
 
-        // Regex from https://stackoverflow.com/questions/163360/regular-expression-to-match-urls-in-java
-        String regex = "\\b(https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]";
-
-        Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
-        Matcher matcher = pattern.matcher(readme);
+        Matcher matcher = WEBSITE_PATTERN.matcher(readme);
 
         while (matcher.find()) {
             int matchStart = matcher.start(1);
