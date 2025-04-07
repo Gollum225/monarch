@@ -85,11 +85,10 @@ public final class CSVHandler {
         CsvMapper csvMapper = new CsvMapper();
         CsvSchema existingSchema = csvMapper.typedSchemaFor(Map.class).withHeader();
 
-        try {
-            MappingIterator<Map<String, String>> it = csvMapper
-                    .readerFor(Map.class)
-                    .with(existingSchema)
-                    .readValues(new File(path.toString()));
+        try (MappingIterator<Map<String, String>> it = csvMapper
+                .readerFor(Map.class)
+                .with(existingSchema)
+                .readValues(new File(path.toString()))) {
 
             existingSchema = (CsvSchema) it.getParserSchema();
 

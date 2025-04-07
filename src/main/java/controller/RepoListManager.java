@@ -38,10 +38,6 @@ public class RepoListManager {
         this.numberOfStars = numberOfStars;
     }
 
-    public RepoListManager(RuleCollection ruleCollection, int numberOfStars) {
-        this(ruleCollection);
-        this.numberOfStars = numberOfStars;
-    }
 
     /**
      * Handles the writing of the results to a CSV file.
