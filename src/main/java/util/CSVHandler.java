@@ -17,7 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static util.Globals.RESOURCE_PATH;
+import static util.Globals.OUTPUT_PATH;
 
 /**
  * Responsible for the writing to and from the result file.
@@ -30,7 +30,7 @@ public final class CSVHandler {
      */
     public CSVHandler(String filePath) {
 
-        this.path = RESOURCE_PATH.resolve(filePath);
+        this.path = OUTPUT_PATH.resolve(filePath);
         this.filePath = filePath.replace(" ", "");
 
     }
@@ -54,7 +54,7 @@ public final class CSVHandler {
         int counter = 2;
         while (file.exists()) {
             lastExistingFile = file;
-            file = new File(RESOURCE_PATH.resolve(filePath.replace(".csv", "") + counter + ".csv").toString());
+            file = new File(OUTPUT_PATH.resolve(filePath.replace(".csv", "") + counter + ".csv").toString());
             path = file.toPath();
             counter++;
         }

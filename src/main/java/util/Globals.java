@@ -4,8 +4,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class Globals {
-    public static Path RESOURCE_PATH = Paths.get("").toAbsolutePath().resolve(Paths.get("src/main/resources"));
     public static Path CLONED_REPOS_PATH = (Paths.get("").toAbsolutePath()).resolve(Paths.get("src/main/resources/cloned_repos"));
+    public static Path OUTPUT_PATH = (Paths.get("").toAbsolutePath()).resolve(Paths.get("src/main/output"));
 
     /**
      * If the repository has more than this number of elements, it will be cloned.

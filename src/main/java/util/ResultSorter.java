@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static util.Globals.RESOURCE_PATH;
+import static util.Globals.OUTPUT_PATH;
 
 /**
  * ChatGPT entirely generated this class. The functionality has been checked manually, take care anyway when using it.
@@ -73,8 +73,8 @@ public class ResultSorter {
 
     // Example call of the method
     public static void main(String[] args) {
-        Path path = RESOURCE_PATH.resolve("results.csv");
-        Path outputPath = RESOURCE_PATH.resolve("sorted.csv");
+        Path path = OUTPUT_PATH.resolve("results.csv");
+        Path outputPath = OUTPUT_PATH.resolve("sorted.csv");
         try {
             sortCsvByTotalScore(path.toString(), outputPath.toString());
         } catch (IOException e) {
