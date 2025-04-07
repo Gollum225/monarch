@@ -54,11 +54,14 @@ public class KeyWord extends Rule {
         textFiles.parallelStream()
                 .forEach(textFile -> {
                     int count = 0;
+                    if (textFile.getContent() == null || textFile.getContent().isEmpty()) {
+                        return;
+                    }
                     for (String keyword : KEYWORDS) {
                         if (stopProcessing.get()) {
                             return;
                         }
-                        if (keyword == null || keyword.isEmpty() || textFile.getContent() == null || textFile.getContent().isEmpty()) {
+                        if (keyword == null || keyword.isEmpty()) {
                             continue;
                         }
                         // The following condition is taken from StackOverflow: https://stackoverflow.com/a/90780
