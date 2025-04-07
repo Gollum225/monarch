@@ -25,9 +25,9 @@ public class RepoCache implements RepoFunctions {
     private JsonNode structure;
 
     /**
-     * The path of the file based on the repository root mapped to the content.
+     * The path of the file based on the repository root as key mapped to the content of the file as value.
      */
-    private final Map<String, String> files = new HashMap<>();
+    private final Map<String, String> filesAtPath = new HashMap<>();
 
     @Override
     public JsonNode getStructure() throws CloneProhibitedException {
@@ -44,14 +44,14 @@ public class RepoCache implements RepoFunctions {
         Map<String, String> results = new HashMap<>();
 
         for (String path : paths) {
-            if (files.containsKey(path)) {
-                results.put(path, files.get(path));
+            if (filesAtPath.containsKey(path)) {
+                results.put(path, filesAtPath.get(path));
             } else {
                 notCached.add(path);
             }
         }
         Map<String, String> requestResults = cloneProxy.getFiles(notCached);
-        files.putAll(requestResults);
+        filesAtPath.putAll(requestResults);
         results.putAll(requestResults);
 
         return results;
@@ -73,7 +73,7 @@ public class RepoCache implements RepoFunctions {
     @Override
     public void finish() {
         structure = null;
-        files.clear();
+        filesAtPath.clear();
         cloneProxy.finish();
     }
 

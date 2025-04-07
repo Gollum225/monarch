@@ -156,6 +156,8 @@ public class Checker {
                     }
                 }
                 for (Rule rule : equippedRules) {
+
+                    // Have to check for each rule to save the 0-point result in the else-if.
                     if (currentRepo.getOverallPoints() > 0) {
                         if (rule.getType() == RuleType.QUALITY) {
                             status.updateStatusBar(currentRepo, rule.getClass().getSimpleName());
